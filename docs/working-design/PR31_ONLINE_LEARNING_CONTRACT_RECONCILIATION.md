@@ -59,7 +59,7 @@ The material state-class, prequential, world/transducer, and comparator distinct
 - explicit representation-drift pressure on learned scope;
 - claim ceilings and open seams.
 
-`ONLINE_UPDATE_ORDER_HOSTILE_ATTACK.md` supplies the adversarial test layer for both and now uses the reconciled comparator split (`C0`, `C1`, `C2`, PSR-like, stochastic-latent, later structural extension).
+`ONLINE_UPDATE_ORDER_HOSTILE_ATTACK.md` supplies the adversarial test layer for both and now uses the reconciled comparator sequence: simple incremental baseline, recurrent/no-replay, recurrent/replay, PSR-like, stochastic latent, then any structural extension.
 
 ## Provisional precedence inside PR #31
 
