@@ -4,6 +4,14 @@ Status: WORKING DESIGN RESEARCH / NOT IMPLEMENTATION APPROVAL
 Date: 2026-09-06
 Base: `main@20f7f699ea15b2300c4aa796b286bdab658f52a3`
 
+Companion causal contract: `ONLINE_LEARNING_STATE_TRANSITION_CONTRACT.md`
+
+Independent convergent contract draft: `ONLINE_LEARNING_STATE_TRANSITION_CONTRACT_DRAFT.md`
+
+Hostile update-order tests: `ONLINE_UPDATE_ORDER_HOSTILE_ATTACK.md`
+
+Reconciliation note: `PR31_ONLINE_LEARNING_CONTRACT_RECONCILIATION.md`
+
 ## Research question
 
 What should actually change inside Noema after experience, and what training regime best fits a persistent embodied learner that must learn online, preserve prior competence, remain uncertainty-aware under partial observability, and acquire grounded concepts from action rather than semantic labels?
@@ -203,7 +211,9 @@ The research strengthens one architecture boundary rather than adding a module:
 
 For every event, the design must define which predictive state is read, what is scored before learning, what can update immediately, what can replay, what can consolidate later, what survives checkpoint/restore, and which compute/information belongs to the learner versus evaluator.
 
-That contract should be written before choosing the final fast substrate or slow structural mechanism. It directly addresses the strongest BT2 implementation-realizability finding without prematurely implementing anything.
+That contract now exists as `ONLINE_LEARNING_STATE_TRANSITION_CONTRACT.md`, with `ONLINE_UPDATE_ORDER_HOSTILE_ATTACK.md` supplying the adversarial test layer. A concurrent independent draft is retained and explicitly reconciled rather than overwritten.
+
+This directly addresses the strongest BT2 implementation-realizability pressure in the successor lane without retroactively repairing the frozen R1 subject or prematurely implementing anything.
 
 ## Open research frontier
 
