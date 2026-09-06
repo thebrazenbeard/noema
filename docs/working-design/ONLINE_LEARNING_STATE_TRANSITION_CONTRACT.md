@@ -43,29 +43,33 @@ This document constrains any serious first-core realization at the architecture-
 
 A realization may be synchronous, asynchronous, parallel, event-driven, differentiable, or partly non-differentiable. But if execution order can change the committed learner state, that order is part of the learner's effective algorithm and must be declared, persisted where necessary, and charged in evaluation.
 
+The default evidence discipline is **prequential/test-then-train**: a prediction must be fixed before the scored outcome is used for learner mutation.
+
 ## 3. State classes
 
 The evaluator must maintain a state manifest that classifies every causally relevant variable into one of four planes.
 
 ### L0 — learner-committed state
 
-State that can affect future Noema prediction, action, learning, retrieval, or internal allocation. Examples may include:
+State that can affect future Noema prediction, action, learning, retrieval, evidence interpretation, or internal allocation. Examples may include:
 
 - recurrent predictive state;
 - learned parameters;
-- optimizer state;
+- optimizer/plasticity state;
 - replay contents;
-- replay sampling/policy state;
+- replay sampling/policy/cursor/priority state;
 - uncertainty/calibration state;
 - candidate structural state;
 - routing/gating state;
 - consolidation/probation state;
 - learned skills or temporal abstractions if present;
 - meta-control state;
+- learner-visible interface namespace/calibration state when it changes interpretation of evidence;
 - learner RNG state when stochasticity is part of the algorithm;
+- learner scheduler/internal-work state when ordering is intentionally algorithmically causal;
 - pending internal work whose completion may later alter committed state.
 
-The exact decomposition is realization-specific. The obligation is causal completeness, not semantic modularity.
+The exact decomposition is realization-specific. The obligation is causal completeness, not semantic modularity. A concrete system may store several of these together or use no named module corresponding to them.
 
 ### L1 — learner-visible evidence
 
@@ -126,7 +130,7 @@ For an incoming learner-visible event `e_t`, the logical transition from `C_(t-1
 
 Capture the authoritative pre-event committed state `C_(t-1)` and the exact learner-visible event bytes/cues delivered as `e_t`.
 
-No learner mutation caused by `e_t` is authoritative yet.
+No learner mutation caused by `e_t` is authoritative yet. No future/outcome information that was unavailable before the event may already be present in the causal state used to score the prediction.
 
 ### Phase B — score already-issued predictions before learning from `e_t`
 
@@ -197,7 +201,7 @@ Slow consolidation or structural promotion may become behaviorally live only at 
 
 Promotion must use an immutable evidence window or equivalently snapshot-bound evidence. It may not retroactively change the scores that justified promotion.
 
-The evidence window must make clear which base version and candidate version were compared. If both continue learning during probation, the comparison requires causal windows that prevent "cheaper repairs first" or candidate marginal value from becoming scheduler-dependent.
+The evidence window must make clear which base version and candidate version were compared. If both continue learning during probation, the comparison requires causal windows that prevent `cheaper repairs first` or candidate marginal value from becoming scheduler-dependent.
 
 Promotion can be rejected, deferred, made dormant, or reversed later. None of those outcomes establishes semantic correctness of the candidate.
 
@@ -212,6 +216,8 @@ Only now may new behavior rely on changes from `e_t` unless the realization expl
 Predictions and action evaluations after the transition are bound to `C_t` (or a later declared internal-cognition commit) and receive evaluator-side provenance tickets.
 
 Actions still cross the separate actuator-transducer contract. An action command does not gain semantic success/authorship merely because it was issued from `C_t`.
+
+Between an issued action/prediction and a later scored event, the world/transducer progression follows the separately declared actuator -> world -> sensory-transducer path. Evaluator truth recorded along that path remains outside learner evidence unless explicitly exposed.
 
 ## 7. Internal cognition between external events
 
@@ -244,7 +250,7 @@ If worker completion order is intentionally allowed to affect learning, then it 
 
 ## 9. Replay contract
 
-Replay is not "free memory." Its budget and contents are part of Noema's learning resources.
+Replay is not `free memory`. Its budget and contents are part of Noema's learning resources.
 
 Every replay realization must declare:
 
@@ -290,12 +296,13 @@ Depending on realization, this may include:
 
 - predictive recurrent state;
 - learned parameters;
-- optimizer state;
-- replay contents and replay-policy state;
+- optimizer/plasticity state;
+- replay contents and replay-policy/sampler state;
 - uncertainty/calibration accumulators;
 - probationary candidates and their evidence windows;
 - gating/routing state;
 - consolidation/promotions pending or committed;
+- learner-visible interface namespace/calibration state when it affects evidence interpretation;
 - learner RNG state;
 - learner scheduler/internal-work state if order is algorithmically causal;
 - pending prediction/action accounting needed to preserve learning semantics;
@@ -320,7 +327,7 @@ The event boundary must declare how the learner distinguishes or tolerates:
 
 Transport-level deduplication may use transport metadata that terminates before cognition, but the learner must not receive a semantic event-identity oracle as a side effect.
 
-The evaluator must distinguish "same cognitive evidence delivered twice by transport error" from "the world produced two similar observations" without leaking that distinction into learner semantics unless deliberately supplied.
+The evaluator must distinguish `same cognitive evidence delivered twice by transport error` from `the world produced two similar observations` without leaking that distinction into learner semantics unless deliberately supplied.
 
 ## 13. Evaluator scoring versus learner learning
 
@@ -357,11 +364,12 @@ A more complex learner earns architecture status only when it beats a simpler ri
 
 The first mandatory learning comparators remain:
 
-1. simple incremental predictive/system-identification baseline;
-2. recurrent probabilistic predictor without replay;
-3. recurrent probabilistic predictor with bounded replay;
-4. stochastic latent-state/world-model realization;
-5. only after these, scoped structural extension.
+1. **C0** — simple incremental predictive/system-identification baseline;
+2. **C1** — recurrent probabilistic predictor without replay;
+3. **C2** — recurrent probabilistic predictor with bounded replay;
+4. **C3a** — predictive-state/PSR-like realization under the same causal contract;
+5. **C3b** — stochastic latent-state/recurrent world-model realization under the same causal contract;
+6. **C4** — only after simpler rivals, scoped structural extension.
 
 ## 15. First-core realization default
 
