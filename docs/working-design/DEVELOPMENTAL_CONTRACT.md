@@ -56,7 +56,7 @@ This list is not yet a claim that every term is necessary, distinct, or correctl
 
 Structured perception may expose momentary perceptual features, but **perception is not identity**.
 
-A percept may contain position, motion, shape, orientation, size, surface features, or other structured sensory measurements. It must not receive a stable object identifier whose persistence across observations silently supplies haecceity or object permanence.
+A percept may contain motion, shape-like local features, orientation, size-like extent, surface features, depth, contact, or other structured sensory measurements. It must not receive a stable object identifier whose persistence across observations silently supplies haecceity or object permanence.
 
 Percept-instance identifiers, if needed operationally, are local to the observation and expire with it. The learner must infer whether two temporally separated percepts correspond to the same persistent entity.
 
@@ -76,6 +76,14 @@ This keeps two distinct developmental problems separate:
 2. **Persistent identity / haecceity:** is this the same individual encountered before?
 
 Noema should not receive either answer from privileged perceptual metadata.
+
+## Spatial-reference boundary
+
+Initial spatial perception is **egocentric**, not a privileged world-coordinate feed.
+
+The learner may receive structured local measurements such as relative direction, depth/distance cues, local motion, orientation relative to its current sensor/body frame, and contact. It should not begin with a god's-eye `x,y,z` location for itself or perceived environmental structure.
+
+Stable place, trajectory, allocentric/world-relative location, and map-like spatial organization should be learned from temporal continuity, movement, sensorimotor regularity, and accumulated experience.
 
 ## Self-discovery rule
 
