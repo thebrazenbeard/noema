@@ -74,17 +74,25 @@ A meaningful communication capability should require Noema to demonstrate that l
 
 ## Operator interface implication
 
-A future Noema Console can expose two explicitly different channels:
+A future Noema Console exposes two explicitly different channels:
 
 1. **Learned communication:** Patrick ↔ Noema through ordinary perceptual and action channels.
 2. **Diagnostic instrumentation:** Noema → interpreter → Patrick, with no privileged reverse path.
 
-The interface may eventually combine a simulated world view, direct communication controls, and diagnostic inspection, but UI implementation is intentionally deferred until the cognitive and experimental boundaries are clearer.
+The console is now specified concretely in `OPERATOR_CONSOLE_SPEC.md`: a shared world pane, direct text/voice communication pane, read-only state/diagnostic pane, and separate operator controls. The first usable version may exist before 3D embodiment is complete; Experiment A remains language-free during formal runs while the surrounding console can still be used for observation and experiment control.
+
+## Current provisional modality stance
+
+Typed text is the first practical direct communication channel because it can be exposed as minimally interpreted symbol sequences without requiring Noema to first solve speech perception.
+
+Voice should also be supported as a first-class route, but its sensory boundary must remain explicit: raw/low-level acoustic input tests speech learning, while external speech-to-text is an optional sensory transducer that imports segmentation/spelling and therefore cannot count as evidence that Noema learned those perceptual capabilities itself.
+
+Noema should have an outbound communication actuator from early development even when its output is initially immature or meaningless.
 
 ## Open questions
 
-- Which communication modalities should exist from the earliest developmental stage: symbolic signals, text, voice, gesture, or a staged combination?
-- How should outbound communication begin before mature language exists?
-- Should diagnostic interpretation be deterministic over inspectable structures, model-assisted, or both?
-- How should interpreter uncertainty be represented so Patrick can distinguish Noema's actual state from the interpreter's gloss?
-- What tests best separate grounded communication from memorized linguistic response patterns?
+- exact raw symbol encoding for early text;
+- exact acoustic front end for developmentally pure voice;
+- whether diagnostic interpretation is deterministic over inspectable structures, model-assisted, or both;
+- how interpreter uncertainty is represented so Patrick can distinguish Noema's actual state from the interpreter's gloss;
+- what tests best separate grounded communication from memorized linguistic response patterns.
