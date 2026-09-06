@@ -35,11 +35,23 @@ Initial direction established:
 27. A strictly linear developmental ladder is likely the wrong abstraction. Several capabilities should co-develop, so the working model is now a **developmental capability dependency graph**.
 28. Candidate graph clusters: temporal prediction/sensorimotor contingency/feature binding; self-world/persistence/spatial mapping; causal intervention/affordance/error diagnosis; social agent modeling; learned salience/preferences/drives; meta-learning/transfer/abstraction/self-development.
 29. Every developmental claim should ultimately require acquisition, ablation, intervention, and transfer evidence, with privileged labels/IDs/scripted policies/evaluator leakage treated as disqualifying explanations.
+30. A proposed general substrate based on one persistent recurrent predictive latent state was adversarially stress-tested rather than accepted.
+31. Stress-test result: **prediction appears necessary but is not sufficient**. A single point latent state collapses uncertainty; next-step prediction can reward surface shortcuts; prediction alone does not establish causation, exploration, wants, empathy, abstraction, planning, durable memory, or correct credit assignment.
+32. Stronger surviving hypothesis: an evolving **belief state** over latent causes, preserving competing hypotheses and uncertainty, learning reusable structure through multi-horizon predictive compression, and treating Noema's own interventions as special causal evidence.
+33. Independent pressures still appear necessary: primitive viability/valence, multiple memory timescales, selective salience/attention, and the capacity for information-seeking when uncertainty matters.
+34. Controllability is evidence for selfhood but not identical to selfhood; tools, remote effectors, attachments, and other controllable structures require learned, potentially layered self/body/agency boundaries.
+35. Agenthood must not be credited merely because behavior prediction improves. Social tests must require latent agent-specific state/history/information models to outperform surface dynamical prediction.
+36. Abstraction should be tested as reusable compression and transfer across changed surface form, not merely good prediction on familiar cases.
+37. Full adversarial review is recorded in `PREDICTIVE_SUBSTRATE_STRESS_TEST.md`.
 
 ## Open design frontier
 
-Stop asking increasingly obvious environmental-interface questions unless a genuine architecture fork exists.
+Do not choose implementation architecture yet.
 
-The next substantive design problem is to identify a **general learning substrate** capable of producing multiple developmental capabilities from shared mechanisms. The project should avoid building one bespoke learner for objecthood, another for causation, another for selfhood, another for social reasoning, and then mistaking integration of hand-authored modules for emergent intelligence.
+The current substantive question is whether the minimal general foundation is best characterized as:
 
-The next discussion should compare candidate substrate families from first principles and determine what common computational operations Noema actually needs before choosing implementation architecture.
+**prediction + compression + uncertainty + intervention + viability**
+
+and, critically, whether any of those terms can be derived from the others rather than being separate primitives.
+
+The next discussion should attack that five-part foundation for redundancy, hidden assumptions, and missing necessities before comparing implementation families.
