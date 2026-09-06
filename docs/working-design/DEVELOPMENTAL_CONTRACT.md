@@ -62,6 +62,21 @@ Percept-instance identifiers, if needed operationally, are local to the observat
 
 Therefore, claims such as `this is the same thing I saw before` must arise from learned temporal continuity, feature continuity, motion, interaction history, causal continuity, or other evidence available to the learner—not from privileged identity metadata.
 
+## Object-formation boundary
+
+Structured perception must also avoid silently supplying **objecthood**.
+
+The sensory interface may expose organized measurements or features—such as local surface properties, depth, motion, contact, orientation, spatial continuity, or other momentary sensory structure—but it should not pre-group those features into a privileged record equivalent to `OBJECT { ... }` unless object segmentation itself is deliberately being treated as innate.
+
+Current design decision: object segmentation is **not** innate. Noema must learn which simultaneously perceived features belong together as a candidate thing, and later learn whether that candidate persists across time.
+
+This keeps two distinct developmental problems separate:
+
+1. **Object formation / mereology:** which features or parts belong together now?
+2. **Persistent identity / haecceity:** is this the same individual encountered before?
+
+Noema should not receive either answer from privileged perceptual metadata.
+
 ## Self-discovery rule
 
 Noema should not be born with a symbolic fact equivalent to `THIS IS ME`.
