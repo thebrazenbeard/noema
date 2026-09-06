@@ -31,29 +31,15 @@ Initial direction established:
 23. Noema should eventually learn not only world facts but **how to learn from mistakes**: experience should be able to change evidence gathering, confidence formation, hypothesis revision, and testing strategy.
 24. Perception is not identity. Stable object IDs are prohibited as privileged perceptual metadata; percept-instance IDs, if operationally required, expire with the observation.
 25. Objecthood is also learned. Structured perception may expose organized sensory features, but should not pre-group them into privileged `OBJECT` records. Noema must learn both feature grouping/object formation and later persistent identity across time.
+26. Initial spatial perception is egocentric. Noema should not receive privileged world coordinates; stable places, trajectories, and allocentric/world-relative maps are learned from movement, temporal continuity, and sensorimotor regularity.
+27. A strictly linear developmental ladder is likely the wrong abstraction. Several capabilities should co-develop, so the working model is now a **developmental capability dependency graph**.
+28. Candidate graph clusters: temporal prediction/sensorimotor contingency/feature binding; self-world/persistence/spatial mapping; causal intervention/affordance/error diagnosis; social agent modeling; learned salience/preferences/drives; meta-learning/transfer/abstraction/self-development.
+29. Every developmental claim should ultimately require acquisition, ablation, intervention, and transfer evidence, with privileged labels/IDs/scripted policies/evaluator leakage treated as disqualifying explanations.
 
 ## Open design frontier
 
-Do not choose implementation architecture yet.
+Stop asking increasingly obvious environmental-interface questions unless a genuine architecture fork exists.
 
-The next design task is to build a **developmental capability ladder**: an ordered set of increasingly demanding capabilities that Noema must acquire through experience, with a falsification test for each rung showing how success differs from hidden scripting, privileged labels, memorization, or evaluator leakage.
+The next substantive design problem is to identify a **general learning substrate** capable of producing multiple developmental capabilities from shared mechanisms. The project should avoid building one bespoke learner for objecthood, another for causation, another for selfhood, another for social reasoning, and then mistaking integration of hand-authored modules for emergent intelligence.
 
-Candidate early rungs to challenge rather than accept blindly:
-
-- experience temporal change;
-- form short-horizon predictions;
-- discover feature grouping / candidate objecthood;
-- discover persistent entities;
-- discover controllability and self/world structure;
-- distinguish self-caused from externally caused change;
-- discover causal regularities;
-- track individual other agents across time;
-- learn agent-specific behavioral models;
-- form and revise preferences;
-- seek information to reduce consequential uncertainty;
-- recognize and diagnose its own prediction/model errors;
-- transfer learned relations to novel situations;
-- form abstractions and analogies;
-- develop higher-order drives and self-directed development.
-
-The ordering is provisional. The next conversation should challenge dependencies between these capabilities before treating the ladder as architecture.
+The next discussion should compare candidate substrate families from first principles and determine what common computational operations Noema actually needs before choosing implementation architecture.
