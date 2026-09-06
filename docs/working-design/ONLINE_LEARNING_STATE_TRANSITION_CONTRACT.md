@@ -8,6 +8,12 @@ Source cut at drafting: `main@20f7f699ea15b2300c4aa796b286bdab658f52a3`
 
 Companion research: `LEARNING_AND_TRAINING_RESEARCH_SYNTHESIS.md`
 
+Independent convergent draft retained for provenance: `ONLINE_LEARNING_STATE_TRANSITION_CONTRACT_DRAFT.md`
+
+Reconciliation: `PR31_ONLINE_LEARNING_CONTRACT_RECONCILIATION.md`
+
+Hostile test companion: `ONLINE_UPDATE_ORDER_HOSTILE_ATTACK.md`
+
 ## 1. Purpose
 
 Noema cannot claim online learning merely because several components are allowed to update continuously. A persistent learner needs a causal contract for **which state is read, which prediction is scored, which evidence is available to which update, when replay is sampled, when candidate structure can learn, when any change becomes behaviorally live, and what must survive restart**.
@@ -191,7 +197,7 @@ Slow consolidation or structural promotion may become behaviorally live only at 
 
 Promotion must use an immutable evidence window or equivalently snapshot-bound evidence. It may not retroactively change the scores that justified promotion.
 
-The evidence window must make clear which base version and candidate version were compared. If both continue learning during probation, the comparison requires causal windows that prevent "cheaper repair first" or candidate marginal value from becoming scheduler-dependent.
+The evidence window must make clear which base version and candidate version were compared. If both continue learning during probation, the comparison requires causal windows that prevent "cheaper repairs first" or candidate marginal value from becoming scheduler-dependent.
 
 Promotion can be rejected, deferred, made dormant, or reversed later. None of those outcomes establishes semantic correctness of the candidate.
 
