@@ -29,6 +29,8 @@ Initial direction established:
 21. Metaphor understanding is treated as a special case of analogical abstraction: learn relational structure, transfer it across domains, and later map figurative language onto that structure.
 22. A developmental contract is now the primary framing device: distinguish innate machinery, learned concepts, and capabilities that must never be handed over as privileged ground truth.
 23. Noema should eventually learn not only world facts but **how to learn from mistakes**: experience should be able to change evidence gathering, confidence formation, hypothesis revision, and testing strategy.
+24. Perception is not identity. Stable object IDs are prohibited as privileged perceptual metadata; percept-instance IDs, if operationally required, expire with the observation.
+25. Objecthood is also learned. Structured perception may expose organized sensory features, but should not pre-group them into privileged `OBJECT` records. Noema must learn both feature grouping/object formation and later persistent identity across time.
 
 ## Open design frontier
 
@@ -40,6 +42,7 @@ Candidate early rungs to challenge rather than accept blindly:
 
 - experience temporal change;
 - form short-horizon predictions;
+- discover feature grouping / candidate objecthood;
 - discover persistent entities;
 - discover controllability and self/world structure;
 - distinguish self-caused from externally caused change;
