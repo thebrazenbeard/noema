@@ -13,7 +13,7 @@ PR #31 acquired two independently produced online-learning state-transition draf
 
 They are strongly convergent rather than conflicting, but leaving their relationship unstated would create an avoidable authority/precedence ambiguity.
 
-A later direct-edit attempt on the non-`_DRAFT` contract was rejected by GitHub with a stale-content `409`. No force or blind overwrite was attempted. The safe response is fresh-head reconciliation while retaining both concurrent artifacts. This is itself a useful concurrency check: the source-control precondition prevented a stale write from erasing intervening work.
+A direct-edit attempt on the non-`_DRAFT` contract was initially rejected by GitHub with a stale-content `409`. No force or blind overwrite was attempted. After refreshing the exact blob, only cross-links were added to the contract; substantive reconciliation remains in this note. This is itself a useful concurrency check: the source-control precondition prevented a stale write from erasing intervening work.
 
 ## Shared conclusion
 
