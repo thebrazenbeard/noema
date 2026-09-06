@@ -4,9 +4,9 @@ Status: **BRAINSTORMING / PROVISIONAL / NOT AN APPROVED ARCHITECTURE**
 
 ## Core direction
 
-Build the persistent thing that understands and predicts a world first, then teach that thing to talk.
+Build the persistent thing that understands and predicts a world first, while developing grounded communication as a first-class developmental track rather than making language the substrate of cognition.
 
-Language is not assumed to be the substrate of cognition. LLMs, tokenization, semantic/pragmatic models, and existing AI architectures remain optional candidate tools.
+Language is not assumed to be the substrate of cognition. LLMs, tokenization, semantic/pragmatic models, and existing AI architectures remain optional candidate tools. Communication may begin early as perceptual and action signals whose meanings must be learned through interaction with the world and other agents.
 
 The current hypothesis is a persistent predictive cognitive architecture, not a proven foundation. Design must remain falsifiable and architecture should follow target capabilities rather than familiar AI components.
 
@@ -21,6 +21,16 @@ The current hypothesis is a persistent predictive cognitive architecture, not a 
 - Intracommunication inside the learner is first-class, not an implementation detail.
 - Internal communication uses both direct subsystem-to-subsystem messaging and a shared workspace.
 - Internal messages are provisionally hybrid: typed/inspectable structure plus learned latent payloads.
+
+## Grounded communication stance
+
+Patrick should be able to communicate with Noema during development. Speech, text, gesture, demonstration, correction, and other agent-produced signals may enter as observations, but their meaning, referents, pragmatic force, reliability, and speaker-specific usage must be learned rather than supplied as privileged semantics.
+
+Noema should eventually produce communicative signals through its own action interface. Text and voice are acceptable modalities, but successful communication must depend on learned world and agent models rather than conversational imitation alone.
+
+Development also needs an operator-facing diagnostic channel so Patrick can inspect Noema before mature language exists. Human-readable diagnostic interpretation must remain separate from Noema's learned communication and must not feed privileged labels or evaluator conclusions back into the learner.
+
+See `COMMUNICATION_INTERFACE.md` for the current communication and operator-interface boundary.
 
 ## Provisional motivational / viability model
 
@@ -51,6 +61,6 @@ Experience is continuous; durable memory should be selective. Decay, forgetting,
 
 ## Current caution
 
-Do not add architecture merely because a familiar AI component exists. The target capabilities should determine the architecture. The design should remain falsifiable and should make it possible to distinguish actual learning, persistent modeling, self-correction, agency, and developmental emergence from scripted behavior or response imitation.
+Do not add architecture merely because a familiar AI component exists. The target capabilities should determine the architecture. The design should remain falsifiable and should make it possible to distinguish actual learning, persistent modeling, self-correction, agency, developmental emergence, and grounded communication from scripted behavior or response imitation.
 
 See `DEVELOPMENTAL_CONTRACT.md` for the current innate-versus-discovered boundary.
