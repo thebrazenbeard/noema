@@ -6,6 +6,10 @@ Date: 2026-09-06
 
 Companion contract: `ONLINE_LEARNING_STATE_TRANSITION_CONTRACT.md`
 
+Independent convergent draft provenance: `ONLINE_LEARNING_STATE_TRANSITION_CONTRACT_DRAFT.md`
+
+Reconciliation: `PR31_ONLINE_LEARNING_CONTRACT_RECONCILIATION.md`
+
 ## 1. Attack question
 
 Can a Noema realization appear to learn online while its measured competence is actually produced by scheduler accidents, shared mutable state, replay ordering, retrospective scoring, incomplete restart state, or evaluator leakage?
@@ -394,8 +398,9 @@ Evaluate under equal learner-visible information and declared resource budgets:
 1. simple incremental predictive/system-identification baseline;
 2. recurrent probabilistic predictor without replay;
 3. recurrent probabilistic predictor + bounded replay;
-4. stochastic latent-state realization;
-5. proposed slow/structural machinery.
+4. predictive-state/PSR-like realization;
+5. stochastic latent-state realization;
+6. proposed slow/structural machinery.
 
 ### Pass condition
 
@@ -435,7 +440,7 @@ A proposed first-core realization should be rejected or demoted if any of these 
 
 ## 27. Bottom line
 
-The dangerous failure mode is not merely "wrong optimizer order." It is letting infrastructure scheduling become invisible cognitive machinery.
+The dangerous failure mode is not merely `wrong optimizer order`. It is letting infrastructure scheduling become invisible cognitive machinery.
 
 A Noema learning loop is credible only when:
 
