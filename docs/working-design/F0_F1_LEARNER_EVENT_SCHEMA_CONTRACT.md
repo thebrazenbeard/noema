@@ -1,8 +1,10 @@
 # Noema F0/F1 learner-event schema contract
 
-Status: **BRAINSTORMING / CONCRETE FIRST-CORE INTERFACE SYNTHESIS / NOT IMPLEMENTED**
+Status: **BRAINSTORMING / REVISED CONCRETE FIRST-CORE INTERFACE SYNTHESIS / NOT IMPLEMENTED**
 
 Date: 2026-09-06
+
+Revised after: `F0_EVENT_SCHEMA_HOSTILE_ATTACK.md`
 
 Related:
 - `INTERACTION_EVENT_CONTRACT.md`
@@ -16,25 +18,25 @@ Related:
 
 ## Purpose
 
-The earlier contracts define what Noema must **not** be given accidentally. This document turns those constraints into one concrete F0/F1 data boundary.
+The earlier contracts define what Noema must not be given accidentally. This document binds those constraints into one concrete F0/F1 information surface.
 
-It is intentionally narrower than a full runtime implementation specification. It binds the shape of the first learner-visible event interface closely enough that F0 can audit it and F1 can consume the same boundary without a convenience-only training representation.
+The hostile self-attack exposed an important refinement: a clean event field list is not enough. Information can leak through parser metadata, preprocessing, encoder routing, random-number coupling, queue order, host timing, backpressure, diagnostics, or shared runtime objects.
 
-The main synthesis is:
+The authoritative rule is therefore:
 
-> **Evaluator truth, transducer description, learner-visible topology, learner-visible events, and learner actions are separate artifacts. Only the latter three cross the learner/runtime boundary, and only to the degree explicitly declared below.**
+> **Noema's learner boundary is the complete set of variables that can causally influence cognitive state or action, not merely the fields we intended to serialize.**
 
-This document also tightens one older Candidate A phrase: the learner-visible event envelope should **not** contain semantic source classes such as `external observation`, `communication`, `retrieved memory`, or `simulation` merely because the evaluator can classify them that way. Low-level routing/efference cues may exist; higher source meaning remains learned unless explicitly supplied and claim-limiting.
+F0 must audit the whole evaluator-to-cognition path. F1 must consume that audited path directly rather than training through a richer convenience representation.
 
-## 1. Boundary artifacts
+## 1. Boundary layers
 
-F0/F1 should distinguish four concrete artifacts.
+The first core distinguishes six layers.
 
-### A. Evaluator event record — never direct learner input
+### A. Evaluator event record — evaluator only
 
-The evaluator may record exact ground truth needed for reproducibility, scoring, lineage, and leakage audit.
+The evaluator may retain exact truth required for generation, scoring, lineage, and audit.
 
-Illustrative evaluator-only record:
+Illustrative fields include:
 
 ```text
 EvaluatorEventRecord {
@@ -58,17 +60,15 @@ EvaluatorEventRecord {
 }
 ```
 
-The exact evaluator schema may evolve. None of these fields is learner-visible merely because it is logged.
+None of these fields becomes cognitive evidence merely because the evaluator knows or logs it.
 
-### B. Transducer/port manifest — evaluator description of supplied structure
+### B. Evaluator-side transducer/actuator manifests
 
-For every learner-visible port, F0 records what the transducer does before delivery.
-
-Required evaluator-side fields include:
+Every sensor, communication route, efference route, and actuator has an evaluator-side manifest documenting the supplied transformation.
 
 ```text
 TransducerPortManifest {
-  schema_version
+  manifest_version
   port_key
   evaluator_semantic_description
   physical_or_virtual_source
@@ -76,24 +76,42 @@ TransducerPortManifest {
   payload_encoding
   payload_shape_or_bounds
   sampling_or_emission_policy
+  preprocessing_parameter_origin
   buffering_or_windowing_policy
   learner_visible_time_basis
   externally_supplied_auxiliary_fields
   withheld_fields
+  encoder_family_and_provenance
   known_failure_modes
   claim_restrictions
 }
 ```
 
-The semantic description and withheld-field list remain evaluator-side.
+```text
+ActuatorManifest {
+  manifest_version
+  actuator_key
+  evaluator_semantic_description
+  command_encoding
+  command_bounds
+  addressing_structure
+  clipping_or_saturation
+  latency_policy
+  failure_or_attenuation_policy
+  physical_world_mapping
+  claim_restrictions
+}
+```
 
-### C. Learner port manifest — supplied low-level topology
+Semantic descriptions, evaluator identities, and hidden truth remain evaluator-side.
 
-The learner/runtime needs enough information to accept and encode the stream. The first-core default therefore permits a deliberately small supplied port manifest:
+### C. Runtime port manifest — supplied machine topology, not cognitive evidence
+
+The runtime needs enough information to parse and route each port.
 
 ```text
-LearnerPortManifest {
-  schema_version
+RuntimePortManifest {
+  transport_schema_version
   port_id
   payload_kind
   payload_shape
@@ -101,409 +119,495 @@ LearnerPortManifest {
 }
 ```
 
+This is supplied architecture. It is used to construct/route low-level encoders but is **not automatically concatenated into cognitive input**.
+
 Rules:
 
-- `port_id` is an opaque route identifier, not a semantic modality, person, agent, object, or source label.
-- `payload_kind`, shape, and domain are supplied transducer/topology structure and must be counted as such.
-- the learner-visible manifest contains no human-readable semantic port name such as `vision`, `Patrick`, `self_action`, `memory`, or `teacher_correction`;
-- if different encoder families are used for different payload kinds, that is also supplied inductive structure and belongs in the capability ledger.
+- `port_id` is opaque route topology, not semantic modality/person/agent/source identity;
+- payload kind/shape/domain are supplied inductive structure and must be counted as such;
+- no human-readable semantic port names such as `vision`, `Patrick`, `teacher`, `memory`, `self_action`, or `correction` enter cognition;
+- modality-specific or pretrained encoders are allowed only with explicit provenance and claim restriction.
 
-A later implementation may test weaker or richer port manifests as ablations. The first core should not pretend that payload shape/type was learned if the runtime requires it from birth.
+### D. Runtime transport envelope — parser-visible
 
-### D. Learner event stream — actual evidence presented to F1
-
-The default F0/F1 learner-visible event is:
+The first-core wire/runtime envelope is:
 
 ```text
-LearnerEvent {
-  schema_version
+RuntimeEnvelope {
+  transport_schema_version
   port_id
   payload
   dt_bin
 }
 ```
 
-Each field is constrained below.
+`transport_schema_version` exists only so runtime machinery can decode the record. It terminates at the parser/router and is **not a cognitive feature**.
 
-## 2. `schema_version`
+### E. Cognitive event — actual learner evidence
 
-`schema_version` identifies only the machine-level event encoding contract.
-
-It must not correlate with:
-
-- experiment answer;
-- scenario class;
-- hidden regime;
-- intervention status;
-- teacher identity;
-- developmental phase.
-
-Changing a transducer implementation without changing the learner-visible schema does not require a new learner-visible version value. Evaluator manifests can version their internal description independently.
-
-Formal evaluation should keep `schema_version` constant across conditions whose semantic difference the learner is expected to discover.
-
-## 3. `port_id`
-
-`port_id` is a small opaque identifier for the delivery route.
-
-It supplies **stable low-level topology**, not semantic source truth.
-
-Allowed use:
-
-- route payloads to compatible low-level encoders;
-- learn route-specific statistical regularities;
-- learn that one route is more or less reliable in a context;
-- learn relationships among routes from experience.
-
-Not supplied by `port_id`:
-
-- `this is vision`;
-- `this came from Patrick`;
-- `this is self-generated`;
-- `this is memory rather than perception`;
-- `this is a correction`;
-- `this is trustworthy`;
-- `this is the same source as another port`.
-
-If a claimed capability could be solved by a permanent route-name shortcut, the evaluator should include port permutation/rerouting controls.
-
-## 4. `payload`
-
-`payload` is the raw or declared minimally transformed output of the port transducer.
-
-Permitted examples depend on the experiment:
-
-- continuous scalar/vector measurements;
-- image-like numeric arrays;
-- raw or low-level acoustic windows;
-- bytes/symbols from typed communication;
-- proprioceptive actuator/body-state measurements;
-- an efference copy of an issued command encoded at the action interface's low level.
-
-The payload must not silently include evaluator semantic fields such as:
-
-- stable object or agent IDs;
-- hidden world coordinates not physically/transducer supplied;
-- semantic body/self masks;
-- `correct`, `wrong`, `trusted`, `command`, `goal`, `intent`, `cause`;
-- common-source/common-event IDs;
-- action-cause links;
-- hidden regime IDs;
-- evaluator model-adequacy labels;
-- exact simulator noise parameters;
-- evaluator truth confidence.
-
-A richer transducer may deliberately emit additional information, but then the transducer manifest and capability claim must say exactly what it supplied.
-
-## 5. `dt_bin`: the first-core chronoception choice
-
-F0/F1 needs temporal order and enough duration information for streaming prediction without exposing absolute age or one perfect world clock.
-
-The first-core default is therefore **relative, quantized learner-delivery time**:
-
-`dt_bin = quantized elapsed learner-visible time since the previous delivered LearnerEvent`
-
-Properties:
-
-- no wall-clock/UTC time;
-- no absolute simulator tick;
-- no run age;
-- no event UUID encoded in time;
-- no reset value tied to hidden scenario boundaries;
-- no guarantee of exact physical simultaneity across ports;
-- quantization policy fixed by the declared T2 timebase for a preregistered run family;
-- the evaluator retains exact T0/T1 timing separately.
-
-Why use `dt_bin` at all:
-
-- pure event order would make duration unavailable;
-- exact timestamps would create a stronger temporal subsidy;
-- relative quantized duration supplies a weak chronoceptive basis while preserving a real learning problem around recurrence, cross-modal latency, action-feedback delay, and event segmentation.
-
-The exact bin edges are an implementation parameter to preregister before F1. They must be chosen from engineering/experimental needs, not tuned against hidden test answers.
-
-A no-explicit-time/order-only comparator and a richer timestamp comparator remain valid ablations.
-
-## 6. No learner-visible numeric event index
-
-The learner receives events sequentially, so event order already exists causally in the runtime.
-
-The first-core event does **not** add:
-
-- global sequence number;
-- episode step index;
-- message number;
-- intervention counter;
-- developmental age counter.
-
-Those values remain evaluator-side.
-
-This avoids turning a convenient identifier into a regime, curriculum, or memory-index shortcut.
-
-If the learner later develops an internal count/age estimate, that is learned state derived from its experience and supplied temporal basis.
-
-## 7. Availability and quality metadata: omitted by default
-
-The default `LearnerEvent` has no generic `confidence`, `variance`, `quality`, `valid`, or `reliability` field.
-
-For first-core F0/F1:
-
-- a valid emitted sample appears as an event;
-- no sample is represented by its absence, which is observable through timing when relevant;
-- clipping/saturation should be represented in the declared payload encoding where feasible rather than by an oracle-like semantic warning;
-- direct operational status may be added only when a specific transducer requires it, and then it becomes an explicitly supplied auxiliary port/field in the manifest;
-- external confidence estimates are not supplied by default.
-
-This prevents simulator noise knobs or decoder confidence from solving uncertainty estimation externally.
-
-## 8. Packetization and grouping
-
-Each `LearnerEvent` is one transducer emission, not a declaration that it corresponds to one meaningful world event.
-
-The learner-visible schema contains no:
-
-- `same_event_id`;
-- packet-group semantic ID;
-- cross-modal correspondence ID;
-- episode ID;
-- synchronized-frame ID.
-
-If multiple values are bundled inside one port payload because the transducer physically samples a frame/window, that windowing is listed in the evaluator-side manifest as supplied structure.
-
-The harness must support tests in which meaningful processes span multiple emissions and unrelated processes occur within the same transducer window.
-
-## 9. Spatial information
-
-Spatial encoding is entirely port/transducer specific.
-
-The generic `LearnerEvent` contributes no global coordinates, object position, body mask, target identity, reachability flag, or cross-modal registration.
-
-If a port emits spatial structure, its manifest records:
-
-- coordinate/reference frame;
-- calibration;
-- distortion/quantization;
-- whether depth/range/bearing is supplied;
-- any external registration performed.
-
-The learner receives only the declared payload—not the evaluator's S0 geometry.
-
-## 10. Communication
-
-Typed or acoustic communication uses ordinary ports under this same event contract.
-
-Examples:
-
-- a typed-symbol stream can emit one symbol/byte event at a time;
-- a framed message transducer can emit a payload/window whose boundary is explicitly credited as supplied segmentation;
-- a voice transducer can emit acoustic windows;
-- ASR can be used in a comparator, but lexical/endpointing/punctuation/confidence output must be attributed to that transducer.
-
-No generic event field says:
-
-- speaker identity;
-- correction;
-- directive;
-- question;
-- truthfulness;
-- reference;
-- joint attention.
-
-## 11. Learner action interface
-
-F1/F2 also needs an explicit outbound boundary.
-
-Default action request:
+After parsing/routing, the cognitive learner receives only:
 
 ```text
-LearnerAction {
-  schema_version
+CognitiveEvent {
+  port_id
+  payload_or_declared_encoded_payload
+  dt_bin
+}
+```
+
+If an encoder transforms the raw payload before cognition, that encoder is part of supplied transducer/architectural machinery and its provenance is recorded in F0.
+
+### F. Cognitive action — learner output before actuator realization
+
+The learner emits:
+
+```text
+CognitiveAction {
   actuator_port_id
   command_payload
 }
 ```
 
-Rules:
+The runtime may wrap/version this for transport, but transport metadata is not a cognitive action feature.
 
-- `actuator_port_id` is opaque supplied actuator topology;
-- `command_payload` is low-level and bounded by the actuator manifest;
-- no object/agent target ID is supplied unless that actuator's declared physical interface intrinsically exposes such an address;
-- the evaluator records action issuance and world consequences separately;
-- command issuance does not imply successful realization.
+Command issuance does not imply successful realization.
 
-When an efference trace is part of the innate signal family, the runtime emits a corresponding ordinary learner-visible event on a declared low-level efference port after command issuance. It contains the issued command information needed for prediction but no `success`, `cause`, or future-consequence label.
+## 2. `port_id`: topology without semantic source truth
 
-## 12. Retrieved memory and internal simulation
+`port_id` is a small opaque route identifier.
 
-The older Candidate A event-boundary text listed `retrieved memory` and `internal simulation` as possible source classes. For first-core F0/F1 this should be interpreted more cautiously.
+It may support:
 
-If internal retrieval/simulation later re-enters the predictive substrate through event-like interfaces, the learner may have access to low-level endogenous routing cues sufficient to distinguish streams when the architecture requires it. But those cues must not automatically encode semantic conclusions such as:
+- routing to compatible low-level encoders;
+- learning route-specific statistical regularities;
+- learning changing reliability of a route;
+- learning cross-route relationships.
 
-- `this is a true memory`;
-- `this was personally experienced`;
-- `this is imagined`;
-- `this branch is counterfactual`;
-- `this source is trustworthy`.
+It does not by itself mean:
 
-F1 does not require mature memory/simulation source attribution. The first schema reserves no privileged semantic source-class field for it.
+- `vision`;
+- `Patrick`;
+- `self-generated`;
+- `memory`;
+- `simulation`;
+- `correction`;
+- `trusted`;
+- `same source as another route`.
 
-## 13. Evaluator-to-learner projection function
+The older Candidate A wording that listed semantic source classes such as `external observation`, `communication`, `retrieved memory`, and `internal simulation` is therefore tightened: evaluator/source taxonomy is not automatically learner-visible source knowledge.
 
-F0 should treat learner delivery as an explicit projection:
+Port-label permutation tests are restricted to machine-compatible routes unless the experiment deliberately tests encoder transfer. Encoder differences themselves remain declared supplied priors.
 
-`LearnerEvent = Project(EvaluatorEventRecord, TransducerPortManifest, T2_timebase)`
+## 3. Payload rule
 
-The projection must be deterministic for deterministic transducers given the same declared transducer state/seed.
+`payload_or_declared_encoded_payload` is the output of a declared low-level transducer/encoder path.
 
-Crucially:
+Permitted examples depend on the experiment:
 
-> **Changing evaluator-only facts that are supposed to be withheld must not change serialized learner-visible bytes unless those facts legitimately alter the physical/transducer evidence.**
+- continuous scalar/vector measurements;
+- image-like numeric arrays;
+- low-level acoustic windows;
+- typed bytes/symbols;
+- proprioceptive measurements;
+- low-level efference copies of issued commands.
 
-This becomes a direct leakage-test principle.
+The cognitive payload must not silently include:
 
-## 14. F0 conformance tests
+- stable evaluator object/agent IDs;
+- hidden world coordinates not explicitly supplied by the sensor;
+- semantic body/self masks;
+- `correct`, `wrong`, `trusted`, `goal`, `intent`, `cause`, `command`;
+- common-source/common-event IDs;
+- action-cause links;
+- hidden regime IDs;
+- evaluator model-adequacy labels;
+- true simulator noise parameters;
+- evaluator truth/confidence values.
 
-Before any F1 learning result is accepted, F0 should run the following schema tests.
+Richer transducers are legitimate comparators only when their additional supplied structure is declared and capability claims narrow accordingly.
 
-### LES-0 — field allowlist
+## 4. `dt_bin`: first-core chronoception
 
-Serialize every learner event and reject any field outside the approved learner schema/declared port payload.
+F0/F1 needs temporal order plus coarse duration without exposing one perfect global clock.
+
+The default is:
+
+> `dt_bin = quantized elapsed T2 learner-visible experimental time since the prior cognitive event`
+
+Crucially, **T2 time is not host wall-clock delivery latency**.
+
+For the initial simulated F1/F2 worlds:
+
+- host scheduling, CPU/GPU latency, garbage collection, diagnostic rendering, and queue wait remain evaluator/transducer instrumentation;
+- T2 advances according to the preregistered world/learner timing policy;
+- the resulting elapsed interval is quantized before cognitive input.
+
+The cognitive event contains:
+
+- no UTC/wall time;
+- no absolute simulator tick;
+- no run age;
+- no numeric event index;
+- no curriculum/intervention counter;
+- no hidden-boundary reset marker.
+
+`dt_bin` does not assert that events on different ports are physically simultaneous or causally related.
+
+The exact bin edges remain an implementation parameter to preregister. Order-only and richer-time comparators remain valid ablations.
+
+### Scope limitation: silence
+
+A time value delivered only with events does not provide autonomous cognitive updates during indefinite silence.
+
+That is acceptable for first-core F1/F2 only if their declared emission schedule supplies events often enough for the tested capability.
+
+Do not silently fix the problem with semantic `NO_EVENT` messages. A later capability requiring cognition through silence must separately specify endogenous chronoceptive/cognitive-time dynamics; any periodic pulse/tick is itself supplied temporal structure.
+
+## 5. No generic availability or confidence field by default
+
+The default cognitive event has no generic:
+
+- `confidence`;
+- `variance`;
+- `quality`;
+- `valid`;
+- `reliability`;
+- simulator noise parameter.
+
+First-core default:
+
+- a produced sample arrives as an event;
+- missingness is represented by absence/timing unless a particular sensor needs declared operational status;
+- clipping/saturation should be reflected by the declared payload encoding where feasible;
+- any explicit operational health/status field is a supplied auxiliary signal documented in the manifest;
+- external confidence/reliability estimates are withheld unless they are the explicit comparator.
+
+This keeps uncertainty estimation inside Noema rather than in the simulator API.
+
+## 6. Packetization does not define meaningful events
+
+One `RuntimeEnvelope` is one transducer emission, not one evaluator-defined world event.
+
+No cognitive field carries:
+
+- `same_event_id`;
+- synchronized-frame semantic ID;
+- cross-modal correspondence ID;
+- episode ID;
+- common-source group.
+
+Transducer frame/window boundaries are supplied segmentation and are documented in the manifest.
+
+Formal tests must allow:
+
+- meaningful processes spanning multiple emissions;
+- multiple unrelated changes within one sensor window;
+- asynchronous sampling across ports;
+- related signals arriving across packet boundaries.
+
+## 7. Spatial information remains transducer-specific
+
+The generic event boundary adds no:
+
+- global XYZ;
+- stable object location;
+- body mask;
+- target identity;
+- reachability flag;
+- exact cross-modal registration.
+
+Any port supplying spatial structure declares its reference frame, calibration, distortion, range/depth/bearing information, and external registration in the transducer manifest.
+
+The cognitive learner receives only the declared sensor/transducer result, not S0 evaluator geometry.
+
+## 8. Communication uses ordinary ports
+
+Typed and acoustic communication enters through the same boundary.
+
+A transducer may emit:
+
+- bytes/symbols;
+- framed text, with framing credited as supplied segmentation;
+- acoustic windows;
+- ASR output in an explicit comparator condition.
+
+No generic event field supplies:
+
+- speaker identity;
+- teacher status;
+- correction intent;
+- directive/question type;
+- truthfulness;
+- reference;
+- joint attention.
+
+External ASR lexicalization, endpointing, punctuation, diarization, and confidence remain transducer contributions.
+
+## 9. Efference and action realization
+
+When efference is included as an innate signal family, command issuance generates a low-level learner-visible event on a declared route.
+
+It may represent what Noema attempted to issue.
+
+It must not contain:
+
+- success/failure truth;
+- causal attribution to later observation;
+- hidden actuator state;
+- future consequence;
+- evaluator target identity.
+
+Actuator manifests must explicitly document command domain, addressing, clipping, latency, failure/attenuation, and physical mapping.
+
+Experiment A's intervention command is therefore a deliberately supplied actuator capability, while failed/attenuated outcomes keep `command issued` separate from `world obeyed`.
+
+## 10. Preprocessing must be causal or explicitly external
+
+F0 must audit not only payload fields but how payload transformations were fit.
+
+Forbidden without explicit comparator/claim restriction:
+
+- normalization mean/variance computed over the full run;
+- min/max using held-out evaluation observations;
+- PCA/whitening fitted on future data;
+- vocabulary/quantizer built from answer-bearing evaluation data;
+- adaptive calibration initialized from the held-out distribution.
+
+Every preprocessing parameter must be classified as:
+
+- fixed a priori from engineering/physical bounds;
+- learned causally from past learner-available experience only;
+- learned on a separately declared external corpus;
+- intentionally non-causal for a comparator condition.
+
+Future/test-dependent preprocessing is F0 leakage even if the resulting payload has no semantic label.
+
+## 11. Randomness isolation
+
+Hidden evaluator metadata must not change learner evidence indirectly by changing random-number consumption.
+
+The harness should use isolated named random streams/seeds for at least:
+
+- world dynamics;
+- transducer noise;
+- evaluator bookkeeping/labels;
+- test perturbations;
+- learner initialization/training stochasticity.
+
+With legitimate world/transducer streams fixed, changing withheld evaluator labels must leave cognitive-event bytes unchanged unless the changed fact physically/transducer-causally alters learner evidence.
+
+## 12. Queue, scheduling, and simultaneous-event policy
+
+The event queue itself can leak structure.
+
+The implementation spec must declare:
+
+- queue capacity;
+- producer blocking policy;
+- overflow/drop policy;
+- whether world time advances during learner compute;
+- whether learner compute can alter sensor delivery;
+- tie policy for multiple emissions at the same T2 time.
+
+First-core default:
+
+> learner compute cost is measured evaluator-side but should not accidentally alter the physical evidence stream through host backpressure.
+
+If simultaneous events must be serialized, tie order must not depend on hidden semantic labels. Where simultaneous-order invariance is claimed, evaluation should permute/randomize legal tie order.
+
+## 13. Diagnostics must not perturb T2 evidence silently
+
+Diagnostics can affect experiments without feeding Noema directly by changing scheduling, memory pressure, or queue latency.
+
+Formal F1/F2 runs should therefore ensure that:
+
+- diagnostic rendering does not define T2 learner time;
+- logging is non-blocking or perturbation is measured;
+- diagnostic-on/off deterministic runs can be compared for learner-visible stream equality where practical;
+- evaluator logging may remain richer than live UI rendering.
+
+Patrick's separate human-teacher observer effect remains governed by the developmental interface contract.
+
+## 14. Whole-path evaluator-to-cognition projection
+
+Conceptually:
+
+```text
+Evaluator/world truth
+        |
+        v
+Declared transducer projection + evaluator manifest
+        |
+        v
+RuntimeEnvelope {transport_schema_version, port_id, payload, dt_bin}
+        |
+      parser/router          transport_schema_version ends here
+        |
+        v
+CognitiveEvent {port_id, payload_or_declared_encoded_payload, dt_bin}
+        |
+        v
+       F1 cognition
+        |
+        v
+CognitiveAction {actuator_port_id, command_payload}
+        |
+        v
+Declared actuator transducer
+        |
+        v
+     world dynamics
+```
+
+The parser/runtime manifest is supplied machinery. The cognitive learner should not be handed transport metadata merely because software needs it.
+
+## 15. F0 conformance tests
+
+Before accepting any F1 result, F0 should pass at least these checks.
+
+### LES-0 — cognitive field allowlist
+
+Instrument the actual learner update boundary. Reject undeclared inputs beyond:
+
+- cognitive event fields;
+- declared persistent learner state;
+- explicitly declared innate signals;
+- explicitly allowed internal/resource signals.
 
 ### LES-1 — withheld-metadata mutation
 
-Mutate evaluator-only labels/IDs while holding physical/transducer output constant.
+Change evaluator-only object/agent/source/regime/intervention/truth annotations while holding legitimate physical/transducer evidence and random streams constant.
 
-Pass: learner-visible serialization is byte-identical.
+Pass: cognitive-event serialization is byte-identical.
 
-Examples of mutated evaluator-only state:
+### LES-2 — parser metadata termination
 
-- object ID;
-- agent ID;
-- source name;
-- causal annotation;
-- hidden regime name;
-- intervention identifier;
-- truth label.
+Verify transport schema/version, semantic manifest descriptions, evaluator IDs, and hidden source labels do not become model inputs or embeddings.
 
-### LES-2 — semantic port-name rejection
+### LES-3 — time noninterference
 
-The learner-visible port manifest must contain opaque IDs and machine payload contracts only.
+Verify T2 `dt_bin` derives from the declared experimental timebase, not host scheduling, diagnostic rendering, or learner compute latency.
 
-Fail if human semantic names or evaluator roles cross the boundary.
+### LES-4 — grouping/tie leakage
 
-### LES-3 — time leakage
-
-Verify that absolute evaluator time, simulator step, run age, hidden schedule counters, and scenario resets cannot be recovered directly from event fields beyond what the declared `dt_bin` sequence legitimately reveals.
-
-### LES-4 — grouping leakage
-
-Verify absence of evaluator common-event, episode, object, synchronized-frame, or causal-group identifiers.
+Verify absence of common-event/episode/correspondence IDs and stress legal tie-order permutations.
 
 ### LES-5 — reliability leakage
 
-Verify absence of evaluator noise parameters, expected-error values, correctness probabilities, or external confidence unless the run is an explicitly declared confidence-transducer comparator.
+Verify true noise/error/confidence is absent unless explicitly supplied as a comparator.
 
 ### LES-6 — spatial leakage
 
-Verify generic envelope contains no S0 geometry and each spatial port emits only its declared S2 transducer output.
+Verify generic envelopes contain no evaluator geometry and spatial ports emit only declared S2 transducer output.
 
 ### LES-7 — action-cause separation
 
-Verify an issued command/efference event contains no realized outcome, success bit, or evaluator causal link to future observation.
+Verify command/efference contains no realized-outcome, success, future-consequence, or evaluator causal link.
 
-### LES-8 — training/evaluation schema identity
+### LES-8 — causal preprocessing
 
-F1 training/development and held-out evaluation use the same learner-visible event schema and port-manifest rules unless a transformation is itself the preregistered test.
+Verify normalizers/encoders/quantizers use only declared a-priori, past-causal, or separately sourced statistics. Reject undeclared future/evaluation fitting.
 
-### LES-9 — replay equivalence
+### LES-9 — RNG isolation
 
-Given recorded learner-visible events, replay reproduces the same serialized event order, payloads, port IDs, and `dt_bin` values. Evaluator metadata is not required to recreate learner input after the learner-visible stream has been captured.
+With world/transducer RNG fixed, mutate hidden evaluator metadata and verify learner-visible evidence is unchanged.
 
-### LES-10 — downstream visibility audit
+### LES-10 — queue/backpressure isolation
 
-No model component, structural adapter, gate, retrieval policy, or meta-control path may receive evaluator-only fields through a side channel. The learner-visible event/action boundary is the **maximum information surface** for F1 cognition unless another innate signal is explicitly declared.
+Verify learner compute and diagnostics do not accidentally change sensor evidence under the first-core timing policy.
 
-## 15. F1 implications
+### LES-11 — encoder provenance
 
-The first persistent streaming learner should consume the `LearnerEvent` stream directly.
+Inventory per-port encoder family, initialization/pretraining source, weight sharing, and supplied invariances.
+
+### LES-12 — training/evaluation boundary identity
+
+F1 development and held-out evaluation use the same cognitive boundary unless the transformation itself is preregistered.
+
+### LES-13 — input replay fidelity
+
+Recorded cognitive events reproduce identical port IDs, payloads, order, and `dt_bin` on replay.
+
+This is distinct from learner determinism.
+
+### LES-14 — deterministic twin-run noninterference
+
+When learner initialization/RNG/scheduler are fixed, feed identical cognitive events while changing evaluator-only metadata.
+
+Pass: learner state/action trace is identical.
+
+This catches side channels through shared configuration, callbacks, diagnostics, globals, or object references.
+
+## 16. F1 implications
+
+The persistent streaming learner consumes the cognitive-event stream directly.
 
 Do not train through a richer convenience object and strip fields only at evaluation time.
 
-F1 state updates should be functions of:
+F1 state changes may depend only on:
 
 - prior persistent learner state;
-- current learner-visible event(s);
-- internally generated state allowed by Candidate A;
-- declared resource/learning mechanics.
+- cognitive events;
+- internally generated state allowed by the architecture;
+- declared innate signals;
+- declared learning/resource mechanics.
 
-They should not depend on evaluator annotations.
+Evaluator/world/transducer objects are not reachable from learner code by reference.
 
-The event boundary therefore becomes the clean seam for comparing:
+This boundary is the comparison seam for:
 
 - simple recurrent probabilistic baselines;
-- Candidate A's fast predictive realization;
+- Candidate A fast predictive realizations;
 - later scoped structural mechanisms;
 - packetization/time/reliability ablations.
 
-## 16. F2 / Experiment A mapping
+## 17. F2 / Experiment A mapping
 
-Experiment A can use the same schema without introducing causal semantics.
+Experiment A uses the same boundary.
 
-A minimal mapping can be:
+A minimal mapping can provide:
 
-- one or more observation ports carrying continuous signal values such as `x`, `y`, `z` as opaque numeric channels;
-- one actuator/efference route carrying the low-level intervention command;
-- later ordinary observation events showing whether the world actually followed the command;
-- no `intervention=true`, graph edge, causal-parent, success, regime, or evaluator chain/fork label in the learner event.
+- continuous observation ports carrying `x`, `y`, `z` values as opaque numeric routes;
+- a low-level intervention actuator;
+- an efference event describing the issued command;
+- later ordinary observations showing actual consequences.
+
+The cognitive learner receives no:
+
+- `intervention=true`;
+- graph edge;
+- causal parent;
+- success bit;
+- hidden regime;
+- chain/fork label;
+- evaluator structure ID.
 
 The evaluator retains those facts for scoring.
 
-Before intervention, calibrated non-commitment is evaluated from predictions, not from a hidden structure label. After intervention, revision is evaluated from changed action-conditioned prediction and transfer.
+Before intervention, calibrated non-commitment is evaluated from predictive behavior. After intervention, revision is evaluated from changed action-conditioned prediction, calibration, transfer, and resource use.
 
-## 17. What remains intentionally open
+## 18. Open implementation parameters
 
-This schema does not yet choose:
+This contract still does not choose:
 
-- actual serialized wire format;
-- programming language/types;
-- numeric normalization per port;
+- serialized wire format;
+- programming language/type system;
 - exact `dt_bin` edges;
-- event queue implementation;
-- async scheduling mechanism;
+- queue/runtime implementation;
+- per-port normalization values;
 - encoder architecture;
-- persistence file format;
-- checkpoint representation;
-- F1 predictive-state implementation;
+- predictive-state realization;
+- persistence/checkpoint format;
 - F2 world implementation.
 
-Those belong in the next implementation specification or concrete experiment harness design.
+Those belong in the next implementation specification.
 
-## 18. Current verdict
+## 19. Current verdict
 
-The interface/provenance research is now concrete enough to stop adding generic learner-input concepts before implementation design.
+The first-core information boundary is now concrete enough for implementation design **after hostile qualification**, without pretending that software transport metadata is cognition.
 
-For F0/F1, the proposed boundary is:
+The key shift from the first draft is:
 
-```text
-Evaluator truth/logging
-        |
-        v
-Declared transducer projection + evaluator-side manifest
-        |
-        +----> learner-visible port manifest
-        |
-        +----> LearnerEvent {schema_version, port_id, payload, dt_bin}
-                        |
-                        v
-                 F1 learner state
-                        |
-                        v
-LearnerAction {schema_version, actuator_port_id, command_payload}
-                        |
-                        v
-                 world dynamics
-```
+> **F0 is a whole-path noninterference audit, not merely a schema lint check.**
 
-Everything richer must justify why it crosses that boundary and what capability claim it subsidizes.
-
-This is the first concrete implementation-facing synthesis of the F0/F1 learner information surface. It should now be attacked for insufficiency and hidden subsidy rather than expanded casually.
+Everything that can causally influence Noema's cognitive state must either pass through the declared cognitive boundary or be listed as an explicit innate/supplied capability. Everything else is evaluator/transducer infrastructure and must remain causally isolated from cognition.
