@@ -13,7 +13,7 @@ PR #31 acquired two independently produced online-learning state-transition draf
 
 They are strongly convergent rather than conflicting, but leaving their relationship unstated would create an avoidable authority/precedence ambiguity.
 
-A direct-edit attempt on the non-`_DRAFT` contract was initially rejected by GitHub with a stale-content `409`. No force or blind overwrite was attempted. After refreshing the exact blob, only cross-links were added to the contract; substantive reconciliation remains in this note. This is itself a useful concurrency check: the source-control precondition prevented a stale write from erasing intervening work.
+A direct-edit attempt on the non-`_DRAFT` contract was initially rejected by GitHub with a stale-content `409`. No force or blind overwrite was attempted. After refreshing the exact blob, the non-`_DRAFT` contract was updated to ingest the independent draft's useful state-class, prequential, world/transducer, and comparator distinctions while preserving the independent draft as provenance. This is itself a useful concurrency check: the source-control precondition prevented a stale write from erasing intervening work.
 
 ## Shared conclusion
 
@@ -34,15 +34,17 @@ Both also agree that:
 - simple recurrent learners with and without replay remain mandatory rivals;
 - none of this retroactively changes the frozen BT2 R1 subject.
 
-## Distinct useful contributions
+## Distinct useful contributions and disposition
 
-`ONLINE_LEARNING_STATE_TRANSITION_CONTRACT_DRAFT.md` contributes especially clear:
+`ONLINE_LEARNING_STATE_TRANSITION_CONTRACT_DRAFT.md` contributed especially clear:
 
 - prequential/test-then-train framing and research lineage;
 - explicit plasticity, replay, probationary, interface-calibration, and stochastic state classes;
 - world/transducer progression as a named phase;
 - compact C0-C4 comparison framing;
 - explicit reminder that exact online recurrent-gradient methods are comparators rather than obligations.
+
+The material state-class, prequential, world/transducer, and comparator distinctions are now represented in the non-`_DRAFT` contract. The draft remains useful as independent convergence/provenance rather than as a competing authoritative document.
 
 `ONLINE_LEARNING_STATE_TRANSITION_CONTRACT.md` contributes especially clear:
 
@@ -71,7 +73,7 @@ This is only PR-internal working precedence. It is not merged architecture autho
 
 ## Material unresolved seam
 
-The two drafts do not solve BT2's representation-drift problem for learned scope. The consolidated contract can prevent hidden scheduler/causal contamination, but a gate/candidate whose applicability depends on a changing latent representation still needs one of:
+The reconciliation does not solve BT2's representation-drift problem for learned scope. The consolidated contract can prevent hidden scheduler/causal contamination, but a gate/candidate whose applicability depends on a changing latent representation still needs one of:
 
 - representation-invariant scope;
 - an explicit lawful remapping mechanism that does not use evaluator semantic correspondence; or
@@ -81,9 +83,4 @@ That remains a separate successor architecture problem rather than being papered
 
 ## Recommendation
 
-Keep both drafts during PR review for provenance, but treat the non-`_DRAFT` contract plus the hostile attack as the current consolidation target. Before merge, perform a fresh-head adjudication and then either:
-
-- fold any still-unique useful wording from the `_DRAFT` into the contract and retain the draft as research provenance; or
-- explicitly archive/remove the duplicate through reviewed source cleanup.
-
-No cleanup/overwrite is performed by this note because concurrent source provenance should not be destroyed casually.
+Keep the independent draft through PR review as provenance. Treat the non-`_DRAFT` contract plus the hostile attack as the current consolidation target. Any later duplicate cleanup should be a fresh-head reviewed source decision rather than an automatic deletion.
