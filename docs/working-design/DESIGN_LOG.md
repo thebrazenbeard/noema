@@ -31,29 +31,43 @@ Initial direction established:
 23. Noema should eventually learn not only world facts but **how to learn from mistakes**: experience should be able to change evidence gathering, confidence formation, hypothesis revision, and testing strategy.
 24. Perception is not identity. Stable object IDs are prohibited as privileged perceptual metadata; percept-instance IDs, if operationally required, expire with the observation.
 25. Objecthood is also learned. Structured perception may expose organized sensory features, but should not pre-group them into privileged `OBJECT` records. Noema must learn both feature grouping/object formation and later persistent identity across time.
+26. Initial spatial perception is egocentric. Noema should not receive privileged world coordinates; stable places, trajectories, and allocentric/world-relative maps are learned from movement, temporal continuity, and sensorimotor regularity.
+27. A strictly linear developmental ladder is likely the wrong abstraction. Several capabilities should co-develop, so the working model is now a **developmental capability dependency graph**.
+28. Candidate graph clusters: temporal prediction/sensorimotor contingency/feature binding; self-world/persistence/spatial mapping; causal intervention/affordance/error diagnosis; social agent modeling; learned salience/preferences/drives; meta-learning/transfer/abstraction/self-development.
+29. Every developmental claim should ultimately require acquisition, ablation, intervention, and transfer evidence, with privileged labels/IDs/scripted policies/evaluator leakage treated as disqualifying explanations.
+30. A proposed general substrate based on one persistent recurrent predictive latent state was adversarially stress-tested rather than accepted.
+31. Stress-test result: **prediction appears necessary but is not sufficient**. A single point latent state collapses uncertainty; next-step prediction can reward surface shortcuts; prediction alone does not establish causation, exploration, wants, empathy, abstraction, planning, durable memory, or correct credit assignment.
+32. Stronger surviving hypothesis: an evolving **belief state** over possible latent world states/explanations, preserving competing hypotheses and uncertainty, learning reusable structure through multi-horizon predictive compression, and treating Noema's own interventions as special evidence.
+33. Independent pressures still appear necessary: primitive viability/valence, multiple memory timescales, selective salience/attention, and the capacity for information-seeking when uncertainty matters.
+34. Controllability is evidence for selfhood but not identical to selfhood; tools, remote effectors, attachments, and other controllable structures require learned, potentially layered self/body/agency boundaries.
+35. Agenthood must not be credited merely because behavior prediction improves. Social tests must require latent agent-specific state/history/information models to outperform surface dynamical prediction.
+36. Abstraction should be tested as reusable compression and transfer across changed surface form, not merely good prediction on familiar cases.
+37. Full adversarial review is recorded in `PREDICTIVE_SUBSTRATE_STRESS_TEST.md`.
+38. A second functional review found **allocation/attention is functionally fundamental** because finite cognition must decide where scarce sensory, modeling, memory, learning, and planning resources go. The content of salience should largely be learned even if allocation capacity exists from birth.
+39. `Homeostasis` was broadened to **valuation/motivation**: primitive viability and valence seed the system, while later preferences, drives, commitments, and values can become learned and multi-timescale.
+40. The current functional skeleton is: **model/simulate; value/motivate; allocate/attend; act/intervene; learn/adapt**. Persistence/memory, uncertainty/provenance, multi-timescale operation, internal integration, and anti-cheating constraints remain cross-cutting requirements.
+41. Concrete adversarial scenarios exposed a major substrate requirement not captured by the five loops: **dynamic relational binding/compositionality**. False-belief reasoning, analogy, role transfer, nested agent models, and later language require reusable relations that can bind arbitrary learned entities/states without a pre-authored ontology.
+42. A second substrate requirement is **epistemic source/mode separation**. Observed, remembered, inferred, predicted, simulated, intended, and desired states may share representational machinery but must not silently collapse into one evidential status.
+43. Learning must support **structural locality of revision** so a correction can change the implicated belief, relation, or learning policy without indiscriminate global drift.
+44. Valuation likely cannot be a single scalar reward. Noema should eventually support multiple learned concerns over different timescales and construct derived goals over predicted future states.
+45. Intracommunication/integration should preserve disagreement, confidence, provenance, and causal influence instead of flattening subsystem outputs into premature consensus.
+46. Full functional review is recorded in `FUNCTIONAL_CORE_STRESS_TEST.md`; concrete scenario attacks are recorded in `ADVERSARIAL_DEVELOPMENTAL_SCENARIOS.md`.
 
 ## Open design frontier
 
-Do not choose implementation architecture yet.
+Do not choose implementation architecture merely because a familiar AI family already provides some of these pieces.
 
-The next design task is to build a **developmental capability ladder**: an ordered set of increasingly demanding capabilities that Noema must acquire through experience, with a falsification test for each rung showing how success differs from hidden scripting, privileged labels, memorization, or evaluator leakage.
+The current functional skeleton survives, but the representational substrate now has strong constraints:
 
-Candidate early rungs to challenge rather than accept blindly:
+- open-ended latent structure;
+- dynamic relational binding/compositionality;
+- persistent uncertain state;
+- epistemic source/mode separation;
+- counterfactual simulation;
+- localizable continual learning and metaplasticity;
+- multi-timescale persistence and forgetting;
+- contestable internal integration;
+- intervention-sensitive learning;
+- learned valuation and allocation.
 
-- experience temporal change;
-- form short-horizon predictions;
-- discover feature grouping / candidate objecthood;
-- discover persistent entities;
-- discover controllability and self/world structure;
-- distinguish self-caused from externally caused change;
-- discover causal regularities;
-- track individual other agents across time;
-- learn agent-specific behavioral models;
-- form and revise preferences;
-- seek information to reduce consequential uncertainty;
-- recognize and diagnose its own prediction/model errors;
-- transfer learned relations to novel situations;
-- form abstractions and analogies;
-- develop higher-order drives and self-directed development.
-
-The ordering is provisional. The next conversation should challenge dependencies between these capabilities before treating the ladder as architecture.
+The next design step is to compare broad implementation families against these requirements and reject families that need privileged labels or bespoke cognitive modules to fake the developmental capabilities Noema is supposed to acquire.
