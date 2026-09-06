@@ -10,6 +10,8 @@ Independent convergent draft provenance: `ONLINE_LEARNING_STATE_TRANSITION_CONTR
 
 Reconciliation: `PR31_ONLINE_LEARNING_CONTRACT_RECONCILIATION.md`
 
+This test suite is successor-only. It may explain how a later architecture cut addresses frozen-R1 findings, but it must not be used to alter or reinterpret the frozen BT2 R1 verdict.
+
 ## 1. Attack question
 
 Can a Noema realization appear to learn online while its measured competence is actually produced by scheduler accidents, shared mutable state, replay ordering, retrospective scoring, incomplete restart state, or evaluator leakage?
