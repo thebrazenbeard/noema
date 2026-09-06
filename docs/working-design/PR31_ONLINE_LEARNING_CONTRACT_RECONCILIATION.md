@@ -32,6 +32,7 @@ Both also agree that:
 - scheduling that changes committed learning is part of the algorithm, not neutral infrastructure;
 - checkpoint/restart claims require all causally relevant learner state;
 - simple recurrent learners with and without replay remain mandatory rivals;
+- PSR-like and stochastic-latent realizations should be compared under the same causal contract rather than mixed with different evidence/update semantics;
 - none of this retroactively changes the frozen BT2 R1 subject.
 
 ## Distinct useful contributions and disposition
@@ -58,7 +59,7 @@ The material state-class, prequential, world/transducer, and comparator distinct
 - explicit representation-drift pressure on learned scope;
 - claim ceilings and open seams.
 
-`ONLINE_UPDATE_ORDER_HOSTILE_ATTACK.md` supplies the adversarial test layer for both and now uses the reconciled comparator split (`C0`, `C1`, `C2`, `C3a`, `C3b`, later structural extension).
+`ONLINE_UPDATE_ORDER_HOSTILE_ATTACK.md` supplies the adversarial test layer for both and now uses the reconciled comparator split (`C0`, `C1`, `C2`, PSR-like, stochastic-latent, later structural extension).
 
 ## Provisional precedence inside PR #31
 
