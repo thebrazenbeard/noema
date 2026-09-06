@@ -44,6 +44,7 @@ This document does not:
 - require Noema to represent branches, ancestry, or identity using this schema;
 - require one memory architecture;
 - require distinct episodic/semantic/procedural modules;
+- require cleanly localized semantic state regions merely to make evaluator intervention convenient;
 - authorize checkpointing, state mutation, training, deployment, or implementation;
 - define production persistence or recovery for Vera.
 
@@ -163,6 +164,8 @@ The operation record must identify what actually crossed the boundary strongly e
 
 If the implementation cannot localize these distinctions, the experiment must say so rather than pretending a clean selective graft occurred.
 
+A clean semantic graft is **not** a mandatory implementation capability. Where state is distributed or entangled, the evaluator may instead use approximate, learned, functional, behavioral, or causal interventions whose validity is independently checked. The claim ceiling must match the intervention actually achieved.
+
 ### Recombination / multi-parent derivation
 
 A successor incorporates material causal state from two or more source lineages.
@@ -205,7 +208,70 @@ These are **claim-side functional categories**, not a mandated architecture deco
 
 If two categories are inseparable in a candidate implementation, record that as an implementation fact. Do not fabricate component isolation for the sake of a clean benchmark.
 
-## 5. Every manipulation gets an information-boundary declaration
+## 5. Selective causal persistence must not become a modularity oracle
+
+The TKI-6/TKI-8 program creates a risk of its own: an evaluator may demand perfectly isolated `skill`, `memory`, `preference`, or `self` components and thereby select for an architecture organized around the benchmark's semantic categories.
+
+That would violate Noema's representation-neutral discipline.
+
+Distributed representations are a legitimate design possibility. In distributed systems, one representational element may participate in several functions and one function may depend on many elements. The scientific target is therefore not `find the bytes that are SKILL and copy only those bytes`.
+
+The target is:
+
+> **test whether claimed functional distinctions have sufficiently different causal roles that interventions, natural perturbations, transfer, forgetting, ablation, or relearning can pull them apart without presupposing a symbolic modular decomposition.**
+
+Representative research pressure includes:
+
+- Kumar et al., *Searching through functional space reveals distributed visual, auditory, and semantic coding in the human brain* (PLOS Computational Biology, 2020), DOI `10.1371/journal.pcbi.1008457`, as an existence proof that useful representations can be widely distributed rather than neatly anatomically localized;
+- Suter et al., *Robustly Disentangled Causal Mechanisms: Validating Deep Representations for Interventional Robustness* (ICML, 2019), which motivates evaluating learned representations through intervention rather than assuming disentanglement from representation format alone;
+- broader distributed-representation work in neural systems and neural networks showing that representational reuse/overlap can support generalization while complicating localization.
+
+These sources do not establish the Noema substrate. They establish that clean semantic localization must not be an unexamined benchmark assumption.
+
+### Intervention-validity requirement
+
+A causal intervention can itself create an unnatural internal state. Therefore a failed post-intervention behavior is not automatically evidence that the targeted function was localized or necessary.
+
+For any selective state manipulation, record and test where practical:
+
+- whether the manipulated state remains on or near the candidate's naturally reachable state distribution;
+- collateral changes to unrelated benchmark capabilities;
+- whether the same functional effect can be reproduced through an independent intervention route;
+- whether relearning/regeneration restores the targeted behavior through a different representation;
+- whether the result survives multiple seeds/instances and not one convenient localization;
+- whether intervention magnitude rather than semantic target explains the impairment.
+
+A selective-graft or ablation result gets only the claim strength warranted by those controls.
+
+### Acceptable ways to test causal distinction
+
+Depending on implementation, evidence may come from:
+
+- naturally occurring forgetting or regime change;
+- checkpoint variants that omit operational state classes already exposed by the architecture;
+- learned probes followed by independent causal intervention;
+- low-rank/subspace interventions with collateral-damage controls;
+- targeted retraining or unlearning/relearning;
+- distillation that preserves competence while changing history/state carrier;
+- behavioral transfer under held-out conative contexts;
+- intervention on input/history rather than direct parameter surgery;
+- exact modular transfer **only when the architecture itself legitimately supplies such a boundary**.
+
+No one method is privileged.
+
+### Failure of the evaluator, not the learner
+
+If the evaluator cannot selectively perturb a distributed architecture without destroying unrelated function, it must not conclude:
+
+`the architecture has no distinction between skill and autobiography`.
+
+The correct result may instead be:
+
+`the proposed intervention does not identify the distinction`.
+
+This is an identifiability/intervention limitation and should remain bounded uncertainty.
+
+## 6. Every manipulation gets an information-boundary declaration
 
 For each copy/restore/graft/recombination experiment, explicitly list:
 
@@ -231,7 +297,7 @@ Evaluator-only facts such as:
 
 If any such cue is intentionally exposed, it must be declared as supplied capability and the resulting claim ceiling reduced accordingly.
 
-## 6. Learner-visible consequences cannot be waved away as hidden operations
+## 7. Learner-visible consequences cannot be waved away as hidden operations
 
 An evaluator operation may be semantically hidden and still be detectable.
 
@@ -251,7 +317,7 @@ Therefore each manipulation records not merely what metadata was withheld, but w
 
 A claim of `Noema inferred the restore/fork` is meaningful only relative to those available consequences.
 
-## 7. Readback and operation verification
+## 8. Readback and operation verification
 
 A planned state transfer is not evidence that the transfer occurred as intended.
 
@@ -267,7 +333,7 @@ Each experiment should verify the operation sufficiently for its claim, for exam
 
 If the result is ambiguous, classify the experiment outcome as ambiguous rather than using the intended operation as ground truth.
 
-## 8. Counterfactual controls for lineage claims
+## 9. Counterfactual controls for lineage claims
 
 The highest-value continuity experiments require pairs where familiar cues point in opposite directions.
 
@@ -295,13 +361,13 @@ Restore learner state without restoring the environment.
 
 A self-continuity architecture that reduces everything to one cue should fail at least one of these crossed controls.
 
-## 9. Claim ceilings
+## 10. Claim ceilings
 
 Evaluator lineage evidence can establish statements such as:
 
 - instance B was created from exact state artifact X;
 - C received specified state derived from A and B;
-- a skill-state transfer occurred under the declared implementation mechanism;
+- a declared state transformation derived from source A materially changed successor C;
 - a learner and environment were restored to different temporal frontiers.
 
 It does **not** by itself establish:
@@ -312,11 +378,12 @@ It does **not** by itself establish:
 - that Noema's self-model is correct;
 - that copied memory is first-person autobiographical memory;
 - that a transferred policy carries a transferred desire/commitment;
+- that a semantic function is cleanly localized merely because one intervention damaged it;
 - phenomenological continuity.
 
 Those require separate evidence and, for Noema, learner-visible behavior/state under declared information boundaries.
 
-## 10. Interaction with existing Noema contracts
+## 11. Interaction with existing Noema contracts
 
 ### F0
 
@@ -334,7 +401,7 @@ Checkpoint scope must reveal whether active task/allocation/retrieval configurat
 
 ### Skills and transfer
 
-The contract allows TKI-6/TKI-8 to distinguish exact/partial competence transfer from transfer of episodes, goals, or valuation if the candidate implementation actually provides separable state carriers.
+The contract allows TKI-6/TKI-8 to test functional/casual separation between competence and episodes/goals/valuation **without requiring those functions to live in cleanly separable modules**. Exact selective copying is one possible intervention only where the architecture supplies a legitimate boundary.
 
 ### Self/other modeling
 
@@ -348,4 +415,8 @@ The paradoxical-looking rule is intentional:
 
 > **The evaluator should know lineage more exactly so Noema does not have to be told lineage more exactly.**
 
-Without a non-linear lineage/state-transfer contract, future copy/restore/graft experiments risk either losing the ground truth needed to score self-continuity or solving the self-continuity problem by leaking that ground truth into the learner.
+A second rule is equally important:
+
+> **The evaluator should test causal distinction without requiring the architecture to organize itself around evaluator semantic categories.**
+
+Without a non-linear lineage/state-transfer contract, future copy/restore/graft experiments risk either losing the ground truth needed to score self-continuity or solving the self-continuity problem by leaking that ground truth into the learner. Without intervention-validity discipline, the same experiments risk mistaking benchmark-friendly modularity for intelligence.
