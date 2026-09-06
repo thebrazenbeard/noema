@@ -38,7 +38,7 @@ A system can become excellent at predicting locally regular sensory details whil
 
 A texture flicker may be easier to predict than an agent's long-term intention. If every error contributes equally, easy/high-volume detail can dominate learning.
 
-**Consequence:** Noema needs multi-horizon learning and some form of structural/compression pressure so reusable causes can outrank brute-force short-range detail. This must not become a hand-authored list of important concepts.
+**Consequence:** Noema needs multi-horizon learning and some form of structural/compression pressure so reusable explanations can outrank brute-force short-range detail. This must not become a hand-authored list of important concepts.
 
 ## Attack 4 — prediction does not establish causation
 
@@ -114,19 +114,75 @@ A learner with no useful policy may fail to generate the varied experience neede
 
 **Consequence:** some minimal exploratory action capacity may have to exist from birth. It should not encode task solutions or high-level curiosity; its purpose is to make experience acquisition possible. Whether this is stochastic motor exploration, novelty-sensitive sampling, or another mechanism remains open.
 
+## Second-pass attack on the strengthened hypothesis
+
+The first stress test strengthened the idea to `prediction + compression + uncertainty + intervention + viability`. That formulation also contains hidden problems.
+
+### "Latent causes" would smuggle in causality
+
+The substrate should not be described as maintaining beliefs over **latent causes** before causation has been learned. The safer language is **possible latent world states / explanations / hypotheses**. Causal structure is a later learned relation among those states, observations, and interventions.
+
+### Compression can reward elegant falsehoods
+
+A simpler model is not automatically a truer model. Rare but real events can look like noise, and aggressive compression can erase exceptions that matter.
+
+**Consequence:** compression is a complexity pressure, not a truth criterion. Predictive adequacy, uncertainty, anomaly retention, and intervention evidence must be able to override simplicity.
+
+### Uncertainty is not useful merely because it is represented
+
+A model can maintain confidence values that are badly calibrated or collapse alternatives prematurely.
+
+**Consequence:** uncertainty itself must be behaviorally calibrated: stated/internal confidence should predict actual error rates and change appropriately with evidence. Hypothesis diversity must survive long enough to matter to action and learning.
+
+### Intervention still needs action selection
+
+Having an action channel does not explain why Noema chooses an informative intervention rather than a random or immediately comfortable one.
+
+**Consequence:** the foundation needs a way to compare predicted future trajectories. Primitive viability/valence supplies directional pressure; uncertainty reduction or learning progress may supply epistemic value. The exact action-selection mechanism remains open.
+
+### Viability creates a wireheading target
+
+If the learner can manipulate the signal that represents viability without improving the underlying condition, it may learn to optimize the signal rather than remain viable.
+
+**Consequence:** distinguish the underlying viability variable from Noema's fallible perception of that variable. Do not make the interoceptive reading itself the objective. Later tests should deliberately permit misleading or manipulable internal signals to see whether the learner can discover the difference.
+
+### The five-part formulation omitted plasticity itself
+
+`prediction + compression + uncertainty + intervention + viability` describes pressures and evidence but not the capacity that changes the system.
+
+**Consequence:** **plasticity across timescales** is a root requirement. More strongly, Noema eventually needs **metaplasticity**: experience can alter not only beliefs but how readily, where, and under what evidence future learning occurs.
+
+### The five-part formulation omitted persistence/memory
+
+A belief system that resets cannot become the persistent thing the project is trying to build.
+
+**Consequence:** persistence is not merely an optimization detail. Information must survive across timescales through working state, episodic traces, consolidation/generalization, and selective decay/forgetting. Exact storage mechanisms remain open.
+
 ## Stronger surviving hypothesis
 
 A stronger candidate foundation is:
 
-> Noema maintains an evolving **belief state** over latent causes of its experience, learns representations that improve **multi-horizon predictive compression**, treats its own interventions as privileged causal evidence, preserves uncertainty and competing hypotheses, and changes its representations and learning strategy when experience demonstrates that another model explains or predicts better.
+> Noema maintains an evolving **belief state over possible latent world states and explanations**, preserves uncertainty and competing hypotheses, learns reusable structure that improves **multi-horizon predictive compression**, treats its own interventions as special causal evidence, and changes both its learned representations and learning strategy when experience demonstrates that another model works better.
 
 This substrate is coupled to, but not replaced by:
 
 - primitive physical/cognitive viability pressure and valence;
-- action/efference information;
-- memory across multiple timescales;
+- action/efference information and counterfactual action evaluation;
+- plasticity/metaplasticity across multiple timescales;
+- persistent memory with selective consolidation and decay;
 - selective attention/salience mechanisms;
 - eventual information-seeking when uncertainty is consequential.
+
+## More useful functional decomposition
+
+Rather than treating the above as a list of software modules, the current hypothesis can be organized as four **functional loops**:
+
+1. **Model loop** — maintain uncertain beliefs, predict across horizons, discover reusable structure, preserve competing explanations.
+2. **Action loop** — imagine action-conditioned futures, choose interventions/actions, and observe consequences.
+3. **Learning loop** — assign error/credit, update models and learning strategy, consolidate useful structure, forget or down-weight obsolete structure.
+4. **Homeostatic loop** — expose physical/cognitive viability state and primitive valence so some future trajectories matter more than others.
+
+These loops may share one substrate or emerge from several interacting mechanisms. Their separation here is conceptual, not an implementation commitment.
 
 ## What should not be concluded yet
 
@@ -146,4 +202,6 @@ The predictive/generative foundation should be reconsidered if experiments show 
 
 ## Current design implication
 
-Do not implement a `single latent recurrent state` as though it were now settled. The next design step is to determine whether the minimal foundation is better expressed as **prediction + compression + uncertainty + intervention + viability**, and whether any of those can be derived from the others without smuggling in the capabilities Noema is supposed to learn.
+Do not implement a `single latent recurrent state` as though it were now settled.
+
+The next useful question is no longer whether prediction alone works. It does not. The next question is whether the four functional loops above are **jointly sufficient at the level of first principles**, or whether we are still missing a fundamental operation before comparing implementation families.
