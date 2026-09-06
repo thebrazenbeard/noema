@@ -1,6 +1,6 @@
 # Noema Experiment A — externally scheduled intervention
 
-Status: **BRAINSTORMING / APPROVED SEQUENCE / DESIGN NOT YET COMPLETE / NOT IMPLEMENTED**
+Status: **BRAINSTORMING / APPROVED SEQUENCE / DESIGN ADVANCED / NOT IMPLEMENTED**
 
 ## Sequence decision
 
@@ -11,67 +11,279 @@ Patrick approved the sequence:
 
 B is gated on A. If A fails, B is premature.
 
+Patrick also approved giving Noema prior experience with externally scheduled interventions in simpler worlds before Experiment A. This isolates the intended target: **using intervention evidence to resolve structural ambiguity**, rather than simultaneously testing whether the system can discover the operational meaning of the intervention channel from scratch.
+
 ## What Experiment A is trying to falsify
 
-The narrow claim is that Noema's epistemic substrate can discover and revise useful latent structure from temporally ordered signals without privileged semantic labels.
+The narrow claim is that Noema's epistemic substrate can discover and revise useful latent structure from minimally interpreted continuous signals without privileged semantic labels.
 
 The test deliberately removes motivation, organism-level action selection, 3D perception, language, social cognition, and viability management so failure can be attributed more cleanly.
 
-## World structure — first design section
+The experiment is not intended to prove general intelligence. It is intended to kill or preserve a specific architectural claim cheaply.
 
-The evaluator constructs a small temporal world with several observable signal channels and hidden generative structure. Noema receives only the observations, temporal order, and the raw fact that an intervention occurred on a specified channel/process. It does not receive graph structure, semantic node types, causal labels, or an answer key.
+## Signal regime
 
-Two hidden explanations are engineered to be observationally equivalent during a passive phase:
+Use a small number of **continuous-valued channels with modest stochastic noise**.
 
-- **Shared-driver family:** an unobserved latent process drives multiple observable channels.
-- **Dependency-chain family:** observable/latent processes form a sequential dependency that produces the same passive joint behavior over the pre-intervention distribution.
+Reasons:
 
-The passive data are constructed so neither family can legitimately dominate from observation alone. A correct learner should therefore preserve uncertainty or competing structural hypotheses rather than invent certainty.
+- binary signals make lookup-like or finite-state shortcuts unusually easy;
+- continuous values require the learner to represent dependency strength and uncertainty;
+- linear-Gaussian worlds let the evaluator construct exact observational equivalence analytically;
+- later nonlinear worlds can be added without changing the test's conceptual structure.
 
-At a predetermined point, the evaluator applies an intervention that perturbs one process while breaking the ordinary dependency that would otherwise determine it. The two hidden families then predict measurably different downstream observations.
+No signal channel receives an object, role, causal, or identity label. Channel addresses are operational indices only.
 
-The intervention schedule is external in Experiment A. Noema's job is epistemic interpretation, not intervention selection.
+## Intervention curriculum before Experiment A
 
-## Required behavior
+The curriculum teaches only the **operational semantics of intervention**.
 
-A successful system should:
+### Curriculum world class
 
-- form at least two materially distinct live explanations when passive evidence underdetermines structure;
-- avoid unjustified collapse to one explanation before intervention evidence;
-- predict different post-intervention consequences under the competing hypotheses;
-- revise confidence/structure after the intervention in the direction supported by evidence;
-- localize revision rather than globally rewriting unrelated learned structure;
-- transfer the learned structural pattern to a surface-remapped world;
-- lose the transfer benefit when the implicated learned structure is ablated.
+Use simple two- and three-channel continuous systems whose dependencies are not ambiguous. Externally scheduled commands clamp one channel to a supplied value for one or more steps/samples.
 
-## Anti-cheating controls
+Noema receives:
 
-The learner must not receive:
+- the ordinary observation stream;
+- temporal order;
+- a raw intervention/efference packet containing an opaque target address and commanded value;
+- the resulting observations.
 
-- object, cause, parent, child, driver, chain, graph-edge, or hypothesis-family labels;
-- stable semantic names for signal channels across transfer worlds;
-- the hidden graph or intervention target's semantic role;
-- a reward for selecting the evaluator's preferred explanation;
-- a fixed rule such as `intervention breaks incoming causes`, unless that operational behavior is exposed only through experience and learned from the raw intervention channel.
+Noema is not told that the intervention `breaks a cause`, `sets a node`, or has any semantic significance beyond being a distinct source channel whose consequences can be learned.
 
-The evaluator may keep hidden ground truth for scoring.
+### Curriculum success condition
+
+Before entering Experiment A, Noema must demonstrate that it can predict the consequences of previously encountered intervention patterns in held-out simple worlds better than a predictor that ignores the intervention channel.
+
+This is a **prerequisite**, not evidence for Experiment A itself.
+
+### Anti-leakage rule
+
+The curriculum may teach that an intervention command has characteristic consequences. It may not expose graph orientation, parent/child status, hidden-family labels, or the answer to the later ambiguity problem.
+
+## Exact first ambiguity world
+
+The first world uses three observed scalar channels, provisionally `x`, `y`, and `z`. These names exist only in the evaluator specification; the learner receives opaque channel positions.
+
+Construct a zero-mean unit-variance Gaussian joint distribution with:
+
+- `corr(x, y) = 0.8`
+- `corr(y, z) = 0.7`
+- `corr(x, z) = 0.56`
+
+The covariance satisfies `x ⟂ z | y` and can therefore be generated by multiple observationally equivalent structural orientations.
+
+Two evaluator-known hidden families are used.
+
+### Family C — chain orientation
+
+A valid parameterization is:
+
+- `x ~ N(0, 1)`
+- `y = 0.8*x + eps_y`, where `eps_y ~ N(0, 0.36)`
+- `z = 0.7*y + eps_z`, where `eps_z ~ N(0, 0.51)`
+
+### Family F — fork orientation
+
+A valid parameterization of the **same passive observational distribution** is:
+
+- `y ~ N(0, 1)`
+- `x = 0.8*y + eps_x`, where `eps_x ~ N(0, 0.36)`
+- `z = 0.7*y + eps_z`, where `eps_z ~ N(0, 0.51)`
+
+The passive joint distribution is exactly the same in both families. No amount of passive data from this stationary distribution legitimately identifies whether the `x-y` dependency is oriented one way or the other.
+
+This is stronger than merely making two models numerically similar: the evaluator deliberately constructs **observational non-identifiability**.
+
+## Decisive intervention in Experiment A
+
+The evaluator externally clamps `x` to a nontrivial value drawn from a pre-registered intervention set, such as values away from the passive mean.
+
+Noema receives the raw intervention packet and the resulting observations.
+
+The two hidden families now diverge:
+
+- under Family C, changing `x` changes the distribution of `y`, which changes `z`;
+- under Family F, changing `x` does not change the generative process for `y` or `z`.
+
+Noema is not told these interpretations. It must learn them from the observed intervention consequences.
+
+The first experiment should include positive and negative clamp values and more than one magnitude so a brittle one-value association cannot pass.
+
+## Why this world is preferable to the earlier shared-hidden-driver example
+
+The earlier shared-driver-versus-chain sketch was conceptually useful but did not automatically guarantee exact observational equivalence.
+
+The Markov-equivalent chain/fork construction gives us an analytic guarantee that passive evidence cannot settle the question. That removes a major evaluator confound: a clever learner cannot win A by exploiting a small unintended passive-distribution difference.
+
+Shared-hidden-driver ambiguity remains a later test family because hidden-common-source discovery is important, but it should not be the first falsification world.
+
+## Representation requirements under test
+
+Experiment A does **not** require Noema's internal representation to literally contain human-readable `chain` and `fork` records.
+
+It does require behaviorally consequential structural uncertainty. Before intervention, the system must preserve enough alternative structure that its action-conditioned predictions reflect more than one plausible post-intervention outcome.
+
+After intervention, the implicated structure must be selectively revisable and later ablatable.
+
+A purely diffuse uncertainty estimate that never corresponds to a reusable or selectively removable learned dependency is not sufficient evidence for DGFW/RGSS.
+
+## Structural proposal grammar allowed in A
+
+The first implementation design should permit only generic operations already admitted by the developmental contract:
+
+- add/remove a dependency;
+- reverse or replace a dependency orientation as a generic structural mutation;
+- introduce a provisional latent-process mediator;
+- split/fork a competing structural hypothesis;
+- merge/retire redundant hypotheses;
+- change temporal or conditional scope;
+- retain the relationship in distributed form instead of consolidating explicit structure.
+
+The proposal machinery may not contain templates named `chain`, `fork`, `cause`, `parent`, `child`, `common cause`, or any task-family-specific detector.
+
+## Experiment A stages
+
+### A0 — intervention-semantics prerequisite
+
+Complete the simpler intervention curriculum and verify that intervention-aware prediction transfers to held-out simple worlds.
+
+### A1 — passive ambiguity
+
+Expose a long enough passive sequence to fit the observational distribution well.
+
+Required result: good passive prediction **without unjustified certainty about the hidden orientation**.
+
+### A2 — externally scheduled decisive intervention
+
+Apply the pre-registered clamp sequence to `x`.
+
+Required result: intervention-conditioned predictions and internal structural confidence move toward the family actually generating the world.
+
+### A3 — held-out intervention prediction
+
+Use new clamp values not seen in A2.
+
+Required result: Noema predicts the downstream distribution better than a passive-only or wrong-orientation model.
+
+### A4 — surface-remapped transfer
+
+Create a new world with:
+
+- permuted channel positions;
+- different coefficients and noise levels;
+- different numeric scales/offsets;
+- the same abstract ambiguity class;
+- no stable semantic channel names.
+
+Required result: prior learning reduces the evidence/compute needed to form useful alternative structures, without simply reusing old channel identities.
+
+### A5 — ablation
+
+Ablate the learned structure/operator/proposal knowledge claimed to produce transfer.
+
+Required result: the corresponding transfer or intervention-prediction advantage materially degrades while unrelated passive predictive capacity remains substantially intact.
+
+### A6 — meta-learning series
+
+Run a series of analogous but non-identical ambiguity worlds, mixed with negative-control worlds whose structure does not match the learned pattern.
+
+Required result: proposal efficiency improves on relevant worlds without forcing the same ontology onto negative controls.
+
+## Baselines
+
+At minimum compare against:
+
+1. **continuous-only predictor** — equivalent base capacity without explicit RGSS structural consolidation;
+2. **single-hypothesis ablation** — cannot preserve competing structural explanations;
+3. **intervention-blind ablation** — receives observations but not intervention provenance;
+4. **no-structure-meta-learning ablation** — learns each world but cannot improve proposal generation across worlds;
+5. **oracle structural upper bound** — evaluator supplies the correct structural family, used only to estimate achievable predictive performance;
+6. **semantic-cheat diagnostic** — receives privileged family/orientation labels and is explicitly disqualified as a developmental model; included only to detect whether the task itself is learnable under the resource budget.
+
+The important comparison is not merely whether Noema predicts well. It is whether explicit learned structure creates **intervention, transfer, locality, or sample-efficiency advantages** over the continuous-only baseline.
+
+## Primary evaluation criteria
+
+### Observational equivalence verification
+
+Before any learner is evaluated, the generator must analytically and numerically verify that Family C and Family F produce the same passive distribution to numerical tolerance.
+
+If this check fails, the trial is invalid.
+
+### Calibration before intervention
+
+Passive evidence must not produce unjustified near-certainty in one orientation.
+
+The exact metric depends on the uncertainty implementation, but the evaluation must penalize confident structural commitment that is unsupported by the passive likelihood.
+
+### Intervention-conditioned predictive gain
+
+After the decisive intervention, the learner's held-out interventional predictive score must improve relative to its own pre-intervention prediction and outperform the intervention-blind and wrong-structure baselines across random seeds.
+
+### Local revision
+
+The intervention should change confidence/structure specifically in the implicated dependency. Unrelated learned predictive relationships should not suffer broad degradation.
+
+### Transfer gain
+
+On surface-remapped worlds, the full system must reach equivalent structural/interventional performance with less evidence or fewer structural proposals than the no-meta-learning ablation.
+
+### Ablation specificity
+
+Removing the learned structure responsible for transfer should selectively reduce the claimed transfer/intervention benefit rather than merely wreck the entire predictor.
+
+## Statistical pass rule
+
+Avoid a single hand-picked seed or one arbitrary accuracy threshold.
+
+For each primary effect above, run a pre-registered set of random seeds/world parameterizations and require:
+
+- the full system's median effect to be in the predicted direction;
+- a bootstrap confidence interval for the key advantage over the relevant ablation/baseline to exclude zero;
+- no negative-control condition showing the same supposed structural advantage when the learned relation is absent.
+
+Exact seed count and confidence level belong in the implementation plan, but they must be fixed before looking at final test results.
+
+## Kill criteria for DGFW/RGSS at this stage
+
+The direction should be rejected or materially revised if, under a reasonable fixed compute budget, any of the following persists across implementation variants:
+
+1. the system can only generate the useful structural distinction when proposal rules encode family-specific semantics;
+2. explicit structure provides no intervention or transfer advantage over a comparably capable continuous-only model;
+3. preserving useful competing hypotheses causes intractable growth even in this tiny world;
+4. the learner becomes confidently wrong during the passive phase despite observational equivalence;
+5. intervention evidence causes broad global rewriting instead of local structural correction;
+6. transfer depends on stable channel identities or copied numeric parameters rather than reusable learned relational structure;
+7. proposal meta-learning makes later search faster only by forcing early-world ontology onto negative-control worlds.
+
+A failure here is a useful result. The experiment exists to prevent us from building a large organism around a bad epistemic substrate.
+
+## Resource discipline
+
+Experiment A should be intentionally small enough to run locally on ordinary hardware once implementation is authorized.
+
+No hosted compute, paid API, GitHub Actions runner, cloud deployment, or metered external service is part of the design.
+
+The implementation plan should prefer deterministic local generation and CPU-feasible baselines first. GPU use, if ever useful later, is a separate decision rather than an assumption.
 
 ## Experiment B handoff
 
-After A passes, B removes the external intervention schedule. Noema receives a set of possible interventions and must decide whether/when one is worth taking because its live hypotheses predict different outcomes. This adds epistemic action selection without yet adding broader organism-level wants or viability concerns.
+After A passes, B removes the external intervention schedule. Noema receives possible interventions and must decide whether/when one is worth taking because its live hypotheses predict different outcomes.
 
-## Still-open design items
+B therefore adds one new claim only: **active epistemic selection**.
 
-Before implementation, Experiment A still needs explicit decisions for:
+It should reuse A's world generators and evaluation machinery so any new success/failure can be attributed primarily to intervention choice rather than a changed epistemic substrate.
 
-- signal value regime and noise;
-- exact hidden generative families and how observational equivalence is guaranteed;
-- intervention semantics exposed to the learner;
-- candidate structural grammar available to RGSS;
-- uncertainty representation and calibration metric;
-- transfer-world generation;
-- baselines and ablations;
-- quantitative pass/fail and kill criteria;
-- resource budgets.
+## Remaining design frontier before implementation
+
+Experiment A is now much more tightly specified. The remaining architectural design work is to choose among a small number of generic realizations for:
+
+- uncertainty over competing structural hypotheses;
+- the continuous predictive substrate;
+- the slow explicit latent-process representation and binding;
+- the RGSS proposal mechanism under a fixed resource budget.
+
+Those choices should be compared against the experiment above, not selected because they are fashionable or familiar.
 
 No implementation is authorized by this document alone.
