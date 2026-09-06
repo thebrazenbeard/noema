@@ -52,13 +52,11 @@ Initial direction established:
 44. Valuation likely cannot be a single scalar reward. Noema should eventually support multiple learned concerns over different timescales and construct derived goals over predicted future states.
 45. Intracommunication/integration should preserve disagreement, confidence, provenance, and causal influence instead of flattening subsystem outputs into premature consensus.
 46. Full functional review is recorded in `FUNCTIONAL_CORE_STRESS_TEST.md`; concrete scenario attacks are recorded in `ADVERSARIAL_DEVELOPMENTAL_SCENARIOS.md`.
-47. Broad architecture families were compared. No conventional family cleanly satisfies the developmental contract. The strongest current synthesis is the provisional **Dynamic Generative Factor Workspace (DGFW)**: continuous sensorimotor representation plus optional learned latent factors/relations, uncertain active hypotheses, action-conditioned simulation, allocation, multi-timescale persistence, learned valuation, and local plasticity/metaplasticity.
-48. DGFW was adversarially stress-tested. `Factor` must not mean object slot; distributed phenomena must remain representable; factor formation must use domain-general evidence rather than semantic heuristics; multiple factorizations may remain live; the workspace must not become a privileged homunculus; raw provenance channels must not be born with human epistemic labels.
-49. Candidate factor formation is driven by persistent reusable residual structure, with proposed factors earning support through multi-horizon prediction, intervention response, transfer/recombination, uncertainty calibration, compression benefit, and local credit-assignment value.
-50. A foundational correction was made to the anti-cheating rule: **zero inductive bias is impossible**. Noema should instead use the weakest explicit domain-general inductive biases needed for learning while refusing to encode the target concepts it is supposed to discover. Current admissible candidates include temporal order, predictive usefulness, reuse/compression pressure, uncertainty preservation, intervention sensitivity, cross-context transfer, finite-resource pressure, and generic structural plasticity.
-51. The candidate search mechanism is now **Residual-Guided Structure Search (RGSS)**: preserve unexplained prediction residuals with provenance; detect recurring unexplained dependencies; generate local generic structural mutations; keep a resource-bounded Pareto set of competing hypotheses; use actions to discriminate them; consolidate structure only after repeated predictive/intervention/transfer survival.
-52. A key separation emerged: **proposal is not acceptance**. A future learned proposal policy may become better at suggesting hypotheses, but candidate structures still have to earn support through evidence. This gives a concrete path toward learning how to hypothesize without letting the hypothesis generator declare truth.
-53. RGSS therefore distinguishes **model learning** from **hypothesis-generation learning**. A mistake may teach both what belief should change and what kinds of explanatory revisions are worth proposing next time.
+47. Communication timing was corrected: Noema's intelligence must **not depend on language**, but communication should be a **first-class developmental track from the beginning**, not a late accessory added only after a world model is mature.
+48. Patrick↔Noema communication should be grounded through ordinary agent-produced observations and actions. Speech, text, gesture, demonstration, and correction may be available early, but referents, pragmatic force, reliability, and speaker-specific usage remain learned rather than privileged semantics.
+49. Operator instrumentation is distinct from learned communication. A diagnostic interpreter may render inspectable internal state into human-readable summaries for Patrick, but that path is read-only with respect to Noema and must not leak labels or evaluator conclusions back into the learner.
+50. Grounded communication is now a candidate intelligence criterion: tests should require situated reference, ambiguity handling, correction, epistemic source separation, transfer, and action coordination rather than treating fluent text as sufficient evidence.
+51. The communication/operator boundary is recorded in `COMMUNICATION_INTERFACE.md`.
 
 ## Open design frontier
 
@@ -66,7 +64,18 @@ The current architecture hypothesis is now narrow enough to attack at the mechan
 
 The main unresolved risk is **tractable open-ended structure search**. RGSS fails if candidate proposal/comparison requires combinatorial enumeration or if efficiency can only be recovered by adding semantic object/agent/self heuristics.
 
-The next design work should test a two-timescale search strategy:
+- open-ended latent structure;
+- dynamic relational binding/compositionality;
+- persistent uncertain state;
+- epistemic source/mode separation;
+- counterfactual simulation;
+- localizable continual learning and metaplasticity;
+- multi-timescale persistence and forgetting;
+- contestable internal integration;
+- intervention-sensitive learning;
+- learned valuation and allocation;
+- grounded communication without privileged semantic leakage;
+- diagnostic inspectability separated from the learner's own communication channel.
 
 - fast continuous/soft dependency learning to identify where structure may exist;
 - slower explicit structural consolidation/branching only when residual evidence, ambiguity, transfer value, or intervention value justify the cost.
