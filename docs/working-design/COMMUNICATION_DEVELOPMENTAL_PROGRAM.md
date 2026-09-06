@@ -65,6 +65,9 @@ Required achievement:
 
 - learn speaker-specific reliability and usage patterns;
 - distinguish literal referential evidence from request, warning, correction, joke-like play, uncertainty, or other pragmatic functions only as those distinctions become supported by experience;
+- infer communicative/action force separately from uncertainty about content, relevance, necessity, target, or scope;
+- avoid treating a local hedge such as `perhaps`, `maybe`, hesitation, punctuation, or an uncertainty-signaling emoji as automatic uncertainty about whether an otherwise clear action was requested;
+- learn when compact fragments can function as contextually clear imperative shorthand rather than defaulting them to commentary or topic labels;
 - ask for clarification or seek more evidence when multiple interpretations remain consequentially different.
 
 No fixed dialogue-act ontology is required.
@@ -111,7 +114,9 @@ Required achievement:
 
 Developmental interaction with Patrick may be rich and natural.
 
-Formal communication evaluation should include held-out referents, changed surface forms, new contexts, misleading speakers, ambiguous references, interrupted conversations, and situations where fluent but ungrounded responses would fail.
+Formal communication evaluation should include held-out referents, changed surface forms, new contexts, misleading speakers, ambiguous references, interrupted conversations, compact imperative fragments, locally hedged requests, uncertainty-signaling punctuation/emoji, and situations where fluent but ungrounded responses would fail.
+
+At least some evaluations should independently vary **whether an action is requested** and **what part of the utterance is uncertain**. A successful learner should not collapse these into one global uncertainty score.
 
 ## Outbound development
 
