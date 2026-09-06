@@ -37,21 +37,37 @@ Initial direction established:
 29. Every developmental claim should ultimately require acquisition, ablation, intervention, and transfer evidence, with privileged labels/IDs/scripted policies/evaluator leakage treated as disqualifying explanations.
 30. A proposed general substrate based on one persistent recurrent predictive latent state was adversarially stress-tested rather than accepted.
 31. Stress-test result: **prediction appears necessary but is not sufficient**. A single point latent state collapses uncertainty; next-step prediction can reward surface shortcuts; prediction alone does not establish causation, exploration, wants, empathy, abstraction, planning, durable memory, or correct credit assignment.
-32. Stronger surviving hypothesis: an evolving **belief state** over latent causes, preserving competing hypotheses and uncertainty, learning reusable structure through multi-horizon predictive compression, and treating Noema's own interventions as special causal evidence.
+32. Stronger surviving hypothesis: an evolving **belief state** over possible latent world states/explanations, preserving competing hypotheses and uncertainty, learning reusable structure through multi-horizon predictive compression, and treating Noema's own interventions as special evidence.
 33. Independent pressures still appear necessary: primitive viability/valence, multiple memory timescales, selective salience/attention, and the capacity for information-seeking when uncertainty matters.
 34. Controllability is evidence for selfhood but not identical to selfhood; tools, remote effectors, attachments, and other controllable structures require learned, potentially layered self/body/agency boundaries.
 35. Agenthood must not be credited merely because behavior prediction improves. Social tests must require latent agent-specific state/history/information models to outperform surface dynamical prediction.
 36. Abstraction should be tested as reusable compression and transfer across changed surface form, not merely good prediction on familiar cases.
 37. Full adversarial review is recorded in `PREDICTIVE_SUBSTRATE_STRESS_TEST.md`.
+38. A second functional review found **allocation/attention is functionally fundamental** because finite cognition must decide where scarce sensory, modeling, memory, learning, and planning resources go. The content of salience should largely be learned even if allocation capacity exists from birth.
+39. `Homeostasis` was broadened to **valuation/motivation**: primitive viability and valence seed the system, while later preferences, drives, commitments, and values can become learned and multi-timescale.
+40. The current functional skeleton is: **model/simulate; value/motivate; allocate/attend; act/intervene; learn/adapt**. Persistence/memory, uncertainty/provenance, multi-timescale operation, internal integration, and anti-cheating constraints remain cross-cutting requirements.
+41. Concrete adversarial scenarios exposed a major substrate requirement not captured by the five loops: **dynamic relational binding/compositionality**. False-belief reasoning, analogy, role transfer, nested agent models, and later language require reusable relations that can bind arbitrary learned entities/states without a pre-authored ontology.
+42. A second substrate requirement is **epistemic source/mode separation**. Observed, remembered, inferred, predicted, simulated, intended, and desired states may share representational machinery but must not silently collapse into one evidential status.
+43. Learning must support **structural locality of revision** so a correction can change the implicated belief, relation, or learning policy without indiscriminate global drift.
+44. Valuation likely cannot be a single scalar reward. Noema should eventually support multiple learned concerns over different timescales and construct derived goals over predicted future states.
+45. Intracommunication/integration should preserve disagreement, confidence, provenance, and causal influence instead of flattening subsystem outputs into premature consensus.
+46. Full functional review is recorded in `FUNCTIONAL_CORE_STRESS_TEST.md`; concrete scenario attacks are recorded in `ADVERSARIAL_DEVELOPMENTAL_SCENARIOS.md`.
 
 ## Open design frontier
 
-Do not choose implementation architecture yet.
+Do not choose implementation architecture merely because a familiar AI family already provides some of these pieces.
 
-The current substantive question is whether the minimal general foundation is best characterized as:
+The current functional skeleton survives, but the representational substrate now has strong constraints:
 
-**prediction + compression + uncertainty + intervention + viability**
+- open-ended latent structure;
+- dynamic relational binding/compositionality;
+- persistent uncertain state;
+- epistemic source/mode separation;
+- counterfactual simulation;
+- localizable continual learning and metaplasticity;
+- multi-timescale persistence and forgetting;
+- contestable internal integration;
+- intervention-sensitive learning;
+- learned valuation and allocation.
 
-and, critically, whether any of those terms can be derived from the others rather than being separate primitives.
-
-The next discussion should attack that five-part foundation for redundancy, hidden assumptions, and missing necessities before comparing implementation families.
+The next design step is to compare broad implementation families against these requirements and reject families that need privileged labels or bespoke cognitive modules to fake the developmental capabilities Noema is supposed to acquire.
