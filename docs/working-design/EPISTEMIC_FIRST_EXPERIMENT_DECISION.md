@@ -8,6 +8,13 @@ Patrick approved an **epistemic-first falsification experiment** before building
 
 The first serious experiment will isolate the epistemic core rather than mixing in full viability, learned drives, autonomous motivation, social development, and 3D embodiment at once.
 
+Patrick further approved the experiment sequence as **A then B**:
+
+1. **Experiment A — externally scheduled intervention.** First test whether Noema can preserve structural ambiguity and correctly revise from decisive intervention evidence when the intervention itself is supplied by the evaluator.
+2. **Experiment B — active epistemic intervention.** Only after A succeeds, require Noema to recognize which available intervention would discriminate its competing hypotheses and choose to perform it.
+
+B is gated on A. If Noema cannot interpret decisive evidence correctly, testing whether it knows when to seek that evidence is premature.
+
 ## Why
 
 The immediate architectural claim to falsify is whether Noema can form, preserve, revise, and reuse latent structure from ambiguous temporal evidence without privileged semantic labels.
@@ -61,6 +68,8 @@ The seventh criterion is the strongest meta-learning target: it tests whether No
 
 ## Design frontier
 
-Before implementation, specify the synthetic world, observation format, allowed intervention channel, candidate structural grammar, evaluation metrics, anti-cheating controls, ablations, and kill criteria.
+Experiment A is now the active design target. Its first world-design section is recorded in `EXPERIMENT_A_DESIGN.md`.
+
+Before implementation, specify the synthetic world, observation format, allowed intervention channel, candidate structural grammar, evaluation metrics, anti-cheating controls, ablations, kill criteria, and bounded resource budget.
 
 No implementation is authorized by this document alone.
