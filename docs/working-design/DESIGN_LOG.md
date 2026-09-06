@@ -60,9 +60,9 @@ Initial direction established:
 
 ## Open design frontier
 
-Do not choose implementation architecture merely because a familiar AI family already provides some of these pieces.
+The current architecture hypothesis is now narrow enough to attack at the mechanism level rather than by adding more named cognitive modules.
 
-The current functional skeleton survives, but the representational substrate now has strong constraints:
+The main unresolved risk is **tractable open-ended structure search**. RGSS fails if candidate proposal/comparison requires combinatorial enumeration or if efficiency can only be recovered by adding semantic object/agent/self heuristics.
 
 - open-ended latent structure;
 - dynamic relational binding/compositionality;
@@ -77,4 +77,7 @@ The current functional skeleton survives, but the representational substrate now
 - grounded communication without privileged semantic leakage;
 - diagnostic inspectability separated from the learner's own communication channel.
 
-The next design step is to compare broad implementation families against these requirements and reject families that need privileged labels or bespoke cognitive modules to fake the developmental capabilities Noema is supposed to acquire.
+- fast continuous/soft dependency learning to identify where structure may exist;
+- slower explicit structural consolidation/branching only when residual evidence, ambiguity, transfer value, or intervention value justify the cost.
+
+The design should also test whether learned proposal policies can accelerate this process without making early-world ontology self-perpetuating.
