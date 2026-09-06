@@ -1,6 +1,6 @@
 # Noema learning and training research synthesis
 
-Status: WORKING DESIGN RESEARCH / NOT IMPLEMENTATION APPROVAL
+Status: **WORKING DESIGN RESEARCH / SUCCESSOR ONLY / NOT IMPLEMENTATION APPROVAL / NOT R1 REMEDIATION**
 Date: 2026-09-06
 Base: `main@20f7f699ea15b2300c4aa796b286bdab658f52a3`
 
@@ -188,8 +188,9 @@ The first empirical package should compare at minimum:
 1. simple incremental predictive model / online system-identification baseline;
 2. recurrent probabilistic predictor with no replay;
 3. recurrent probabilistic predictor + bounded replay;
-4. stochastic latent state-space/world-model realization;
-5. only after those: scoped structural extension.
+4. predictive-state/PSR-like realization under the same causal contract;
+5. stochastic latent state-space/world-model realization under the same causal contract;
+6. only after those: scoped structural extension.
 
 Dreamer-like and TD-MPC2-like systems are useful engineering reference families, not identity-level requirements. PSR-like predictive sufficiency is a particularly important conceptual comparator. A simple online shallow world model that avoids forgetting by construction should be allowed to embarrass the deep architecture if it performs better under equal information and resource budgets.
 
