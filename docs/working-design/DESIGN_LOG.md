@@ -52,6 +52,11 @@ Initial direction established:
 44. Valuation likely cannot be a single scalar reward. Noema should eventually support multiple learned concerns over different timescales and construct derived goals over predicted future states.
 45. Intracommunication/integration should preserve disagreement, confidence, provenance, and causal influence instead of flattening subsystem outputs into premature consensus.
 46. Full functional review is recorded in `FUNCTIONAL_CORE_STRESS_TEST.md`; concrete scenario attacks are recorded in `ADVERSARIAL_DEVELOPMENTAL_SCENARIOS.md`.
+47. Communication timing was corrected: Noema's intelligence must **not depend on language**, but communication should be a **first-class developmental track from the beginning**, not a late accessory added only after a world model is mature.
+48. Patrick↔Noema communication should be grounded through ordinary agent-produced observations and actions. Speech, text, gesture, demonstration, and correction may be available early, but referents, pragmatic force, reliability, and speaker-specific usage remain learned rather than privileged semantics.
+49. Operator instrumentation is distinct from learned communication. A diagnostic interpreter may render inspectable internal state into human-readable summaries for Patrick, but that path is read-only with respect to Noema and must not leak labels or evaluator conclusions back into the learner.
+50. Grounded communication is now a candidate intelligence criterion: tests should require situated reference, ambiguity handling, correction, epistemic source separation, transfer, and action coordination rather than treating fluent text as sufficient evidence.
+51. The communication/operator boundary is recorded in `COMMUNICATION_INTERFACE.md`.
 
 ## Open design frontier
 
@@ -68,6 +73,8 @@ The current functional skeleton survives, but the representational substrate now
 - multi-timescale persistence and forgetting;
 - contestable internal integration;
 - intervention-sensitive learning;
-- learned valuation and allocation.
+- learned valuation and allocation;
+- grounded communication without privileged semantic leakage;
+- diagnostic inspectability separated from the learner's own communication channel.
 
 The next design step is to compare broad implementation families against these requirements and reject families that need privileged labels or bespoke cognitive modules to fake the developmental capabilities Noema is supposed to acquire.
