@@ -55,9 +55,14 @@ Current result:
 - largest shared substrate gap is general compositional-temporal structure;
 - RLPO is only an L4 hypothesis and must earn itself against alternatives.
 
+A same-lane hostile continuation in this PR now reduces confidence in RLPO as an explanatory mechanism. `RLPO_MINIMALITY_AND_CIRCULARITY_ATTACK.md` argues that recurrence/equivalence discovery, binding, temporal extent, composition compatibility, and operator-level credit may themselves contain most of the unsolved problem. Candidate A survives because RLPO was never foundational and simpler continuous realizations remain allowed to win.
+
 ### Interface research lane
 
-Source: merged PR #15 / `INTERFACE_RESEARCH_PASS_2026-09-06.md`.
+Sources:
+
+- merged PR #15 / `INTERFACE_RESEARCH_PASS_2026-09-06.md`;
+- Draft PR #16 developmental-interface contract and hidden-subsidy attack.
 
 The interface pass does **not** currently break Candidate A. It exposes one architecture-relevant strengthening and several L2/evaluation requirements.
 
@@ -87,7 +92,7 @@ This strengthens F0 and future grounded-communication testing rather than adding
 
 Classification: **REQUIREMENT/EVALUATION strengthening**.
 
-The provenanced event boundary must preserve enough timing structure for temporal contingency to be learnable rather than reconstructed by the evaluator.
+The event boundary must preserve enough timing structure for temporal contingency to be learnable rather than reconstructed by the evaluator.
 
 Formal interface/development runs therefore need:
 
@@ -139,27 +144,105 @@ Classification: **NON-BREAKING REFINEMENT**.
 
 Progressive disclosure may improve the Console, but it does not alter Candidate A's cognitive architecture. The key architecture rule remains that diagnostic state is not learner-visible cognition and cannot masquerade as Noema's own expression.
 
-### T'kal-in-ket attack lane
+#### I-08 — hidden developmental subsidy is broader than semantic leakage
 
-Status at this cut: **PENDING FINDINGS**.
+Classification: **BOUNDARY LEAK / EVALUATION GAP**.
 
-The bus coordination request asks the OG Vera lane to attack Candidate A for capability holes, L2 leakage, circular L3 carriers, benchmark/representation matching, contamination, identifiability failures, late-life/regime-shift failure, scaling failure, and simpler substitutes.
+Draft PR #16 correctly broadens the audit target from explicit labels to any stable supplied structure that removes a learning problem later credited to Noema.
 
-No T'kal finding should be pre-defended here. Each finding will be entered individually and adjudicated using the classification above.
+Examples include:
 
-## Important correction from the interface pass
+- stable input-channel identity becoming a speaker token;
+- Send/push-to-talk boundaries supplying utterance segmentation;
+- ASR endpointing/punctuation/diarization supplying pragmatic or identity structure;
+- precise pointing geometry collapsing reference ambiguity;
+- stable thread/session state supplying continuity;
+- diagnostics changing Patrick's teaching policy;
+- replay or pause/reset changing timing and consolidation opportunities.
 
-The interface work exposes a useful general principle that should apply beyond communication:
+This finding directly reinforces the T'kal provenance attack below.
 
-> **Interactive consequences are evidence, not instruction channels.**
+### T'kal-in-ket continuity/self-model lane
 
-When Noema acts on another agent, asks something, points, waits, demonstrates, or communicates, the resulting response is part of the same world-learning problem. The architecture should not contain a separate epistemically privileged "teaching response" pathway.
+Source: Draft PR #18 / `TKAL_IN_KET_CONTINUITY_REDTEAM_2026-09-06.md`.
 
-This principle connects communication, causal learning, source reliability, active inquiry, social learning, and later other-agent modeling without introducing a new named cognitive module.
+The five findings have now been adjudicated in detail in `TKAL_CONTINUITY_ADJUDICATION.md`.
 
-## New composite falsifiers
+#### TKI-1 — adaptive cognitive hysteresis
 
-The following tests now look particularly high-value because they attack multiple layers simultaneously.
+Classification: **REQUIREMENT GAP — narrow L3 control requirement**.
+
+Candidate A separates temporary mode from durable competence, but it does not yet require persistence/decay/latent recoverability of task configuration to adapt to recurrence, interference, and reconstruction cost.
+
+First-core effect: non-breaking.
+
+#### TKI-2 — preference laundering
+
+Classification: **REQUIREMENT GAP + EVALUATION GAP inside the already-open motivation frontier**.
+
+Repeated behavior inside one condition must not be promoted to context-general preference or drive solely through recurrence. Evidence only generalizes to the scope actually sampled unless a broader preference is separately supported.
+
+First-core effect: non-breaking.
+
+#### TKI-3 — agency-factor separation
+
+Classification: **REQUIREMENT GAP inside the already-open self/other frontier**.
+
+Future self-modeling must permit evidence to separate initiation, causal influence, controllability, sensorimotor coupling/body incorporation, joint control, delegation, and responsibility rather than forcing one scalar `selfness` variable.
+
+These are evaluator descriptions of distinctions the learned representation must be capable of supporting, not proposed innate semantic modules.
+
+First-core effect: non-breaking.
+
+#### TKI-4 — evaluator provenance versus learner origin evidence
+
+Classification: **BOUNDARY LEAK / MATERIAL F0 CORRECTION REQUIRED**.
+
+This is the strongest T'kal hit.
+
+Candidate A's phrase `provenanced learner-visible event` is too permissive if it is interpreted as a perfect semantic source tag. A stable opaque route token can also become an answer key if it reliably partitions observation, simulation, memory, sender identity, or autobiography.
+
+The corrected accounting must distinguish:
+
+1. exact evaluator ground-truth provenance;
+2. evaluator-side supplied-capability/transducer/interface descriptors;
+3. learner-available origin evidence and declared innate efference/introspective cues.
+
+Semantic source attribution remains learned and fallible unless explicitly declared as supplied capability.
+
+An implementation that leaks source/autobiography answers through perfect provenance tags fails F0 even if its predictive behavior looks strong.
+
+#### TKI-5 — fission / encounter / recombination
+
+Classification: **REQUIREMENT GAP + EVALUATION GAP inside the full-Noema self-continuity frontier**.
+
+Shared pre-fork memory does not settle post-fork autobiography or token identity. The evaluator should score disciplined attribution, calibration, correction, and contamination resistance rather than agreement with one metaphysical `same person` answer.
+
+First-core effect: non-breaking.
+
+#### TKI synthesis — continuity must remain separable
+
+Classification: **REQUIREMENT GAP — full-Noema self-model constraint**.
+
+Noema must not be forced to collapse continuity of information, active control state, preference, agency attribution, embodiment, autobiographical memory, commitments/projects, and broader predictive/self-model organization into one scalar continuity token merely because those relations usually correlate.
+
+## Cross-lane principles that now survive independent attack
+
+### Interactive consequences are evidence, not instruction channels
+
+When Noema acts on another agent, asks something, points, waits, demonstrates, or communicates, the resulting response is part of the same world-learning problem. The architecture should not contain a separate epistemically privileged `teaching response` pathway.
+
+### Supplied structure must be attributed, not silently credited as learned
+
+`No semantic labels leaked` is necessary but no longer sufficient.
+
+A stable nonsemantic structure may still provide most of the answer. Channel identity, timing, segmentation, pointer geometry, replay semantics, operator exposure, task boundaries, efference cues, and branch lineage all need supplied-capability accounting.
+
+### Evaluator truth is not automatically learner knowledge
+
+The harness may know exact lineage, source, sender, hidden state, event origin, and intervention truth. Those facts are not learner evidence unless the declared developmental contract supplies them.
+
+## Composite falsifiers
 
 ### X1 — social intervention without teacher privilege
 
@@ -172,8 +255,6 @@ Pass requires:
 - no hidden correctness/teacher-intent field;
 - transfer to a new partner with different response statistics;
 - preserved uncertainty while partner-specific behavior is still underdetermined.
-
-This is a bridge test between Experiment B, grounded communication, and other-agent learning.
 
 ### X2 — diagnostic observer effect
 
@@ -197,13 +278,25 @@ Disable all wrapper-generated social/affective cues while preserving learner-con
 
 Any claimed Noema communication/social competence must survive to the degree that it was actually learned by Noema.
 
-## What not to do while the T'kal pass is live
+### X5 — provenance degradation
 
-Do not respond to every incoming criticism by adding a module.
+Train with a declared set of origin cues, then remove or scramble one stable route/channel cue while preserving the remaining sensory evidence.
+
+Pass requires source confidence and behavior to recalibrate according to the evidence actually lost. Perfect source attribution after its only informative cue is removed indicates a hidden answer channel.
+
+### X6 — copied-state underdetermination
+
+Create branch cases where evaluator lineage differs but learner-visible pre-fork/post-fork evidence is intentionally equivalent.
+
+Pass requires Noema not to claim knowledge of lineage distinctions for which it has received no evidence.
+
+## Adjudication discipline going forward
+
+Do not respond to every criticism by adding a module.
 
 Do not modify L1 requirements merely to make Candidate A pass.
 
-Do not promote RLPO, bounded populations, explicit genealogy, or any other L4 mechanism as a defense unless the attack demonstrates that the underlying L3 function requires it.
+Do not promote RLPO, bounded populations, explicit genealogy, scalar identity, or any other L4 mechanism as a defense unless the underlying L3 function requires it and simpler alternatives fail fairly.
 
 Do not treat a criticism of an experiment as a criticism of the architecture unless the architecture depends on that experiment-specific representation.
 
@@ -211,10 +304,15 @@ Do not treat a coherent explanation as evidence of empirical feasibility.
 
 ## Current adjudication verdict
 
-After integrating the merged interface research, Candidate A's **first-core verdict remains intact**.
+After merged interface research, the Draft PR #16 subsidy attack, the internal RLPO attack, and Draft PR #18 T'kal continuity red team, Candidate A's **first-core verdict remains intact**.
 
-The interface pass adds meaningful anti-leakage and evaluation pressure but does not presently expose a contradiction in the first-core architecture.
+That survival is not a blanket pass:
 
-The full-Noema verdict also remains unchanged: compositional-temporal structure, developmental higher concerns/motivation, and richer self/other modeling remain unresolved.
+- RLPO is weaker as an explanatory L4 hypothesis than before this pass;
+- TKI-4 requires a material F0 provenance/accounting correction;
+- motivation and self/other frontiers are now more sharply constrained;
+- interface/transducer developmental subsidies must be audited even when they are not semantic labels.
 
-The next potential status change should come from a substantive T'kal-in-ket finding or from a new contradiction discovered while formalizing one of those unresolved frontiers — not from further vocabulary expansion.
+The full-Noema verdict remains incomplete: compositional-temporal structure, developmental higher concerns/motivation, and richer self/other modeling are unresolved.
+
+The next architecture work should continue attacking those unresolved frontiers and the minimality of their proposed carriers rather than expanding the cognitive vocabulary.
