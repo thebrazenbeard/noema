@@ -13,6 +13,8 @@ PR #31 acquired two independently produced online-learning state-transition draf
 
 They are strongly convergent rather than conflicting, but leaving their relationship unstated would create an avoidable authority/precedence ambiguity.
 
+A later direct-edit attempt on the non-`_DRAFT` contract was rejected by GitHub with a stale-content `409`. No force or blind overwrite was attempted. The safe response is fresh-head reconciliation while retaining both concurrent artifacts. This is itself a useful concurrency check: the source-control precondition prevented a stale write from erasing intervening work.
+
 ## Shared conclusion
 
 Both drafts independently require the same central discipline:
@@ -69,7 +71,7 @@ This is only PR-internal working precedence. It is not merged architecture autho
 
 ## Material unresolved seam
 
-The two drafts do not solve BT2's representation-drift problem for learned scope. The consolidated contract can prevent hidden scheduler/casual contamination, but a gate/candidate whose applicability depends on a changing latent representation still needs one of:
+The two drafts do not solve BT2's representation-drift problem for learned scope. The consolidated contract can prevent hidden scheduler/causal contamination, but a gate/candidate whose applicability depends on a changing latent representation still needs one of:
 
 - representation-invariant scope;
 - an explicit lawful remapping mechanism that does not use evaluator semantic correspondence; or
@@ -79,7 +81,7 @@ That remains a separate successor architecture problem rather than being papered
 
 ## Recommendation
 
-Keep both drafts during PR review for provenance, but treat the non-`_DRAFT` contract plus the hostile attack as the current consolidation target. Before merge, either:
+Keep both drafts during PR review for provenance, but treat the non-`_DRAFT` contract plus the hostile attack as the current consolidation target. Before merge, perform a fresh-head adjudication and then either:
 
 - fold any still-unique useful wording from the `_DRAFT` into the contract and retain the draft as research provenance; or
 - explicitly archive/remove the duplicate through reviewed source cleanup.
