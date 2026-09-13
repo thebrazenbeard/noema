@@ -12,6 +12,7 @@
     "subject",
     "effect_boundary",
     "information_boundary",
+    "comparator_fairness_contract",
     "candidates",
     "world",
     "stream_contract",
@@ -30,6 +31,7 @@
     "subject": {"$ref": "#/$defs/subject"},
     "effect_boundary": {"$ref": "#/$defs/effect_boundary"},
     "information_boundary": {"$ref": "#/$defs/information_boundary"},
+    "comparator_fairness_contract": {"$ref": "#/$defs/artifact_ref"},
     "candidates": {
       "type": "array",
       "minItems": 2,
@@ -60,6 +62,7 @@
         "properties": {
           "candidates": {
             "allOf": [
+              {"contains": {"properties": {"role": {"const": "C0"}}, "required": ["role"]}},
               {"contains": {"properties": {"role": {"const": "C1"}}, "required": ["role"]}},
               {"contains": {"properties": {"role": {"const": "C2"}}, "required": ["role"]}}
             ]
@@ -240,6 +243,7 @@
       "required": [
         "candidate_id",
         "role",
+        "base_substrate_id",
         "source_commit",
         "source_artifacts",
         "information_condition_id",
