@@ -5,7 +5,7 @@
   "description": "IP_CONFIDENTIAL. Inert preregistration schema. Validation never authorizes execution.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version","classification","status","subject","effect_boundary","information_boundary","candidates","world","stream_contract","resource_contract","audition_scope_contract","lineage_transfer_contract","scoring_contract","statistics_contract","controls","restart_contract","freeze_contract"],
+  "required": ["schema_version","classification","status","subject","effect_boundary","information_boundary","candidates","world","stream_contract","resource_contract","audition_scope_contract","lineage_transfer_contract","scoring_contract","statistics_contract","controls","restart_contract","freeze_contract","comparator_fairness_contract"],
   "properties": {
     "schema_version": {"const": "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V2"},
     "classification": {"enum": ["IP_CONFIDENTIAL","IP_REVIEW_REQUIRED"]},
@@ -23,7 +23,8 @@
     "statistics_contract": {"$ref":"#/$defs/statistics_contract"},
     "controls": {"$ref":"#/$defs/controls"},
     "restart_contract": {"$ref":"#/$defs/restart_contract"},
-    "freeze_contract": {"$ref":"#/$defs/freeze_contract"}
+    "freeze_contract": {"$ref":"#/$defs/freeze_contract"},
+    "comparator_fairness_contract": {"$ref":"#/$defs/artifact_ref"}
   },
   "allOf": [
     {
@@ -61,12 +62,13 @@
           "passive_observational_equivalence_required":{"const":true},
           "intervention_schedule_artifact":{"$ref":"#/$defs/artifact_ref"},
           "intervention_schedule_commitment":{"$ref":"#/$defs/sha256"},
+          "observational_equivalence_verification":{"type":"object","additionalProperties":false,"required":["analytic_check","numeric_check","numeric_tolerance"],"properties":{"analytic_check":{"const":true},"numeric_check":{"const":true},"numeric_tolerance":{"type":"number","exclusiveMinimum":0}}},
           "schedule_may_adapt_to_hidden_family":{"const":false},
           "schedule_may_adapt_to_candidate_predictions":{"const":false},
           "schedule_may_adapt_to_scored_outcomes":{"const":false},
           "schedule_may_adapt_to_evaluator_diagnostics":{"const":false}
         }},
-        "audition_scope_contract":{"properties":{"simple_audition_rival_required":{"const":true}}},
+        "audition_scope_contract":{"properties":{"simple_audition_rival_required":{"const":true},"simple_audition_probability":{"type":"number","exclusiveMinimum":0,"maximum":1}}},
         "scoring_contract":{"properties":{
           "primary_claims":{"type":"array","minItems":1,"uniqueItems":true,"items":{"enum":["S","T","L","G"]}},
           "c2_vs_c4_external_comparison_required":{"const":true}
@@ -100,12 +102,20 @@
     },
     "subject": {
       "type":"object","additionalProperties":false,
-      "required":["project","repository","design_base_commit","implementation_subject_commit","experiment_family","stage","manifest_logical_id","created_at"],
+      "required":["project","repository","design_base_commit","implementation_subject_commit","implementation_subject_manifest","schema_artifact","validator_artifact","comparator_fairness_artifact","resource_addendum_artifact","decidability_addendum_artifact","comparator_matrix_addendum_artifact","comparator_interface_artifact","experiment_family","stage","manifest_logical_id","created_at"],
       "properties":{
         "project":{"const":"Noema"},
         "repository":{"const":"thebrazenbeard/noema"},
         "design_base_commit":{"$ref":"#/$defs/sha40"},
         "implementation_subject_commit":{"$ref":"#/$defs/sha40"},
+        "implementation_subject_manifest":{"$ref":"#/$defs/artifact_ref"},
+        "schema_artifact":{"$ref":"#/$defs/artifact_ref"},
+        "validator_artifact":{"$ref":"#/$defs/artifact_ref"},
+        "comparator_fairness_artifact":{"$ref":"#/$defs/artifact_ref"},
+        "resource_addendum_artifact":{"$ref":"#/$defs/artifact_ref"},
+        "decidability_addendum_artifact":{"$ref":"#/$defs/artifact_ref"},
+        "comparator_matrix_addendum_artifact":{"$ref":"#/$defs/artifact_ref"},
+        "comparator_interface_artifact":{"$ref":"#/$defs/artifact_ref"},
         "experiment_family":{"const":"MINIMAL_STRUCTURAL_VALUE_FALSIFICATION"},
         "stage":{"enum":["SVF-0","SVF-1"]},
         "manifest_logical_id":{"$ref":"#/$defs/nonempty"},
@@ -223,10 +233,11 @@
     },
     "resource_contract": {
       "type":"object","additionalProperties":false,
-      "required":["resource_condition_id","measurement_method","fixed_total_envelope","replay_limits","structural_limits"],
+      "required":["resource_condition_id","measurement_method","measurement_artifact","fixed_total_envelope","replay_limits","structural_limits"],
       "properties":{
         "resource_condition_id":{"$ref":"#/$defs/nonempty"},
         "measurement_method":{"$ref":"#/$defs/nonempty"},
+        "measurement_artifact":{"$ref":"#/$defs/artifact_ref"},
         "fixed_total_envelope":{
           "type":"object","additionalProperties":false,
           "required":["max_resident_memory_bytes","max_durable_state_bytes","max_update_cpu_seconds_per_event","max_query_cpu_seconds_per_event","max_shadow_auditions_per_event"],
@@ -282,12 +293,13 @@
     },
     "lineage_transfer_contract": {
       "type":"object","additionalProperties":false,
-      "required":["cross_world_transfer_used","policy_artifact","matched_candidate_carryover_required","state_scope_manifest_required","evaluator_lineage_ids_learner_visible","reset_and_continue_conditions_distinguished"],
+      "required":["cross_world_transfer_used","policy_artifact","matched_candidate_carryover_required","state_scope_manifest_required","state_scope_manifest_artifacts","evaluator_lineage_ids_learner_visible","reset_and_continue_conditions_distinguished"],
       "properties":{
         "cross_world_transfer_used":{"type":"boolean"},
         "policy_artifact":{"oneOf":[{"$ref":"#/$defs/artifact_ref"},{"type":"null"}]},
         "matched_candidate_carryover_required":{"const":true},
         "state_scope_manifest_required":{"const":true},
+        "state_scope_manifest_artifacts":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/artifact_ref"}},
         "evaluator_lineage_ids_learner_visible":{"const":false},
         "reset_and_continue_conditions_distinguished":{"const":true}
       }
