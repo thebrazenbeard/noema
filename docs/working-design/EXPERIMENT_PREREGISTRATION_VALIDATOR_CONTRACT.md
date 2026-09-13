@@ -11,6 +11,7 @@ Schema under validation:
 
 Companion design:
 - `MINIMAL_STRUCTURAL_VALUE_FALSIFICATION_FAMILY.md`
+- `C0_C4_FAIR_COMPARISON_AND_CLAIM_BOUNDARY_MATRIX.md`
 - `EXPERIMENT_SCOPE_SUPPORT_AND_AUDITION_LEDGER.md`
 - `PREQUENTIAL_SCOPE_APPLICABILITY_CONTRACT.md`
 - `REPRESENTATION_DRIFT_SCOPE_CONTINUITY_CONTRACT.md`
@@ -126,6 +127,12 @@ Verify that no learner-visible path contains:
 
 Violation returns `FAIL_INFORMATION_BOUNDARY`.
 
+### V3.3 — diagnostic isolation
+
+A reference, oracle, or semantic-cheat diagnostic may be run only as an evaluator diagnostic. It must not share learner weights, learner state, replay, RNG state, outputs, or mutable side effects with a developmental candidate. Any shared path must be declared as a different subject, and diagnostic outputs must not enter developmental updates.
+
+Violation returns `FAIL_INFORMATION_BOUNDARY`.
+
 ## 6. Comparator fairness
 
 ### V4 — information-condition equivalence
@@ -152,6 +159,20 @@ Verify that replay privilege is explicit:
 - replay compute charge.
 
 If C4 receives richer or more frequent replay than C2, the comparison must be labeled as a different opportunity/resource condition unless a matched condition exists.
+
+### V4.3 — C0–C4 ladder and claim boundary
+
+Resolve the immutable `comparator_fairness_contract` artifact and apply its matrix.
+
+For SVF-0, require independently identifiable C0, C1, and C2 entries. C0 is a persistence floor; C1/C2 must share the declared base substrate and differ only by the preregistered replay condition for the replay comparison.
+
+For SVF-1, require C2 and C4. C2 and C4 must resolve to the same declared base-substrate contract, including initialization/state-capacity and logical update-schedule conditions, unless the manifest labels the result as a different comparison condition. A fixed-envelope claim does not waive this requirement.
+
+If C3 is present, verify that it uses the same learner-visible stream and declared base/resource conditions as the comparison row it enters. If C3 is omitted, a future positive C4 result is limited to the explicit C2-versus-C4 whole-system claim; it may not be reported as superiority over the strongest non-scoped structural alternative without a predeclared equivalent C3 comparison.
+
+For claim G, verify the same C4 candidate machinery, base condition, learner-visible stream, resource meter, and declared audit quota in learned-scope and bounded-audition modes; only the scope/audition policy may differ.
+
+Violation returns `FAIL_CROSS_FIELD_INVARIANT` or `FAIL_RESOURCE_ACCOUNTING` as applicable.
 
 ## 7. Resource accounting validation
 
@@ -183,6 +204,12 @@ For a result described as `FIXED_TOTAL_ENVELOPE`, verify from the ledger that no
 
 A run that exceeded the envelope may remain useful exploratory evidence but cannot satisfy the fixed-envelope primary claim.
 
+### V5.3 — immutable measurement-route closure
+
+The manifest's resource measurement method must resolve to an immutable measurement/interface artifact or an exact implementation-facing contract. Free prose such as "reasonable", "bounded", or "measured locally" is not a measurement route.
+
+Every consumed resource class listed by the comparator contract must map to a counter, deterministic proxy, or declared exclusion. A consumed class with no route invalidates a fixed-envelope claim and returns `FAIL_RESOURCE_ACCOUNTING`.
+
 ## 8. Scope/support validation
 
 ### V6 — scope-ticket ordering
@@ -207,7 +234,11 @@ For any claim of strong scope confidence, verify that the claim's region satisfi
 
 Importance sampling, doubly robust estimation, or a learned estimator cannot override this rule.
 
-### V6.3 — simpler audition rival
+### V6.3 — support-class claim admissibility
+
+For a strong positive scoped claim, verify that each contributing region satisfies the frozen direct or lawful transported support rule. `DIRECT_WEAK`, `OFF_POLICY_WEAK`, `ZERO_OR_UNKNOWN_SUPPORT`, `NOT_AUDITED`, `COUNTERFACTUAL_UNOBSERVED`, unresolved, and invalidated opportunities cannot be silently counted as strong positive support. `OFF_POLICY_SUPPORTED` requires a preregistered nonzero-overlap condition and widened uncertainty; it is not equivalent to direct support.
+
+### V6.4 — simpler audition rival
 
 For primary learned-scope claim `G`, verify that the same candidate machinery was evaluated against the frozen simpler bounded-audition rival.
 
@@ -277,7 +308,7 @@ If checkpointing is used and restart equivalence is claimed, verify that persist
 
 Loss of required state forfeits restart equivalence.
 
-A restarted run may continue only under the frozen contract if the missing state cannot alter future evidence semantics.
+If any required restart state is missing, quarantine the affected run from primary trajectory claims. Continuing after the loss requires a new run identity or a separately predeclared recovery protocol with its own validity conditions; a reviewer may not restore restart equivalence by asserting that the missing state was probably irrelevant.
 
 ## 12. Freeze integrity
 
