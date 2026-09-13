@@ -24,84 +24,86 @@
     "freeze_contract"
   ],
   "properties": {
-    "schema_version": {
-      "const": "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V1"
-    },
-    "classification": {
-      "enum": ["IP_CONFIDENTIAL", "IP_REVIEW_REQUIRED"]
-    },
-    "status": {
-      "const": "PREREGISTERED_INERT_UNTIL_SEPARATE_EXECUTION_AUTHORITY"
-    },
-    "subject": {
-      "$ref": "#/$defs/subject"
-    },
-    "effect_boundary": {
-      "$ref": "#/$defs/effect_boundary"
-    },
-    "information_boundary": {
-      "$ref": "#/$defs/information_boundary"
-    },
+    "schema_version": {"const": "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V1"},
+    "classification": {"enum": ["IP_CONFIDENTIAL", "IP_REVIEW_REQUIRED"]},
+    "status": {"const": "PREREGISTERED_INERT_UNTIL_SEPARATE_EXECUTION_AUTHORITY"},
+    "subject": {"$ref": "#/$defs/subject"},
+    "effect_boundary": {"$ref": "#/$defs/effect_boundary"},
+    "information_boundary": {"$ref": "#/$defs/information_boundary"},
     "candidates": {
       "type": "array",
       "minItems": 2,
       "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/candidate"
-      }
+      "items": {"$ref": "#/$defs/candidate"}
     },
-    "world": {
-      "$ref": "#/$defs/world"
-    },
-    "stream_contract": {
-      "$ref": "#/$defs/stream_contract"
-    },
-    "resource_contract": {
-      "$ref": "#/$defs/resource_contract"
-    },
-    "audition_scope_contract": {
-      "$ref": "#/$defs/audition_scope_contract"
-    },
-    "scoring_contract": {
-      "$ref": "#/$defs/scoring_contract"
-    },
-    "statistics_contract": {
-      "$ref": "#/$defs/statistics_contract"
-    },
-    "controls": {
-      "$ref": "#/$defs/controls"
-    },
-    "restart_contract": {
-      "$ref": "#/$defs/restart_contract"
-    },
-    "freeze_contract": {
-      "$ref": "#/$defs/freeze_contract"
-    }
+    "world": {"$ref": "#/$defs/world"},
+    "stream_contract": {"$ref": "#/$defs/stream_contract"},
+    "resource_contract": {"$ref": "#/$defs/resource_contract"},
+    "audition_scope_contract": {"$ref": "#/$defs/audition_scope_contract"},
+    "scoring_contract": {"$ref": "#/$defs/scoring_contract"},
+    "statistics_contract": {"$ref": "#/$defs/statistics_contract"},
+    "controls": {"$ref": "#/$defs/controls"},
+    "restart_contract": {"$ref": "#/$defs/restart_contract"},
+    "freeze_contract": {"$ref": "#/$defs/freeze_contract"}
   },
   "allOf": [
     {
       "if": {
         "properties": {
           "subject": {
-            "properties": {
-              "stage": {
-                "const": "SVF-1"
-              }
-            },
+            "properties": {"stage": {"const": "SVF-0"}},
             "required": ["stage"]
           }
         }
       },
       "then": {
         "properties": {
+          "candidates": {
+            "allOf": [
+              {"contains": {"properties": {"role": {"const": "C1"}}, "required": ["role"]}},
+              {"contains": {"properties": {"role": {"const": "C2"}}, "required": ["role"]}}
+            ]
+          },
           "world": {
             "properties": {
-              "intervention_mode": {
-                "const": "EXTERNALLY_SCHEDULED"
-              },
-              "passive_observational_equivalence_required": {
-                "const": true
+              "intervention_mode": {"const": "NONE"},
+              "passive_observational_equivalence_required": {"const": false}
+            }
+          },
+          "scoring_contract": {
+            "properties": {
+              "primary_claims": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {"const": "S"}
               }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "subject": {
+            "properties": {"stage": {"const": "SVF-1"}},
+            "required": ["stage"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "candidates": {
+            "allOf": [
+              {"contains": {"properties": {"role": {"const": "C2"}}, "required": ["role"]}},
+              {"contains": {"properties": {"role": {"const": "C4"}}, "required": ["role"]}}
+            ]
+          },
+          "world": {
+            "properties": {
+              "intervention_mode": {"const": "EXTERNALLY_SCHEDULED"},
+              "passive_observational_equivalence_required": {"const": true}
             },
             "required": [
               "intervention_mode",
@@ -125,18 +127,9 @@
     }
   ],
   "$defs": {
-    "sha40": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{40}$"
-    },
-    "sha256": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
-    },
-    "nonempty_string": {
-      "type": "string",
-      "minLength": 1
-    },
+    "sha40": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nonempty_string": {"type": "string", "minLength": 1},
     "artifact_ref": {
       "type": "object",
       "additionalProperties": false,
@@ -156,6 +149,7 @@
         "project",
         "repository",
         "design_base_commit",
+        "implementation_subject_commit",
         "experiment_family",
         "stage",
         "manifest_logical_id",
@@ -165,12 +159,7 @@
         "project": {"const": "Noema"},
         "repository": {"const": "thebrazenbeard/noema"},
         "design_base_commit": {"$ref": "#/$defs/sha40"},
-        "implementation_subject_commit": {
-          "oneOf": [
-            {"$ref": "#/$defs/sha40"},
-            {"type": "null"}
-          ]
-        },
+        "implementation_subject_commit": {"$ref": "#/$defs/sha40"},
         "experiment_family": {"const": "MINIMAL_STRUCTURAL_VALUE_FALSIFICATION"},
         "stage": {"enum": ["SVF-0", "SVF-1"]},
         "manifest_logical_id": {"$ref": "#/$defs/nonempty_string"},
@@ -257,7 +246,8 @@
         "opportunity_condition_id",
         "resource_condition_id",
         "replay_policy_id",
-        "scope_policy_id"
+        "scope_policy_id",
+        "developmental_evidence_eligible"
       ],
       "properties": {
         "candidate_id": {"$ref": "#/$defs/nonempty_string"},
@@ -280,7 +270,27 @@
         "replay_policy_id": {"$ref": "#/$defs/nonempty_string"},
         "scope_policy_id": {"$ref": "#/$defs/nonempty_string"},
         "developmental_evidence_eligible": {"type": "boolean"}
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "role": {"enum": ["REFERENCE", "ORACLE_DIAGNOSTIC", "CHEAT_DIAGNOSTIC"]}
+            },
+            "required": ["role"]
+          },
+          "then": {
+            "properties": {
+              "developmental_evidence_eligible": {"const": false}
+            }
+          },
+          "else": {
+            "properties": {
+              "developmental_evidence_eligible": {"const": true}
+            }
+          }
+        }
+      ]
     },
     "world": {
       "type": "object",
@@ -356,9 +366,7 @@
         "checkpoint_limits"
       ],
       "properties": {
-        "resource_views": {
-          "const": ["FIXED_TOTAL_ENVELOPE", "RESOURCE_PERFORMANCE_FRONTIER"]
-        },
+        "resource_views": {"const": ["FIXED_TOTAL_ENVELOPE", "RESOURCE_PERFORMANCE_FRONTIER"]},
         "measurement_method": {"$ref": "#/$defs/nonempty_string"},
         "fixed_total_envelope": {
           "type": "object",
@@ -374,7 +382,7 @@
         "replay_limits": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["raw_buffer_capacity_events", "max_replay_updates_per_event", "replay_compute_charged"],
+          "required": ["raw_buffer_capacity_events", "max_replay_updates_per_event", "replay_compute_charged", "replay_selection_policy_id"],
           "properties": {
             "raw_buffer_capacity_events": {"type": "integer", "minimum": 0},
             "max_replay_updates_per_event": {"type": "integer", "minimum": 0},
@@ -417,7 +425,8 @@
         "selection_probability_logged_before_outcome",
         "zero_support_confidence_allowed",
         "off_policy_estimator_may_override_zero_support",
-        "representation_drift_requires_support_disposition"
+        "representation_drift_requires_support_disposition",
+        "support_class_thresholds"
       ],
       "properties": {
         "scope_ticket_required_before_outcome": {"const": true},
@@ -491,7 +500,8 @@
         "multiple_comparison_rule",
         "stopping_rule",
         "maximum_worlds",
-        "maximum_events_per_world"
+        "maximum_events_per_world",
+        "kill_criteria"
       ],
       "properties": {
         "seed_count": {"type": "integer", "minimum": 2},
@@ -583,12 +593,16 @@
     }
   },
   "x-noema-invariants": [
+    "candidate_id values MUST be unique even when candidate objects differ in other fields; standard JSON Schema uniqueItems is insufficient for key uniqueness, so the future manifest validator must enforce this.",
     "learner_visible_field_names and evaluator_only_field_names MUST be disjoint; standard JSON Schema cannot enforce cross-array disjointness, so the future manifest validator must.",
     "Evaluator-only fields MUST have no learner ingress unless a new subject explicitly admits an ordinary learner-visible field through the governed information boundary.",
+    "Each candidate source_commit MUST match the commits bound by its source_artifacts at execution; a mismatch invalidates the subject.",
     "C2 and C4 primary comparisons MUST receive identical learner-visible world streams and externally scheduled interventions in SVF-1.",
     "Every scored prediction/action/scope decision MUST be committed before its scored outcome becomes visible.",
     "Replay records MUST NOT be enriched with evaluator annotations or future-derived semantic labels after original experience.",
     "NOT_AUDITED, COUNTERFACTUAL_UNOBSERVED, unresolved, invalidated, success, and failure MUST remain distinct through aggregation.",
+    "Every primary_metrics claim value MUST be present in primary_claims; the future manifest validator must enforce this cross-collection invariant.",
+    "If transfer claim T is primary, no_meta_learning_ablation MUST be true.",
     "Zero or unknown support MUST NOT be transformed into strong scope confidence by IPS, doubly robust estimation, learned reward models, or another estimator.",
     "A material representation change MUST close or explicitly transport the prior support interval before confidence is reused.",
     "Resource charges for replay, structure, scope inference, audition, checkpointing, and candidate probation MUST be nonzero when resources are actually consumed; unmeasured is not zero.",
