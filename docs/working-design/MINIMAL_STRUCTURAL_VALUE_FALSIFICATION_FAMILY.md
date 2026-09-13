@@ -370,8 +370,8 @@ It would not establish:
 
 ## 16. Exact next design frontier
 
-The structural-value family is now narrow enough that the next research unit should be a **pre-registration manifest schema**, not another architecture document.
+The preregistration schema V2, validator contract, resource/decidability/comparator addenda, and C0–C4 fairness matrix now define the inert research boundary. The next frontier is no longer another conceptual architecture document.
 
-That schema should bind the future authorized implementation to exact evidence, resource, support, scoring, restart, and stopping semantics while keeping evaluator-only fields mechanically separated from learner-visible state.
+The next gated unit is a separately authorized implementation-source lane for the smallest concrete C1/C2 recurrent probabilistic substrate, C4 structural candidate, comparator instrumentation, resource meters, state-scope/lineage evidence, and hostile unit tests. That lane must first bind a real immutable implementation-subject manifest; it must not fabricate a PASS fixture from design-only commits.
 
-The schema itself may be designed now. Populating it with an executable implementation subject or running it remains separately gated.
+Model training and experiment execution remain separately gated even after implementation-source work exists.
