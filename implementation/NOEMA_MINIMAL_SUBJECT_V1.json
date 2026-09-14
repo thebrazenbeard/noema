@@ -1,0 +1,45 @@
+{
+  "schema": "NOEMA_IMPLEMENTATION_SUBJECT_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "research_parent_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "source_commit": "d19a55edd2d29403e90231532070d37979852772",
+  "source_paths": [
+    "src/noema/__init__.py",
+    "src/noema/provenance.py",
+    "src/noema/boundary.py",
+    "src/noema/candidates.py",
+    "src/noema/accounting.py",
+    "src/noema/comparator.py",
+    "src/noema/validator.py"
+  ],
+  "test_paths": [
+    "tests/test_package_boundary.py",
+    "tests/test_provenance.py",
+    "tests/test_boundary.py",
+    "tests/test_c1_c2.py",
+    "tests/test_c4.py",
+    "tests/test_accounting_comparator.py",
+    "tests/test_validator.py",
+    "tests/test_hostile_contracts.py"
+  ],
+  "instrumentation_paths": [
+    "src/noema/accounting.py",
+    "src/noema/comparator.py",
+    "src/noema/validator.py"
+  ],
+  "runtime": {
+    "python": "3.13.5",
+    "jsonschema": "4.26.0",
+    "pytest": "9.0.2"
+  },
+  "authority": {
+    "i0_source_authorized": true,
+    "i1_deterministic_verification_authorized": true,
+    "training_executed": false,
+    "experiment_executed": false,
+    "hosted_compute_used": false,
+    "merge_authorized": false,
+    "deployment_authorized": false,
+    "publication_authorized": false
+  }
+}
