@@ -130,3 +130,241 @@ def transition_c2_once(
     updated_base = transition_c1(state.base, observation, c1_config)
     updated_replay = state.replay.append(observation)
     return C2State(base=updated_base, replay=updated_replay)
+
+from enum import Enum
+
+_SEMANTIC_STRUCTURAL_TOKENS = (
+    "cause",
+    "parent",
+    "child",
+    "chain",
+    "fork",
+    "common cause",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class Dependency:
+    source: int
+    target: int
+    weight: float
+    scope: str
+
+    def __post_init__(self) -> None:
+        if self.source < 0 or self.target < 0:
+            raise ValueError("dependency endpoints must be nonnegative")
+        if self.source == self.target:
+            raise ValueError("self-dependency is not allowed in the minimal C4 subject")
+        if not math.isfinite(self.weight):
+            raise ValueError("dependency weight must be finite")
+        normalized = self.scope.strip().lower().replace("_", " ")
+        if not normalized:
+            raise ValueError("scope must be nonempty")
+        if any(token in normalized for token in _SEMANTIC_STRUCTURAL_TOKENS):
+            raise ValueError("semantic structural labels are forbidden")
+
+
+@dataclass(frozen=True, slots=True)
+class StructuralHypothesis:
+    handle: str
+    dependencies: tuple[Dependency, ...]
+    confidence: float
+
+    def __post_init__(self) -> None:
+        if not self.handle:
+            raise ValueError("hypothesis handle must be nonempty")
+        if not math.isfinite(self.confidence) or not (0.0 <= self.confidence <= 1.0):
+            raise ValueError("hypothesis confidence must be in [0, 1]")
+        if len(set(self.dependencies)) != len(self.dependencies):
+            raise ValueError("duplicate dependency in one hypothesis")
+
+
+@dataclass(frozen=True, slots=True)
+class C4Config:
+    max_active_hypotheses: int
+    max_abs_weight: float
+
+    def __post_init__(self) -> None:
+        if self.max_active_hypotheses < 1:
+            raise ValueError("max_active_hypotheses must be at least 1")
+        if not math.isfinite(self.max_abs_weight) or self.max_abs_weight <= 0:
+            raise ValueError("max_abs_weight must be finite and positive")
+
+
+@dataclass(frozen=True, slots=True)
+class C4State:
+    base: GaussianState
+    hypotheses: tuple[StructuralHypothesis, ...]
+
+    def validate(self, config: C4Config) -> "C4State":
+        if len(self.hypotheses) > config.max_active_hypotheses:
+            raise ValueError("structural hypothesis population exceeds configured cap")
+        handles = tuple(h.handle for h in self.hypotheses)
+        if len(set(handles)) != len(handles):
+            raise ValueError("structural hypothesis handles must be unique")
+        dimension = len(self.base.mean)
+        for hypothesis in self.hypotheses:
+            for dependency in hypothesis.dependencies:
+                if dependency.source >= dimension or dependency.target >= dimension:
+                    raise ValueError("dependency endpoint outside base dimension")
+                if abs(dependency.weight) > config.max_abs_weight:
+                    raise ValueError("dependency weight exceeds configured cap")
+        return self
+
+
+class ProposalKind(str, Enum):
+    ADD_DEPENDENCY = "add_dependency"
+    REMOVE_DEPENDENCY = "remove_dependency"
+    REPLACE_ORIENTATION = "replace_orientation"
+    CHANGE_SCOPE = "change_scope"
+    SPLIT_HYPOTHESIS = "split_hypothesis"
+    MERGE_RETIRE = "merge_retire"
+
+
+@dataclass(frozen=True, slots=True)
+class StructuralProposal:
+    kind: ProposalKind
+    hypothesis_handle: str
+    dependency: Dependency | None = None
+    new_scope: str | None = None
+    new_handle: str | None = None
+    retire_handle: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.hypothesis_handle:
+            raise ValueError("hypothesis_handle must be nonempty")
+
+
+def structural_predict(
+    state: C4State,
+    observation_context: tuple[float, ...],
+    config: C4Config,
+) -> Prediction:
+    state.validate(config)
+    _check_vector(observation_context, name="observation_context")
+    if len(observation_context) != len(state.base.mean):
+        raise ValueError("observation_context dimension mismatch")
+    adjusted = list(state.base.mean)
+    total_confidence = sum(h.confidence for h in state.hypotheses)
+    if total_confidence > 0.0:
+        for hypothesis in state.hypotheses:
+            share = hypothesis.confidence / total_confidence
+            for dependency in hypothesis.dependencies:
+                adjusted[dependency.target] += (
+                    share * dependency.weight * observation_context[dependency.source]
+                )
+    return Prediction(mean=tuple(adjusted), variance=state.base.variance)
+
+
+def _replace_hypothesis(
+    state: C4State,
+    replacement: StructuralHypothesis,
+) -> C4State:
+    return C4State(
+        base=state.base,
+        hypotheses=tuple(
+            replacement if h.handle == replacement.handle else h for h in state.hypotheses
+        ),
+    )
+
+
+def apply_structural_proposal(
+    state: C4State,
+    proposal: StructuralProposal,
+    config: C4Config,
+) -> C4State:
+    state.validate(config)
+    by_handle = {h.handle: h for h in state.hypotheses}
+    if proposal.hypothesis_handle not in by_handle:
+        raise ValueError("proposal references unknown hypothesis")
+    current = by_handle[proposal.hypothesis_handle]
+
+    if proposal.kind is ProposalKind.ADD_DEPENDENCY:
+        if proposal.dependency is None:
+            raise ValueError("add_dependency requires dependency")
+        replacement = StructuralHypothesis(
+            current.handle,
+            (*current.dependencies, proposal.dependency),
+            current.confidence,
+        )
+        return _replace_hypothesis(state, replacement).validate(config)
+
+    if proposal.kind is ProposalKind.REMOVE_DEPENDENCY:
+        if proposal.dependency is None or proposal.dependency not in current.dependencies:
+            raise ValueError("remove_dependency requires an existing dependency")
+        replacement = StructuralHypothesis(
+            current.handle,
+            tuple(d for d in current.dependencies if d != proposal.dependency),
+            current.confidence,
+        )
+        return _replace_hypothesis(state, replacement).validate(config)
+
+    if proposal.kind is ProposalKind.REPLACE_ORIENTATION:
+        if proposal.dependency is None or proposal.dependency not in current.dependencies:
+            raise ValueError("replace_orientation requires an existing dependency")
+        reversed_dep = Dependency(
+            source=proposal.dependency.target,
+            target=proposal.dependency.source,
+            weight=proposal.dependency.weight,
+            scope=proposal.dependency.scope,
+        )
+        replacement = StructuralHypothesis(
+            current.handle,
+            tuple(reversed_dep if d == proposal.dependency else d for d in current.dependencies),
+            current.confidence,
+        )
+        return _replace_hypothesis(state, replacement).validate(config)
+
+    if proposal.kind is ProposalKind.CHANGE_SCOPE:
+        if proposal.dependency is None or proposal.dependency not in current.dependencies:
+            raise ValueError("change_scope requires an existing dependency")
+        if proposal.new_scope is None:
+            raise ValueError("change_scope requires new_scope")
+        changed = Dependency(
+            source=proposal.dependency.source,
+            target=proposal.dependency.target,
+            weight=proposal.dependency.weight,
+            scope=proposal.new_scope,
+        )
+        replacement = StructuralHypothesis(
+            current.handle,
+            tuple(changed if d == proposal.dependency else d for d in current.dependencies),
+            current.confidence,
+        )
+        return _replace_hypothesis(state, replacement).validate(config)
+
+    if proposal.kind is ProposalKind.SPLIT_HYPOTHESIS:
+        if not proposal.new_handle or proposal.new_handle in by_handle:
+            raise ValueError("split_hypothesis requires a unique new_handle")
+        retained = StructuralHypothesis(
+            current.handle,
+            current.dependencies,
+            current.confidence / 2.0,
+        )
+        branch = StructuralHypothesis(
+            proposal.new_handle,
+            current.dependencies,
+            current.confidence / 2.0,
+        )
+        replaced = tuple(retained if h.handle == current.handle else h for h in state.hypotheses)
+        return C4State(state.base, (*replaced, branch)).validate(config)
+
+    if proposal.kind is ProposalKind.MERGE_RETIRE:
+        if not proposal.retire_handle or proposal.retire_handle == current.handle:
+            raise ValueError("merge_retire requires a distinct retire_handle")
+        if proposal.retire_handle not in by_handle:
+            raise ValueError("retire_handle is unknown")
+        retired = by_handle[proposal.retire_handle]
+        merged = StructuralHypothesis(
+            current.handle,
+            current.dependencies,
+            min(1.0, current.confidence + retired.confidence),
+        )
+        remaining = tuple(
+            merged if h.handle == current.handle else h
+            for h in state.hypotheses
+            if h.handle != proposal.retire_handle
+        )
+        return C4State(state.base, remaining).validate(config)
+
+    raise ValueError(f"unsupported proposal kind: {proposal.kind}")
