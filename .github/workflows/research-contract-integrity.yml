@@ -1,0 +1,69 @@
+name: Noema Research Contract Integrity
+
+on:
+  push:
+    paths:
+      - "docs/working-design/**"
+      - "governance/RESEARCH_CURRENTNESS.json"
+      - ".github/workflows/research-contract-integrity.yml"
+  pull_request:
+    paths:
+      - "docs/working-design/**"
+      - "governance/RESEARCH_CURRENTNESS.json"
+      - ".github/workflows/research-contract-integrity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone exact workflow subject
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          git clone --no-checkout "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git" repo
+          cd repo
+          git checkout --detach "${COMMIT_SHA}"
+      - name: Validate research JSON and required V2 surface
+        working-directory: repo
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("docs/working-design")
+          json_files = sorted(root.glob("*.json"))
+          if not json_files:
+              raise SystemExit("no working-design JSON artifacts found")
+
+          for path in json_files:
+              with path.open("r", encoding="utf-8") as fh:
+                  json.load(fh)
+
+          required = [
+              root / "EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_SOURCE_BINDING_ADDENDUM.md",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_RESOURCE_ADDENDUM.md",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_DECIDABILITY_ADDENDUM.md",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md",
+              root / "C2_C4_COMPARATOR_INTERFACE_CONTRACT.md",
+              root / "IMPLEMENTATION_SOURCE_HANDOFF_AND_AUTHORITY_BOUNDARY.md",
+          ]
+          missing = [str(path) for path in required if not path.is_file()]
+          if missing:
+              raise SystemExit("missing required active research artifacts: " + ", ".join(missing))
+
+          with Path("governance/RESEARCH_CURRENTNESS.json").open("r", encoding="utf-8") as fh:
+              currentness = json.load(fh)
+          if currentness.get("schema_id") != "NOEMA_RESEARCH_CURRENTNESS_V1":
+              raise SystemExit("unexpected currentness schema")
+          if currentness.get("authority_ceiling") != "RESEARCH_DESIGN_ONLY_NO_I0_I1_E0_P0_AUTHORITY":
+              raise SystemExit("research authority ceiling is not fail-closed")
+
+          print(f"validated {len(json_files)} working-design JSON artifacts and active V2 research surface")
+          PY
