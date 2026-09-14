@@ -1,0 +1,16 @@
+{
+  "schema_id": "NOEMA_RESEARCH_CURRENTNESS_V1",
+  "canonical_repository": "thebrazenbeard/noema",
+  "canonical_branch": "main",
+  "canonical_commit_observed": "890efdca01cf496ce1b8686d86f8442a149a9d34",
+  "active_research_pull_request": 32,
+  "active_research_branch": "work/noema-representation-drift-scope-20260906",
+  "reviewed_research_subject": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "remediation_parent_subject": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "research_status": "RESEARCH_CONTRACT_AND_HANDOFF_BOUNDARY_READY_BASE_SUBJECT",
+  "authority_ceiling": "RESEARCH_DESIGN_ONLY_NO_I0_I1_E0_P0_AUTHORITY",
+  "superseded_or_provenance_only_pull_requests": [33, 34],
+  "promotion_rule": "Every review or PASS binds an exact immutable subject. Any head movement requires fresh review. Research/design PASS grants no implementation, deterministic source verification, learning/experiment execution, protected effect, merge, deployment, publication, provider mutation, or credential authority.",
+  "staleness_rule": "If canonical main or the active research branch moves, this record becomes historical evidence until refreshed.",
+  "source_of_truth": "Fresh GitHub source readback outranks this snapshot."
+}
