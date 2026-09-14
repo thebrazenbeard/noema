@@ -25,3 +25,20 @@ def test_design_only_subject_is_not_implementation():
         instrumentation_paths=(),
     )
     assert subject.is_implementation_subject() is False
+
+
+def test_resolver_rejects_git_blob_mismatch():
+    from noema.provenance import ArtifactRef, ArtifactRecord, DictArtifactResolver
+    ref = ArtifactRef(
+        repository="thebrazenbeard/noema",
+        commit="a" * 40,
+        path="src/x.py",
+        git_blob="0" * 40,
+    )
+    resolver = DictArtifactResolver({(ref.repository, ref.commit, ref.path): ArtifactRecord(data=b"abc")})
+    try:
+        resolver.resolve(ref)
+    except ValueError as exc:
+        assert "git_blob" in str(exc)
+    else:
+        raise AssertionError("git blob mismatch accepted")

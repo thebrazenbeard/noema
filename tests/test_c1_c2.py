@@ -34,3 +34,21 @@ def test_c2_one_step_uses_same_c1_kernel_and_appends_raw_replay():
     updated = transition_c2_once(state, (2.0,), c1, replay)
     assert updated.base.mean == (0.5,)
     assert updated.replay.items == ((2.0,),)
+
+
+def test_c2_replay_update_is_explicit_and_bounded_by_preregistered_indices():
+    from noema.candidates import C2State, transition_c2_replay
+    c1 = C1Config(alpha=0.5, variance_floor=0.01)
+    replay = ReplayConfig(capacity=3, max_replay_updates_per_event=1)
+    state = C2State(
+        base=GaussianState(mean=(0.0,), variance=(1.0,), count=0),
+        replay=ReplayBuffer.empty(replay).append((2.0,)).append((4.0,)),
+    )
+    updated = transition_c2_replay(state, replay_indices=(1,), c1_config=c1, replay_config=replay)
+    assert updated.base.mean == (2.0,)
+    try:
+        transition_c2_replay(state, replay_indices=(0, 1), c1_config=c1, replay_config=replay)
+    except ValueError as exc:
+        assert "max_replay_updates_per_event" in str(exc)
+    else:
+        raise AssertionError("replay update limit bypassed")

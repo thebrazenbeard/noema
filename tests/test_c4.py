@@ -88,3 +88,23 @@ def test_split_and_merge_retire_are_bounded_and_deterministic():
     merge = StructuralProposal(ProposalKind.MERGE_RETIRE, "h1", retire_handle="h2")
     state = apply_structural_proposal(state, merge, C4Config(2, 1.0))
     assert tuple(h.handle for h in state.hypotheses) == ("h1",)
+
+
+def test_c4_can_use_same_base_replay_kernel_as_c2_without_touching_structure():
+    from noema.candidates import C1Config, ReplayBuffer, ReplayConfig, transition_c4_base_once
+    base = GaussianState(mean=(0.0,), variance=(1.0,), count=0)
+    replay = ReplayConfig(capacity=2, max_replay_updates_per_event=1)
+    state = C4State(
+        base=base,
+        hypotheses=(StructuralHypothesis("h1", (), 1.0),),
+        replay=ReplayBuffer.empty(replay),
+    )
+    updated = transition_c4_base_once(
+        state,
+        (2.0,),
+        C1Config(alpha=0.25, variance_floor=0.01),
+        replay,
+    )
+    assert updated.base.mean == (0.5,)
+    assert updated.replay.items == ((2.0,),)
+    assert updated.hypotheses == state.hypotheses
