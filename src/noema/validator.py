@@ -7,7 +7,7 @@ from typing import Any, Iterable, Mapping
 
 from jsonschema import Draft202012Validator
 
-from .provenance import ArtifactRef, DictArtifactResolver, ImplementationSubjectManifest
+from .provenance import ArtifactRef, DictArtifactResolver, ImplementationSubjectManifest, sha256_hex
 
 
 class ValidationStatus(str, Enum):
@@ -117,18 +117,39 @@ def _resolve_all(
             ref = _to_ref(value)
             record = resolver.resolve(ref)
         except FileNotFoundError as exc:
-            return (_result(ValidationStatus.BLOCKED_UNAVAILABLE_EVIDENCE, "artifact_unavailable", str(exc)), resolved)
+            return (
+                _result(
+                    ValidationStatus.BLOCKED_UNAVAILABLE_EVIDENCE,
+                    "artifact_unavailable",
+                    str(exc),
+                ),
+                resolved,
+            )
         except (KeyError, TypeError, ValueError) as exc:
-            return (_result(ValidationStatus.FAIL_SOURCE_BINDING, "artifact_binding_invalid", str(exc)), resolved)
+            return (
+                _result(
+                    ValidationStatus.FAIL_SOURCE_BINDING,
+                    "artifact_binding_invalid",
+                    str(exc),
+                ),
+                resolved,
+            )
         resolved[(ref.repository, ref.commit, ref.path)] = record.data
     return None, resolved
 
 
-def _implementation_subject_result(manifest: Mapping[str, Any], resolved: Mapping[tuple[str, str, str], bytes]) -> ValidationResult | None:
+def _implementation_subject_result(
+    manifest: Mapping[str, Any],
+    resolved: Mapping[tuple[str, str, str], bytes],
+) -> ValidationResult | None:
     subject = manifest.get("subject", {})
     value = subject.get("implementation_subject_manifest")
     if not isinstance(value, Mapping):
-        return _result(ValidationStatus.FAIL_SOURCE_BINDING, "implementation_subject_manifest_missing", "implementation subject manifest must be an immutable artifact reference")
+        return _result(
+            ValidationStatus.FAIL_SOURCE_BINDING,
+            "implementation_subject_manifest_missing",
+            "implementation subject manifest must be an immutable artifact reference",
+        )
     try:
         ref = _to_ref(value)
         payload = json.loads(resolved[(ref.repository, ref.commit, ref.path)].decode("utf-8"))
@@ -138,12 +159,24 @@ def _implementation_subject_result(manifest: Mapping[str, Any], resolved: Mappin
             instrumentation_paths=tuple(payload["instrumentation_paths"]),
         )
     except (KeyError, TypeError, ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        return _result(ValidationStatus.FAIL_SOURCE_BINDING, "implementation_subject_manifest_invalid", str(exc))
+        return _result(
+            ValidationStatus.FAIL_SOURCE_BINDING,
+            "implementation_subject_manifest_invalid",
+            str(exc),
+        )
     if not implementation.is_implementation_subject():
-        return _result(ValidationStatus.FAIL_SOURCE_BINDING, "design_only_subject", "implementation subject must bind source, tests, and instrumentation")
+        return _result(
+            ValidationStatus.FAIL_SOURCE_BINDING,
+            "design_only_subject",
+            "implementation subject must bind source, tests, and instrumentation",
+        )
     source_commit = subject.get("implementation_subject_commit")
     if not isinstance(source_commit, str) or len(source_commit) != 40:
-        return _result(ValidationStatus.FAIL_SOURCE_BINDING, "implementation_subject_commit_invalid", "implementation subject commit is not exact immutable provenance")
+        return _result(
+            ValidationStatus.FAIL_SOURCE_BINDING,
+            "implementation_subject_commit_invalid",
+            "implementation subject commit is not exact immutable provenance",
+        )
     return None
 
 
@@ -155,10 +188,18 @@ def _information_boundary_result(manifest: Mapping[str, Any]) -> ValidationResul
     evaluator = set(info.get("evaluator_only_field_names", ()))
     overlap = learner & evaluator
     if overlap:
-        return _result(ValidationStatus.FAIL_INFORMATION_BOUNDARY, "learner_evaluator_field_overlap", f"learner/evaluator field sets overlap: {sorted(overlap)!r}")
+        return _result(
+            ValidationStatus.FAIL_INFORMATION_BOUNDARY,
+            "learner_evaluator_field_overlap",
+            f"learner/evaluator field sets overlap: {sorted(overlap)!r}",
+        )
     forbidden = info.get("forbidden_learner_ingress", {})
     if isinstance(forbidden, Mapping) and any(value is not False for value in forbidden.values()):
-        return _result(ValidationStatus.FAIL_INFORMATION_BOUNDARY, "forbidden_learner_ingress", "forbidden evaluator-derived learner ingress must remain false")
+        return _result(
+            ValidationStatus.FAIL_INFORMATION_BOUNDARY,
+            "forbidden_learner_ingress",
+            "forbidden evaluator-derived learner ingress must remain false",
+        )
     return None
 
 
@@ -166,33 +207,92 @@ def _cross_field_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     candidates = [c for c in manifest.get("candidates", ()) if isinstance(c, Mapping)]
     ids = [c.get("candidate_id") for c in candidates]
     if len(ids) != len(set(ids)):
-        return _result(ValidationStatus.FAIL_CROSS_FIELD_INVARIANT, "duplicate_candidate_id", "candidate_id values must be unique")
+        return _result(
+            ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+            "duplicate_candidate_id",
+            "candidate_id values must be unique",
+        )
+
     info_id = manifest.get("information_boundary", {}).get("information_condition_id")
     opp_id = manifest.get("stream_contract", {}).get("opportunity_condition_id")
     resource = manifest.get("resource_contract", {})
     resource_id = resource.get("resource_condition_id")
     replay_id = resource.get("replay_limits", {}).get("replay_policy_id")
     scope_ids = set(manifest.get("audition_scope_contract", {}).get("scope_policy_ids", ()))
+
     for candidate in candidates:
-        for key, expected in (("information_condition_id", info_id), ("opportunity_condition_id", opp_id), ("resource_condition_id", resource_id), ("replay_policy_id", replay_id)):
+        expected_pairs = (
+            ("information_condition_id", info_id),
+            ("opportunity_condition_id", opp_id),
+            ("resource_condition_id", resource_id),
+            ("replay_policy_id", replay_id),
+        )
+        for key, expected in expected_pairs:
             if expected is not None and candidate.get(key) != expected:
-                return _result(ValidationStatus.FAIL_CROSS_FIELD_INVARIANT, "candidate_condition_mismatch", f"candidate {candidate.get('candidate_id')!r} {key} does not resolve to top-level condition")
+                return _result(
+                    ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+                    "candidate_condition_mismatch",
+                    f"candidate {candidate.get('candidate_id')!r} {key} does not resolve to top-level condition",
+                )
         if scope_ids and candidate.get("scope_policy_id") not in scope_ids:
-            return _result(ValidationStatus.FAIL_CROSS_FIELD_INVARIANT, "candidate_scope_policy_unresolved", f"candidate {candidate.get('candidate_id')!r} scope_policy_id is not frozen")
+            return _result(
+                ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+                "candidate_scope_policy_unresolved",
+                f"candidate {candidate.get('candidate_id')!r} scope_policy_id is not frozen",
+            )
+
+    scoring = manifest.get("scoring_contract")
+    if isinstance(scoring, Mapping):
+        primary_claims = set(scoring.get("primary_claims", ()))
+        metrics = [m for m in scoring.get("primary_metrics", ()) if isinstance(m, Mapping)]
+        metric_ids = [m.get("metric_id") for m in metrics]
+        if len(metric_ids) != len(set(metric_ids)):
+            return _result(
+                ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+                "duplicate_metric_id",
+                "metric_id values must be unique",
+            )
+        candidate_ids = set(ids)
+        for metric in metrics:
+            if metric.get("claim") not in primary_claims:
+                return _result(
+                    ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+                    "metric_claim_not_primary",
+                    f"metric {metric.get('metric_id')!r} claim is not in primary_claims",
+                )
+            if metric.get("comparator_candidate_id") not in candidate_ids:
+                return _result(
+                    ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+                    "metric_comparator_unresolved",
+                    f"metric {metric.get('metric_id')!r} comparator does not resolve to a frozen candidate",
+                )
+
     stage = manifest.get("subject", {}).get("stage")
     by_role: dict[str, list[Mapping[str, Any]]] = {}
     for candidate in candidates:
         by_role.setdefault(str(candidate.get("role")), []).append(candidate)
     if stage == "SVF-1" and by_role.get("C2") and by_role.get("C4"):
-        if by_role["C2"][0].get("base_substrate_id") != by_role["C4"][0].get("base_substrate_id"):
-            return _result(ValidationStatus.FAIL_CROSS_FIELD_INVARIANT, "c2_c4_base_substrate_mismatch", "primary C2/C4 comparison must share one declared base substrate")
+        c2 = by_role["C2"][0]
+        c4 = by_role["C4"][0]
+        if c2.get("base_substrate_id") != c4.get("base_substrate_id"):
+            return _result(
+                ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+                "c2_c4_base_substrate_mismatch",
+                "primary C2/C4 comparison must share one declared base substrate",
+            )
     return None
 
 
 def _resource_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     resource = manifest.get("resource_contract")
-    if isinstance(resource, Mapping) and not isinstance(resource.get("measurement_artifact"), Mapping):
-        return _result(ValidationStatus.FAIL_RESOURCE_ACCOUNTING, "resource_measurement_unbound", "resource measurement must be an immutable artifact")
+    if not isinstance(resource, Mapping):
+        return None
+    if not isinstance(resource.get("measurement_artifact"), Mapping):
+        return _result(
+            ValidationStatus.FAIL_RESOURCE_ACCOUNTING,
+            "resource_measurement_unbound",
+            "resource measurement must be an immutable artifact",
+        )
     return None
 
 
@@ -202,19 +302,126 @@ def _lineage_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
         return None
     artifacts = lineage.get("state_scope_manifest_artifacts")
     if not isinstance(artifacts, list) or not artifacts:
-        return _result(ValidationStatus.FAIL_LINEAGE_TRANSFER_CONTRACT, "state_scope_manifest_unbound", "lineage state scope must be bound by at least one immutable artifact")
+        return _result(
+            ValidationStatus.FAIL_LINEAGE_TRANSFER_CONTRACT,
+            "state_scope_manifest_unbound",
+            "lineage state scope must be bound by at least one immutable artifact",
+        )
     return None
 
 
-def validate_manifest(manifest: Mapping[str, Any], schema: Mapping[str, Any], resolver: DictArtifactResolver) -> ValidationResult:
-    schema_errors = sorted(Draft202012Validator(schema).iter_errors(manifest), key=lambda error: tuple(str(part) for part in error.absolute_path))
+def _candidate_source_binding_result(
+    manifest: Mapping[str, Any],
+    resolved: Mapping[tuple[str, str, str], bytes],
+) -> ValidationResult | None:
+    subject = manifest.get("subject", {})
+    ref_value = subject.get("implementation_subject_manifest")
+    if not isinstance(ref_value, Mapping):
+        return None
+    try:
+        ref = _to_ref(ref_value)
+        payload = json.loads(resolved[(ref.repository, ref.commit, ref.path)].decode("utf-8"))
+        bound_commit = payload["source_commit"]
+        source_paths = set(payload["source_paths"])
+    except (KeyError, TypeError, ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        return _result(
+            ValidationStatus.FAIL_SOURCE_BINDING,
+            "implementation_source_manifest_binding_invalid",
+            str(exc),
+        )
+    subject_commit = subject.get("implementation_subject_commit")
+    if bound_commit != subject_commit:
+        return _result(
+            ValidationStatus.FAIL_SOURCE_BINDING,
+            "implementation_subject_commit_mismatch",
+            "implementation-subject manifest source_commit must equal subject implementation_subject_commit",
+        )
+    for candidate in manifest.get("candidates", ()):
+        if not isinstance(candidate, Mapping):
+            continue
+        role = candidate.get("role")
+        developmental = role in {"C0", "C1", "C2", "C3", "C4"} or candidate.get("developmental_evidence_eligible") is True
+        if not developmental:
+            continue
+        if candidate.get("source_commit") != subject_commit:
+            return _result(
+                ValidationStatus.FAIL_SOURCE_BINDING,
+                "candidate_source_commit_mismatch",
+                f"candidate {candidate.get('candidate_id')!r} source_commit differs from implementation subject",
+            )
+        for artifact in candidate.get("source_artifacts", ()):
+            if not isinstance(artifact, Mapping):
+                continue
+            if artifact.get("commit") != subject_commit or artifact.get("path") not in source_paths:
+                return _result(
+                    ValidationStatus.FAIL_SOURCE_BINDING,
+                    "candidate_source_artifact_outside_subject",
+                    f"candidate {candidate.get('candidate_id')!r} source artifact is outside frozen implementation subject",
+                )
+    return None
+
+
+def _commitment_integrity_result(
+    manifest: Mapping[str, Any],
+    resolved: Mapping[tuple[str, str, str], bytes],
+) -> ValidationResult | None:
+    world = manifest.get("world")
+    if not isinstance(world, Mapping):
+        return None
+    pairs = (
+        ("parameter_distribution_artifact", "parameter_distribution_commitment"),
+        ("seed_manifest_artifact", "seed_commitment"),
+        ("intervention_schedule_artifact", "intervention_schedule_commitment"),
+    )
+    for artifact_key, commitment_key in pairs:
+        artifact = world.get(artifact_key)
+        commitment = world.get(commitment_key)
+        if commitment is None:
+            continue
+        if not isinstance(artifact, Mapping):
+            return _result(
+                ValidationStatus.FAIL_FREEZE_INTEGRITY,
+                "commitment_without_artifact",
+                f"{commitment_key} exists without immutable {artifact_key}",
+            )
+        try:
+            ref = _to_ref(artifact)
+            actual = sha256_hex(resolved[(ref.repository, ref.commit, ref.path)])
+        except (KeyError, TypeError, ValueError) as exc:
+            return _result(ValidationStatus.FAIL_FREEZE_INTEGRITY, "commitment_artifact_invalid", str(exc))
+        if actual != commitment:
+            return _result(
+                ValidationStatus.FAIL_FREEZE_INTEGRITY,
+                "commitment_preimage_mismatch",
+                f"{commitment_key} does not match resolved {artifact_key} bytes",
+            )
+    return None
+
+
+def validate_manifest(
+    manifest: Mapping[str, Any],
+    schema: Mapping[str, Any],
+    resolver: DictArtifactResolver,
+) -> ValidationResult:
+    schema_errors = sorted(
+        Draft202012Validator(schema).iter_errors(manifest),
+        key=lambda error: tuple(str(part) for part in error.absolute_path),
+    )
     if schema_errors:
-        return _result(ValidationStatus.FAIL_SCHEMA, "schema", schema_errors[0].message)
+        return _result(
+            ValidationStatus.FAIL_SCHEMA,
+            "schema",
+            schema_errors[0].message,
+        )
+
     resolution_result, resolved = _resolve_all(manifest, resolver)
     if resolution_result is not None:
         return resolution_result
+
     for check in (
         lambda: _implementation_subject_result(manifest, resolved),
+        lambda: _candidate_source_binding_result(manifest, resolved),
+        lambda: _commitment_integrity_result(manifest, resolved),
         lambda: _information_boundary_result(manifest),
         lambda: _cross_field_result(manifest),
         lambda: _resource_result(manifest),
@@ -223,4 +430,5 @@ def validate_manifest(manifest: Mapping[str, Any], schema: Mapping[str, Any], re
         result = check()
         if result is not None:
             return result
+
     return ValidationResult(ValidationStatus.PASS_FROZEN_VALID)
