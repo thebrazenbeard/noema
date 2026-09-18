@@ -1,7 +1,8 @@
 import math
+from dataclasses import replace
 
 from noema.accounting import FixedEnvelope
-from noema.boundary import LearnerEvent, Prediction, commit_prediction
+from noema.boundary import LearnerEvent, Prediction, PredictionTicket, commit_prediction
 from noema.candidates import RecurrentC2State, RecurrentGaussianState, RecurrentReplayBuffer
 from noema.svf0_evaluator import (
     evaluate_gate1,
@@ -25,7 +26,11 @@ def _resources(valid: bool = True) -> StepResources:
 
 
 def _record(candidate_id: str, step: int, channels: tuple[float, float, float], valid: bool = True):
-    prediction = Prediction(mean=(0.0, 0.0, 0.0), variance=(1.0, 1.0, 1.0))
+    variance = tuple(
+        math.exp(2.0 * score) / (2.0 * math.pi)
+        for score in channels
+    )
+    prediction = Prediction(mean=(0.0, 0.0, 0.0), variance=variance)
     ticket = commit_prediction(candidate_id, step, prediction)
     return CandidateStepRecord(
         ticket=ticket,
@@ -207,3 +212,30 @@ def test_evaluator_rejects_mixed_plan_commitments():
         assert "plan commitment" in str(exc)
     else:
         raise AssertionError("mixed plan commitments were accepted")
+
+
+def test_evaluator_rejects_corrupted_prediction_commitment():
+    primary = list(_primary_seed(seed) for seed in _seeds())
+    negative = tuple(_negative_seed(seed) for seed in _seeds())
+    seed = primary[0]
+    steps = list(seed.steps)
+    step = steps[0]
+    records = list(step.candidate_records)
+    record = records[0]
+    records[0] = replace(
+        record,
+        ticket=PredictionTicket(
+            candidate_id=record.ticket.candidate_id,
+            step=record.ticket.step,
+            prediction=record.ticket.prediction,
+            commitment="0" * 64,
+        ),
+    )
+    steps[0] = replace(step, candidate_records=tuple(records))
+    primary[0] = replace(seed, steps=tuple(steps))
+    try:
+        evaluate_gate1(primary_results=tuple(primary), negative_control_results=negative)
+    except ValueError as exc:
+        assert "commitment" in str(exc)
+    else:
+        raise AssertionError("corrupted prediction commitment was accepted")
