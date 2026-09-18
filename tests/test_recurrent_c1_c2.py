@@ -101,3 +101,12 @@ def test_recurrent_replay_update_is_bounded_and_does_not_change_live_context():
         assert "max_replay_updates_per_event" in str(exc)
     else:
         raise AssertionError("recurrent replay limit bypassed")
+
+
+def test_reset_reference_never_carries_cross_time_state():
+    from noema.candidates import predict_reset_reference
+    first = predict_reset_reference(dimension=3, variance=1.0)
+    second = predict_reset_reference(dimension=3, variance=1.0)
+    assert first == second
+    assert first.mean == (0.0, 0.0, 0.0)
+    assert first.variance == (1.0, 1.0, 1.0)
