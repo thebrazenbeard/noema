@@ -132,3 +132,53 @@ def test_primary_metric_comparator_must_resolve_to_frozen_candidate():
     }
     result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
     assert result.status is ValidationStatus.FAIL_CROSS_FIELD_INVARIANT
+
+
+def test_primary_fixed_envelope_checkpointing_fails_resource_accounting():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    manifest["restart_contract"] = {
+        "checkpointing_used": True,
+        "restart_equivalence_claimed": False,
+    }
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status.value == "FAIL_RESOURCE_ACCOUNTING"
+
+
+def test_vague_primary_threshold_rule_fails_scoring_contract():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    manifest["candidates"] = [{
+        "candidate_id": "c1",
+        "role": "C1",
+        "source_commit": "b" * 40,
+        "source_artifacts": [ref("src/noema/candidates.py", commit="b" * 40)],
+        "base_substrate_id": "base-1",
+        "information_condition_id": "info-1",
+        "opportunity_condition_id": "opp-1",
+        "resource_condition_id": "res-1",
+        "replay_policy_id": "replay-1",
+        "scope_policy_id": "scope-1",
+    }]
+    records[("thebrazenbeard/noema", "b" * 40, "src/noema/candidates.py")] = ArtifactRecord(b"source")
+    manifest["scoring_contract"] = {
+        "primary_claims": ["P"],
+        "primary_metrics": [{
+            "metric_id": "m1",
+            "claim": "P",
+            "comparator_candidate_id": "c1",
+            "aggregation_rule": "mean",
+            "threshold_rule": "materially better",
+            "support_requirement": "all scored observations present",
+        }],
+    }
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status.value == "FAIL_SCORING_CONTRACT"
+
+
+def test_vague_negative_control_rule_fails_scoring_contract():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    manifest["world"]["negative_control_acceptance_rule"] = "small overhead allowed"
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status.value == "FAIL_SCORING_CONTRACT"
