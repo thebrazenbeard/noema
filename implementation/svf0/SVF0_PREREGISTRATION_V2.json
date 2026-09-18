@@ -1,0 +1,418 @@
+{
+  "schema_version": "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V2",
+  "classification": "IP_CONFIDENTIAL",
+  "status": "PREREGISTERED_INERT_UNTIL_SEPARATE_EXECUTION_AUTHORITY",
+  "subject": {
+    "project": "Noema",
+    "repository": "thebrazenbeard/noema",
+    "design_base_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+    "implementation_subject_commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+    "implementation_subject_manifest": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "ba4df03780d5f80e8e7b6b9b1378c1d628a5cab1",
+      "path": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
+      "git_blob": "3d54b865ba66bd51b78cabbb9749aa7cfae774e5"
+    },
+    "schema_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+      "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json",
+      "git_blob": "cda8446b473ccb38ef2424ad8f68e9aee4d41b47"
+    },
+    "validator_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+      "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md",
+      "git_blob": "deac889fc6c377ebe1490b23d952439885d6bd2a"
+    },
+    "comparator_fairness_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+      "path": "docs/working-design/C0_C4_FAIR_COMPARISON_AND_CLAIM_BOUNDARY_MATRIX.md",
+      "git_blob": "eed4c71d9d342ab93b61c75dba0a9578c4b062d8"
+    },
+    "resource_addendum_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+      "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_RESOURCE_ADDENDUM.md",
+      "git_blob": "e7bde812596308c8eff9cf687b56514e0020c24b"
+    },
+    "decidability_addendum_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+      "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_DECIDABILITY_ADDENDUM.md",
+      "git_blob": "f8761541e2f2848db87f80e1eda687f297360c54"
+    },
+    "comparator_matrix_addendum_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+      "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md",
+      "git_blob": "725bfcd4dbd14f7bb505cb95e4f9f93b763c3ee6"
+    },
+    "comparator_interface_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+      "path": "docs/working-design/C2_C4_COMPARATOR_INTERFACE_CONTRACT.md",
+      "git_blob": "0e9e5dcedfee242ab8920fcc16075cb674f9aa40"
+    },
+    "experiment_family": "MINIMAL_STRUCTURAL_VALUE_FALSIFICATION",
+    "stage": "SVF-0",
+    "manifest_logical_id": "NOEMA_SVF0_RECURRENT_GATE1_V1",
+    "created_at": "2026-09-18T15:35:00-04:00",
+    "supersedes_manifest": null
+  },
+  "effect_boundary": {
+    "execution": false,
+    "training": false,
+    "paid_compute": false,
+    "merge": false,
+    "deployment": false,
+    "publication": false,
+    "provider_or_credential_mutation": false,
+    "repository_visibility_change": false,
+    "separate_execution_authority_required": true
+  },
+  "information_boundary": {
+    "information_condition_id": "svf0_opaque_numeric_v1",
+    "learner_visible_schema": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+      "path": "implementation/svf0/LEARNER_VISIBLE_SCHEMA_V1.json",
+      "git_blob": "be45043f2e85ebade8bec413d7071691cde92b82"
+    },
+    "evaluator_only_schema": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+      "path": "implementation/svf0/EVALUATOR_ONLY_SCHEMA_V1.json",
+      "git_blob": "46b8ff0a6760eb8ba1119f860570cf8b3cabd2de"
+    },
+    "learner_visible_field_names": [
+      "step",
+      "channels",
+      "intervention"
+    ],
+    "evaluator_only_field_names": [
+      "evaluator_seed",
+      "evaluator_step_index",
+      "regime_after_change",
+      "changed_coefficient",
+      "stable_coefficient"
+    ],
+    "field_sets_must_be_disjoint": true,
+    "forbidden_learner_ingress": {
+      "semantic_applicability_labels": false,
+      "hidden_world_state": false,
+      "future_derived_targets": false,
+      "evaluator_score": false,
+      "exact_intervention_success_truth": false
+    }
+  },
+  "candidates": [
+    {
+      "candidate_id": "c1_recurrent",
+      "role": "C1",
+      "source_commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+      "source_artifacts": [
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "src/noema/candidates.py",
+          "git_blob": "58c246f1684150b949949b055264232eb0b39b83"
+        },
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "implementation/svf0/RECURRENT_BASE_CONFIG_V1.json",
+          "git_blob": "cc326e04af4201e1691ee85e3654fcefb24035b3"
+        },
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "implementation/svf0/EXECUTION_POLICY_V1.json",
+          "git_blob": "26d3a84d4a3710eb43a57ba64ad7cd12e0a217ba"
+        }
+      ],
+      "base_substrate_id": "recurrent_linear_gaussian_v1",
+      "variant_of_candidate_id": null,
+      "variant_dimension": "NONE",
+      "information_condition_id": "svf0_opaque_numeric_v1",
+      "opportunity_condition_id": "svf0_stream_v1",
+      "resource_condition_id": "svf0_fixed_envelope_v2",
+      "replay_policy_id": "replay_most_recent_v1",
+      "scope_policy_id": "scope_not_applicable_v1",
+      "developmental_evidence_eligible": true
+    },
+    {
+      "candidate_id": "c2_recurrent_replay",
+      "role": "C2",
+      "source_commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+      "source_artifacts": [
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "src/noema/candidates.py",
+          "git_blob": "58c246f1684150b949949b055264232eb0b39b83"
+        },
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "implementation/svf0/RECURRENT_BASE_CONFIG_V1.json",
+          "git_blob": "cc326e04af4201e1691ee85e3654fcefb24035b3"
+        },
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "implementation/svf0/REPLAY_CONFIG_V1.json",
+          "git_blob": "cbb9cb4901b595ee218685edacd5ce0be1629f9c"
+        },
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "implementation/svf0/EXECUTION_POLICY_V1.json",
+          "git_blob": "26d3a84d4a3710eb43a57ba64ad7cd12e0a217ba"
+        }
+      ],
+      "base_substrate_id": "recurrent_linear_gaussian_v1",
+      "variant_of_candidate_id": "c1_recurrent",
+      "variant_dimension": "REPLAY",
+      "information_condition_id": "svf0_opaque_numeric_v1",
+      "opportunity_condition_id": "svf0_stream_v1",
+      "resource_condition_id": "svf0_fixed_envelope_v2",
+      "replay_policy_id": "replay_most_recent_v1",
+      "scope_policy_id": "scope_not_applicable_v1",
+      "developmental_evidence_eligible": true
+    },
+    {
+      "candidate_id": "reset_ref",
+      "role": "REFERENCE",
+      "source_commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+      "source_artifacts": [
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "src/noema/candidates.py",
+          "git_blob": "58c246f1684150b949949b055264232eb0b39b83"
+        },
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "implementation/svf0/RESET_REFERENCE_CONFIG_V1.json",
+          "git_blob": "d73b5a360bb7036b551a186cf4adb3bf68ae8c07"
+        },
+        {
+          "repository": "thebrazenbeard/noema",
+          "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+          "path": "implementation/svf0/EXECUTION_POLICY_V1.json",
+          "git_blob": "26d3a84d4a3710eb43a57ba64ad7cd12e0a217ba"
+        }
+      ],
+      "base_substrate_id": null,
+      "variant_of_candidate_id": "c1_recurrent",
+      "variant_dimension": "RESET_REFIT",
+      "information_condition_id": "svf0_opaque_numeric_v1",
+      "opportunity_condition_id": "svf0_stream_v1",
+      "resource_condition_id": "svf0_fixed_envelope_v2",
+      "replay_policy_id": "replay_most_recent_v1",
+      "scope_policy_id": "scope_not_applicable_v1",
+      "developmental_evidence_eligible": false
+    }
+  ],
+  "world": {
+    "generator": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+      "path": "src/noema/svf0.py",
+      "git_blob": "14734ca020fd57b19706bf09dbcf18b6c9d7c7cc"
+    },
+    "parameter_distribution_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+      "path": "implementation/svf0/PARAMETER_DISTRIBUTION_V2.json",
+      "git_blob": "1f228488d422d61e119abc3a8bba8939e70e075a",
+      "sha256": "7040245524d81cc48492782e369115e70b38c6d9ecfb40bc15f6afcb5f8333fc"
+    },
+    "parameter_distribution_commitment": "7040245524d81cc48492782e369115e70b38c6d9ecfb40bc15f6afcb5f8333fc",
+    "seed_manifest_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+      "path": "implementation/svf0/SEED_MANIFEST_V1.json",
+      "git_blob": "47d43c5cb8269f5ce4e06c7ad9b4ebcd73b53c5c",
+      "sha256": "f68ee0307f9a7e9d735a0893c0c7c65bda938682e9d668bdd6bf5ccb2818dd5b"
+    },
+    "seed_commitment": "f68ee0307f9a7e9d735a0893c0c7c65bda938682e9d668bdd6bf5ccb2818dd5b",
+    "hidden_family_randomization_rule": "algo:fixed_none@v1",
+    "intervention_mode": "NONE",
+    "intervention_schedule_artifact": null,
+    "intervention_schedule_commitment": null,
+    "schedule_may_adapt_to_hidden_family": false,
+    "schedule_may_adapt_to_candidate_predictions": false,
+    "schedule_may_adapt_to_scored_outcomes": false,
+    "schedule_may_adapt_to_evaluator_diagnostics": false,
+    "passive_observational_equivalence_required": false,
+    "observational_equivalence_verification": null,
+    "negative_control_generator": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+      "path": "src/noema/svf0.py",
+      "git_blob": "14734ca020fd57b19706bf09dbcf18b6c9d7c7cc"
+    },
+    "negative_control_acceptance_rule": "expr:negative_control_mean_nll_delta<=0.02"
+  },
+  "stream_contract": {
+    "opportunity_condition_id": "svf0_stream_v1",
+    "temporal_order_preserved": true,
+    "predictions_committed_before_outcome": true,
+    "full_history_automatic_refit_allowed": false,
+    "identical_stream_for_primary_c2_c4": true,
+    "missingness_states_preserved": true,
+    "max_events_per_world": 128,
+    "max_external_interventions_per_world": 0
+  },
+  "resource_contract": {
+    "resource_condition_id": "svf0_fixed_envelope_v2",
+    "measurement_method": "algo:noema_svf0_python_fixed_envelope@v2",
+    "measurement_artifact": {
+      "repository": "thebrazenbeard/noema",
+      "commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+      "path": "implementation/svf0/RESOURCE_MEASUREMENT_CONTRACT_V2.json",
+      "git_blob": "b3294303e9213a16a868de2152cdc8de11eb7cd6"
+    },
+    "fixed_total_envelope": {
+      "max_resident_memory_bytes": 8388608,
+      "max_durable_state_bytes": 1048576,
+      "max_update_cpu_seconds_per_event": 0.05,
+      "max_query_cpu_seconds_per_event": 0.01,
+      "max_shadow_auditions_per_event": 0
+    },
+    "replay_limits": {
+      "replay_policy_id": "replay_most_recent_v1",
+      "raw_buffer_capacity_events": 32,
+      "max_replay_updates_per_event": 1,
+      "replay_compute_charged": true,
+      "priority_provenance_declared": true
+    },
+    "structural_limits": {
+      "max_active_candidates": 0,
+      "max_proposals_per_event": 0,
+      "structural_memory_charged": true,
+      "scope_compute_charged": true,
+      "audition_compute_charged": true,
+      "base_shadow_compute_charged": true
+    }
+  },
+  "audition_scope_contract": {
+    "scope_policy_ids": [
+      "scope_not_applicable_v1"
+    ],
+    "learned_scope_primary_claim_allowed": false,
+    "scope_ticket_required_before_outcome": false,
+    "audition_separate_from_candidate_influence": true,
+    "simple_audition_rival_required": false,
+    "simple_audition_probability": null,
+    "selection_probability_logged_before_outcome": true,
+    "zero_support_confidence_allowed": false,
+    "off_policy_estimator_may_override_zero_support": false,
+    "representation_drift_requires_support_disposition": true,
+    "support_class_thresholds": {
+      "DIRECT_STRONG": 1,
+      "DIRECT_WEAK": 0.5
+    }
+  },
+  "lineage_transfer_contract": {
+    "cross_world_transfer_used": false,
+    "policy_artifact": null,
+    "matched_candidate_carryover_required": true,
+    "state_scope_manifest_required": true,
+    "state_scope_manifest_artifacts": [
+      {
+        "repository": "thebrazenbeard/noema",
+        "commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+        "path": "implementation/svf0/STATE_SCOPE_MANIFEST_V2.json",
+        "git_blob": "914b9dacc6444173f2044f87de97ef1db6dae595"
+      }
+    ],
+    "evaluator_lineage_ids_learner_visible": false,
+    "reset_and_continue_conditions_distinguished": true
+  },
+  "scoring_contract": {
+    "proper_scoring_rule": "algo:gaussian_nll_sum@v1",
+    "primary_claims": [
+      "P"
+    ],
+    "primary_metrics": [
+      {
+        "metric_id": "P_C1_VS_RESET_LATE_POST",
+        "claim": "P",
+        "direction": "LOWER_IS_BETTER",
+        "comparator_candidate_id": "reset_ref",
+        "aggregation_rule": "algo:mean_seed_window_delta@v1",
+        "threshold_rule": "expr:mean_nll_delta<=-0.02&&upper_ci_delta<0",
+        "support_requirement": "expr:scored_count==expected_count&&worlds_completed==maximum_worlds&&resource_accounting_complete==true"
+      },
+      {
+        "metric_id": "P_C2_VS_RESET_LATE_POST",
+        "claim": "P",
+        "direction": "LOWER_IS_BETTER",
+        "comparator_candidate_id": "reset_ref",
+        "aggregation_rule": "algo:mean_seed_window_delta@v1",
+        "threshold_rule": "expr:mean_nll_delta<=-0.02&&upper_ci_delta<0",
+        "support_requirement": "expr:scored_count==expected_count&&worlds_completed==maximum_worlds&&resource_accounting_complete==true"
+      }
+    ],
+    "c2_vs_c4_external_comparison_required": false,
+    "c4_internal_base_shadow_diagnostic": false,
+    "counterfactual_unobserved_never_scored_as_observed": true,
+    "post_result_metric_substitution_allowed": false
+  },
+  "statistics_contract": {
+    "seed_count": 8,
+    "confidence_level": 0.95,
+    "uncertainty_method": "algo:student_t_ci@v1:n=8",
+    "multiple_comparison_rule": "algo:holm_bonferroni@v1",
+    "stopping_rule": "expr:worlds_completed==maximum_worlds",
+    "maximum_worlds": 8,
+    "kill_criteria": [
+      "expr:c1_persistence_pass==false",
+      "expr:c2_persistence_pass==false",
+      "expr:c1_changed_dependency_adaptation_pass==false",
+      "expr:c1_stable_dependency_retention_pass==false",
+      "expr:c2_changed_dependency_adaptation_pass==false",
+      "expr:c2_stable_dependency_retention_pass==false"
+    ]
+  },
+  "controls": {
+    "semantic_cheat_diagnostic": false,
+    "intervention_blind_ablation": false,
+    "replay_ablation": true,
+    "reset_refit_diagnostic": true,
+    "premature_commitment_ablation": false,
+    "no_meta_learning_ablation": false,
+    "uniform_audition_rival": false,
+    "negative_structural_value_worlds": true
+  },
+  "restart_contract": {
+    "checkpointing_used": false,
+    "restart_equivalence_claimed": false,
+    "persist_outstanding_tickets": false,
+    "persist_unresolved_outcomes": false,
+    "persist_rng_state": false,
+    "persist_audit_policy_state": false,
+    "persist_support_intervals": false,
+    "persist_representation_boundaries": false,
+    "persist_stopping_rule_state": false,
+    "loss_of_required_state_forfeits_restart_equivalence": true
+  },
+  "freeze_contract": {
+    "outcome_visibility_before_freeze": false,
+    "mutable_after_freeze": false,
+    "change_after_freeze_creates_new_subject": true,
+    "freeze_receipt_locator": "implementation/svf0/SVF0_FREEZE_RECEIPT_V1.json",
+    "receipt_must_bind_manifest_commit_path_and_blob": true
+  },
+  "comparator_fairness_contract": {
+    "repository": "thebrazenbeard/noema",
+    "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+    "path": "docs/working-design/C0_C4_FAIR_COMPARISON_AND_CLAIM_BOUNDARY_MATRIX.md",
+    "git_blob": "eed4c71d9d342ab93b61c75dba0a9578c4b062d8"
+  }
+}
