@@ -2,7 +2,7 @@
   "schema": "NOEMA_IMPLEMENTATION_SUBJECT_V1",
   "classification": "IP_CONFIDENTIAL",
   "research_parent_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
-  "source_commit": "b376526e32945c6a7688b3ef7b0312881aede5de",
+  "source_commit": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
   "source_paths": [
     "src/noema/__init__.py",
     "src/noema/provenance.py",
@@ -21,7 +21,8 @@
     "src/noema/svf0_experiment.py",
     "implementation/svf0/EXECUTION_POLICY_V2.json",
     "src/noema/svf0_evaluator.py",
-    "implementation/svf0/EXECUTION_POLICY_V3.json"
+    "implementation/svf0/EXECUTION_POLICY_V3.json",
+    "implementation/svf0/EXECUTION_POLICY_V4.json"
   ],
   "test_paths": [
     "tests/test_package_boundary.py",
@@ -61,25 +62,21 @@
   },
   "verification": {
     "verified_at": "2026-09-18",
-    "mode": "COMPOSITE_I1_EXECUTION_EVALUATION_FREEZE_V4",
+    "mode": "EXACT_I1_FULL_SUITE_WINDOWS_PYTHON_3_13_5",
     "deterministic_tests_present": 103,
+    "deterministic_tests_executed": 103,
+    "deterministic_tests_passed": 103,
     "known_failures": 0,
-    "focused_execution_evaluation_tests_executed": 34,
-    "focused_execution_evaluation_tests_passed": 34,
-    "focused_test_files": {
-      "tests/test_svf0_runner.py": 8,
-      "tests/test_svf0_statistics.py": 9,
-      "tests/test_svf0_experiment.py": 8,
-      "tests/test_svf0_evaluator.py": 9
+    "exact_worktree_commit": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
+    "exact_worktree_clean": true,
+    "runtime": {
+      "platform": "Windows",
+      "python": "3.13.5",
+      "jsonschema": "4.26.0",
+      "pytest": "9.0.2"
     },
+    "windows_resident_memory_abi": "EXPLICIT_64_BIT_HANDLE_DWORD_BOOL_SIGNATURES",
     "e0_valid_path_executed": false,
-    "full_legacy_suite_rerun": "NOT_EXECUTED_IN_THIS_RUNTIME",
-    "exact_reconstructed_focus": "PASS",
-    "final_post_focus_source_changes": [
-      "validator first-core logical subject identifier V3 -> V4",
-      "matching hostile fixture logical subject identifier V3 -> V4",
-      "new inert EXECUTION_POLICY_V3.json"
-    ],
-    "limitation": "The local exact workspace contains the execution/evaluation slice but not every legacy private-repo module; hosted CI and paid compute were not used."
+    "hosted_or_paid_compute_used": false
   }
 }
