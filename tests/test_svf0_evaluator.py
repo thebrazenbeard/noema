@@ -68,6 +68,8 @@ def _primary_seed(seed: int, *, invalid_step: int | None = None) -> SVF0SeedResu
     return SVF0SeedResult(
         seed=seed,
         negative_control=False,
+        logical_subject_id="NOEMA_SVF0_RECURRENT_GATE1_V4",
+        plan_commitment="a" * 64,
         steps=tuple(
             _step(step, invalid=(step == invalid_step))
             for step in range(128)
@@ -94,6 +96,8 @@ def _negative_seed(seed: int, delta: float = 0.01) -> SVF0SeedResult:
     return SVF0SeedResult(
         seed=seed,
         negative_control=True,
+        logical_subject_id="NOEMA_SVF0_RECURRENT_GATE1_V4",
+        plan_commitment="a" * 64,
         steps=tuple(_negative_step(step, delta=delta) for step in range(128)),
     )
 
@@ -184,3 +188,22 @@ def test_evaluator_rejects_wrong_seed_set_and_wrong_control_kind():
         assert "negative-control" in str(exc)
     else:
         raise AssertionError("wrong control kind was accepted")
+
+
+def test_evaluator_rejects_mixed_plan_commitments():
+    primary = list(_primary_seed(seed) for seed in _seeds())
+    negative = tuple(_negative_seed(seed) for seed in _seeds())
+    original = primary[0]
+    primary[0] = SVF0SeedResult(
+        seed=original.seed,
+        negative_control=False,
+        logical_subject_id=original.logical_subject_id,
+        plan_commitment="b" * 64,
+        steps=original.steps,
+    )
+    try:
+        evaluate_gate1(primary_results=tuple(primary), negative_control_results=negative)
+    except ValueError as exc:
+        assert "plan commitment" in str(exc)
+    else:
+        raise AssertionError("mixed plan commitments were accepted")
