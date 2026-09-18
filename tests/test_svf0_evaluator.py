@@ -38,7 +38,11 @@ def _record(candidate_id: str, step: int, channels: tuple[float, float, float], 
         score=sum(channels),
         channel_scores=channels,
         resources=_resources(valid),
-        replay_updates=0 if candidate_id != "c2_recurrent_replay" else 1,
+        replay_updates=(
+            1
+            if candidate_id == "c2_recurrent_replay" and step > 0
+            else 0
+        ),
     )
 
 
