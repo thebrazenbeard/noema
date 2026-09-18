@@ -43,8 +43,8 @@
     "publication": "NOT_AUTHORIZED",
     "paid_or_hosted_compute": "NOT_AUTHORIZED"
   },
-  "staleness_rule": "Any source/test/config change after the frozen implementation source creates a new subject requiring fresh exact-head reconciliation and fresh I1 verification.",
-  "source_of_truth": "Fresh GitHub source readback outranks this snapshot. Qualification labels are exact-subject-bound.",
+  "staleness_rule": "Implementation I1 becomes stale only when a post-freeze commit changes a path in the exact union frozen by governance/IMPLEMENTATION_SUBJECT_SCOPE_V1.json. Qualification-layer files outside that path set are separately exact-bound and do not by themselves stale implementation I1.",
+  "source_of_truth": "Fresh GitHub source readback plus the frozen implementation-scope contract outrank this snapshot. Implementation I1 and each qualification layer are separately exact-bound.",
   "svf0_support": {
     "commit": "45e6d6b42921e90e57be2ef4678836418e6bd295",
     "bundle_path": "implementation/svf0/SUPPORT_BUNDLE_V6.json",
@@ -83,5 +83,28 @@
     "pre_repair_exact_windows_suite": "FAILED",
     "post_repair_exact_windows_suite": "103/103 PASS"
   },
-  "bt2_r1": "FROZEN_SEPARATE_UNCHANGED"
+  "bt2_r1": "FROZEN_SEPARATE_UNCHANGED",
+  "implementation_subject_scope": {
+    "rule_id": "MANIFEST_ENUMERATED_IMPLEMENTATION_PATH_SET_V1",
+    "path": "governance/IMPLEMENTATION_SUBJECT_SCOPE_V1.json",
+    "commit": "aa554f2eccd8622de99d3084b1c953808f280d9b",
+    "git_blob": "075e3d8e30b8827d3328874a8964cb80466f30c6",
+    "unique_implementation_path_count": 33,
+    "source_manifest_commit": "9b4797aa0bb664a1db17a3ef09288b6d2909b2d1",
+    "source_manifest_git_blob": "7892a2b9e1779fb5c31209bca0b9d1037bc9e2d2",
+    "post_freeze_qualification_layers_separate": true
+  },
+  "implementation_i1_currentness": {
+    "status": "PASS",
+    "frozen_subject": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
+    "exact_i1_evidence": "103/103 PASS + PASS_FROZEN_VALID",
+    "checked_through": "aa554f2eccd8622de99d3084b1c953808f280d9b",
+    "compare_ahead_by": 8,
+    "compare_behind_by": 0,
+    "changed_paths_count": 13,
+    "changed_implementation_scope_paths": [],
+    "extension_rule": "A later branch head preserves implementation I1 currentness iff the compare from frozen_subject to that head changes no path in the exact frozen implementation path union.",
+    "fresh_i1_rerun_required_for_checked_delta": false,
+    "reason": "All checked post-freeze changes are qualification/governance artifacts outside the frozen implementation path set."
+  }
 }
