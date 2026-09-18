@@ -34,3 +34,47 @@ def test_comparator_record_binds_preoutcome_ticket_commitments_and_conditions():
     assert record.right_commitment == right.commitment
     assert record.step == 4
     assert record.resource_condition_id == "res-1"
+
+
+def test_durable_state_bytes_uses_pickle_protocol_5():
+    import pickle
+    from noema.accounting import durable_state_bytes
+    state = {"x": (1, 2, 3)}
+    assert durable_state_bytes(state) == len(pickle.dumps(state, protocol=5))
+
+
+def test_measure_operation_returns_result_cpu_and_peak_memory_without_hiding_measurement():
+    from noema.accounting import measure_operation
+    measured = measure_operation(lambda: sum(range(100)))
+    assert measured.result == 4950
+    assert measured.cpu_seconds >= 0.0
+    assert measured.peak_memory_bytes >= 0
+
+
+def test_fixed_envelope_fails_closed_on_missing_or_over_budget_measurement():
+    from noema.accounting import FixedEnvelope, adjudicate_fixed_envelope
+    envelope = FixedEnvelope(
+        max_resident_memory_bytes=100,
+        max_durable_state_bytes=100,
+        max_update_cpu_seconds_per_event=0.1,
+        max_query_cpu_seconds_per_event=0.1,
+        max_shadow_auditions_per_event=0,
+    )
+    assert adjudicate_fixed_envelope(
+        envelope,
+        resident_memory_bytes=None,
+        durable_state_bytes=10,
+        update_cpu_seconds=0.01,
+        query_cpu_seconds=0.01,
+        shadow_auditions=0,
+    ).valid is False
+    result = adjudicate_fixed_envelope(
+        envelope,
+        resident_memory_bytes=101,
+        durable_state_bytes=10,
+        update_cpu_seconds=0.01,
+        query_cpu_seconds=0.01,
+        shadow_auditions=0,
+    )
+    assert result.valid is False
+    assert "resident_memory_bytes" in result.violations
