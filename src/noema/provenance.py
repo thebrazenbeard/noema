@@ -24,11 +24,17 @@ def sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def git_blob_hex(data: bytes) -> str:
+    header = f"blob {len(data)}\0".encode("ascii")
+    return hashlib.sha1(header + data).hexdigest()
+
+
 @dataclass(frozen=True, slots=True)
 class ArtifactRef:
     repository: str
     commit: str
     path: str
+    git_blob: str | None = None
     sha256: str | None = None
 
     def __post_init__(self) -> None:
@@ -38,6 +44,8 @@ class ArtifactRef:
             raise ValueError("commit must be an exact 40-character lowercase hex SHA")
         if not self.path or self.path.startswith("/") or ".." in self.path.split("/"):
             raise ValueError("path must be a repository-relative immutable artifact path")
+        if self.git_blob is not None and not _SHA40.fullmatch(self.git_blob):
+            raise ValueError("git_blob must be 40-character lowercase hex")
         if self.sha256 is not None and not _SHA256.fullmatch(self.sha256):
             raise ValueError("sha256 must be 64-character lowercase hex")
 
@@ -75,6 +83,12 @@ class DictArtifactResolver:
             raise FileNotFoundError(
                 f"artifact unavailable: {ref.repository}@{ref.commit}:{ref.path}"
             ) from exc
+        if ref.git_blob is not None:
+            actual_blob = git_blob_hex(record.data)
+            if actual_blob != ref.git_blob:
+                raise ValueError(
+                    f"git_blob mismatch for {ref.path}: expected {ref.git_blob}, got {actual_blob}"
+                )
         if ref.sha256 is not None:
             actual = sha256_hex(record.data)
             if actual != ref.sha256:
