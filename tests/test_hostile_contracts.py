@@ -528,7 +528,7 @@ def test_full_v2_normative_research_tuple_must_match_reviewed_subject():
 
 def test_first_core_svf0_profile_requires_exact_primary_metric_semantics():
     manifest, records = _full_v2_svf0_manifest()
-    manifest["subject"]["manifest_logical_id"] = "NOEMA_SVF0_RECURRENT_GATE1_V2"
+    manifest["subject"]["manifest_logical_id"] = "NOEMA_SVF0_RECURRENT_GATE1_V3"
     manifest["candidates"][0]["candidate_id"] = "c1_recurrent"
     manifest["candidates"][1]["candidate_id"] = "c2_recurrent_replay"
     manifest["candidates"][1]["variant_of_candidate_id"] = "c1_recurrent"
