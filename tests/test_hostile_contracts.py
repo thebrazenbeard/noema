@@ -183,3 +183,113 @@ def test_vague_negative_control_rule_fails_scoring_contract():
     manifest["world"]["negative_control_acceptance_rule"] = "small overhead allowed"
     result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
     assert result.status.value == "FAIL_SCORING_CONTRACT"
+
+
+def _bound_c1_candidate():
+    return {
+        "candidate_id": "c1",
+        "role": "C1",
+        "source_commit": "b" * 40,
+        "source_artifacts": [ref("src/noema/candidates.py", commit="b" * 40)],
+        "base_substrate_id": "base-1",
+        "variant_of_candidate_id": None,
+        "variant_dimension": "NONE",
+        "information_condition_id": "info-1",
+        "opportunity_condition_id": "opp-1",
+        "resource_condition_id": "res-1",
+        "replay_policy_id": "replay-1",
+        "scope_policy_id": "scope-1",
+        "developmental_evidence_eligible": True,
+    }
+
+
+def test_arbitrary_prose_primary_threshold_fails_decidability():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    candidate = _bound_c1_candidate()
+    manifest["candidates"] = [candidate]
+    records[("thebrazenbeard/noema", "b" * 40, "src/noema/candidates.py")] = ArtifactRecord(b"source")
+    manifest["scoring_contract"] = {
+        "primary_claims": ["P"],
+        "primary_metrics": [{
+            "metric_id": "m1",
+            "claim": "P",
+            "comparator_candidate_id": "c1",
+            "aggregation_rule": "algo:mean@v1",
+            "threshold_rule": "bananas are better",
+            "support_requirement": "expr:scored_count==expected_count",
+        }],
+    }
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status.value == "FAIL_SCORING_CONTRACT"
+
+
+def test_machine_decidable_primary_rules_can_pass_scoring_check():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    candidate = _bound_c1_candidate()
+    manifest["candidates"] = [candidate]
+    records[("thebrazenbeard/noema", "b" * 40, "src/noema/candidates.py")] = ArtifactRecord(b"source")
+    manifest["scoring_contract"] = {
+        "primary_claims": ["P"],
+        "primary_metrics": [{
+            "metric_id": "m1",
+            "claim": "P",
+            "comparator_candidate_id": "c1",
+            "aggregation_rule": "algo:mean@v1",
+            "threshold_rule": "expr:mean_nll_delta<=-0.02",
+            "support_requirement": "expr:scored_count==expected_count",
+        }],
+    }
+    manifest["world"]["negative_control_acceptance_rule"] = "expr:negative_control_mean_nll_delta<=0.02"
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.PASS_FROZEN_VALID
+
+
+def test_vague_stopping_rule_fails_scoring_contract():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    manifest["statistics_contract"] = {
+        "uncertainty_method": "algo:student_t_ci@v1",
+        "multiple_comparison_rule": "algo:holm_bonferroni@v1",
+        "stopping_rule": "stop when stable",
+        "kill_criteria": ["expr:c1_persistence_pass==false"],
+    }
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status.value == "FAIL_SCORING_CONTRACT"
+
+
+def test_variant_parent_must_resolve_and_not_self_reference():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    candidate = _bound_c1_candidate()
+    candidate["variant_of_candidate_id"] = "missing"
+    manifest["candidates"] = [candidate]
+    records[("thebrazenbeard/noema", "b" * 40, "src/noema/candidates.py")] = ArtifactRecord(b"source")
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_CROSS_FIELD_INVARIANT
+
+    candidate["variant_of_candidate_id"] = "c1"
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_CROSS_FIELD_INVARIANT
+
+
+def test_validator_exposes_all_normative_v2_result_classes():
+    expected = {
+        "PASS_FROZEN_VALID",
+        "FAIL_SCHEMA",
+        "FAIL_STAGE_SEMANTICS",
+        "FAIL_CROSS_FIELD_INVARIANT",
+        "FAIL_SOURCE_BINDING",
+        "FAIL_INFORMATION_BOUNDARY",
+        "FAIL_WORLD_SCHEDULE_INTEGRITY",
+        "FAIL_COMPARATOR_FAIRNESS",
+        "FAIL_RESOURCE_ACCOUNTING",
+        "FAIL_SUPPORT_AUDITION_CONTRACT",
+        "FAIL_LINEAGE_TRANSFER_CONTRACT",
+        "FAIL_SCORING_CONTRACT",
+        "FAIL_RESTART_INTEGRITY",
+        "FAIL_FREEZE_INTEGRITY",
+        "BLOCKED_UNAVAILABLE_EVIDENCE",
+    }
+    assert {status.value for status in ValidationStatus} == expected
