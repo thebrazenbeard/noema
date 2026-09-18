@@ -108,3 +108,23 @@ def test_c4_can_use_same_base_replay_kernel_as_c2_without_touching_structure():
     assert updated.base.mean == (0.5,)
     assert updated.replay.items == ((2.0,),)
     assert updated.hypotheses == state.hypotheses
+
+
+def test_c4_replay_update_matches_c2_base_kernel_and_preserves_structure():
+    from noema.candidates import C1Config, ReplayBuffer, ReplayConfig, transition_c4_replay
+    replay = ReplayConfig(capacity=3, max_replay_updates_per_event=1)
+    hypothesis = StructuralHypothesis("h1", (), 1.0)
+    state = C4State(
+        base=GaussianState(mean=(0.0,), variance=(1.0,), count=0),
+        hypotheses=(hypothesis,),
+        replay=ReplayBuffer.empty(replay).append((2.0,)).append((4.0,)),
+    )
+    updated = transition_c4_replay(
+        state,
+        replay_indices=(1,),
+        c1_config=C1Config(alpha=0.5, variance_floor=0.01),
+        replay_config=replay,
+    )
+    assert updated.base.mean == (2.0,)
+    assert updated.replay == state.replay
+    assert updated.hypotheses == state.hypotheses
