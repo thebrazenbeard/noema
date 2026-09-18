@@ -5,11 +5,12 @@ from noema.accounting import FixedEnvelope
 from noema.boundary import LearnerEvent, Prediction, PredictionTicket, commit_prediction
 from noema.candidates import RecurrentC2State, RecurrentGaussianState, RecurrentReplayBuffer
 from noema.svf0_evaluator import (
+    evaluate_experiment_result,
     evaluate_gate1,
     seed_channel_window_delta,
     seed_total_window_delta,
 )
-from noema.svf0_experiment import SVF0SeedResult
+from noema.svf0_experiment import SVF0ExperimentResult, SVF0SeedResult
 from noema.svf0_runner import CandidateStepRecord, StepResources, SVF0StepResult
 
 
@@ -243,3 +244,25 @@ def test_evaluator_rejects_corrupted_prediction_commitment():
         assert "commitment" in str(exc)
     else:
         raise AssertionError("corrupted prediction commitment was accepted")
+
+
+def test_top_level_experiment_result_is_provenance_checked_before_evaluation():
+    primary = tuple(_primary_seed(seed) for seed in _seeds())
+    negative = tuple(_negative_seed(seed) for seed in _seeds())
+    result = SVF0ExperimentResult(
+        logical_subject_id="NOEMA_SVF0_RECURRENT_GATE1_V4",
+        plan_commitment="a" * 64,
+        authorization_id="test-only-not-executed",
+        primary_results=primary,
+        negative_control_results=negative,
+    )
+    evaluation = evaluate_experiment_result(result)
+    assert evaluation.overall_pass is True
+
+    bad = replace(result, plan_commitment="b" * 64)
+    try:
+        evaluate_experiment_result(bad)
+    except ValueError as exc:
+        assert "top-level plan commitment" in str(exc)
+    else:
+        raise AssertionError("mismatched top-level experiment provenance was accepted")
