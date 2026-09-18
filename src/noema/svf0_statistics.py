@@ -72,6 +72,89 @@ def student_t_ci_n8(seed_values: tuple[float, ...]) -> ConfidenceInterval:
     )
 
 
+
+def _beta_continued_fraction(a: float, b: float, x: float) -> float:
+    max_iterations = 200
+    epsilon = 3.0e-14
+    fp_min = 1.0e-300
+    qab = a + b
+    qap = a + 1.0
+    qam = a - 1.0
+    c = 1.0
+    d = 1.0 - qab * x / qap
+    if abs(d) < fp_min:
+        d = fp_min
+    d = 1.0 / d
+    h = d
+    for m in range(1, max_iterations + 1):
+        m2 = 2 * m
+        aa = m * (b - m) * x / ((qam + m2) * (a + m2))
+        d = 1.0 + aa * d
+        if abs(d) < fp_min:
+            d = fp_min
+        c = 1.0 + aa / c
+        if abs(c) < fp_min:
+            c = fp_min
+        d = 1.0 / d
+        h *= d * c
+
+        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
+        d = 1.0 + aa * d
+        if abs(d) < fp_min:
+            d = fp_min
+        c = 1.0 + aa / c
+        if abs(c) < fp_min:
+            c = fp_min
+        d = 1.0 / d
+        delta = d * c
+        h *= delta
+        if abs(delta - 1.0) <= epsilon:
+            return h
+    raise ArithmeticError("incomplete-beta continued fraction did not converge")
+
+
+def _regularized_incomplete_beta(x: float, a: float, b: float) -> float:
+    if not (0.0 <= x <= 1.0):
+        raise ValueError("x must be in [0, 1]")
+    if a <= 0.0 or b <= 0.0:
+        raise ValueError("beta parameters must be positive")
+    if x == 0.0:
+        return 0.0
+    if x == 1.0:
+        return 1.0
+    log_bt = (
+        math.lgamma(a + b)
+        - math.lgamma(a)
+        - math.lgamma(b)
+        + a * math.log(x)
+        + b * math.log1p(-x)
+    )
+    bt = math.exp(log_bt)
+    if x < (a + 1.0) / (a + b + 2.0):
+        return bt * _beta_continued_fraction(a, b, x) / a
+    return 1.0 - bt * _beta_continued_fraction(b, a, 1.0 - x) / b
+
+
+def student_t_two_sided_p_df7(t_statistic: float) -> float:
+    if not math.isfinite(t_statistic):
+        raise ValueError("t_statistic must be finite")
+    degrees_freedom = 7.0
+    x = degrees_freedom / (degrees_freedom + t_statistic * t_statistic)
+    return _regularized_incomplete_beta(x, degrees_freedom / 2.0, 0.5)
+
+
+def student_t_two_sided_p_n8(seed_values: tuple[float, ...]) -> float:
+    _finite_values(seed_values, name="seed_values")
+    if len(seed_values) != 8:
+        raise ValueError("frozen first-core Student-t p-value requires exactly 8 seed values")
+    mean = statistics.fmean(seed_values)
+    sample_sd = statistics.stdev(seed_values)
+    if sample_sd == 0.0:
+        return 1.0 if mean == 0.0 else 0.0
+    t_statistic = mean / (sample_sd / math.sqrt(8.0))
+    return student_t_two_sided_p_df7(t_statistic)
+
+
 def primary_persistence_result(
     *,
     seed_deltas: tuple[float, ...],
