@@ -65,15 +65,22 @@ def _symmetric(seed: int, step: int, lane: int) -> float:
     return 2.0 * _unit_interval(seed, step, lane) - 1.0
 
 
+def _previous_driver(seed: int, step: int, lane: int) -> float:
+    if step == 0:
+        return _symmetric(seed, 0, lane + 100)
+    return _symmetric(seed, step - 1, lane)
+
+
 def svf0_point(*, seed: int, step: int, config: SVF0WorldConfig) -> SVF0WorldPoint:
     driver = _symmetric(seed, step, 0)
+    lagged_driver = _previous_driver(seed, step, 0)
     changed_coefficient = (
         config.coefficient_before if step < config.change_point else config.coefficient_after
     )
     changed_noise = config.noise_half_width * _symmetric(seed, step, 1)
     stable_noise = config.noise_half_width * _symmetric(seed, step, 2)
-    changed = changed_coefficient * driver + changed_noise
-    stable = config.stable_coefficient * driver + stable_noise
+    changed = changed_coefficient * lagged_driver + changed_noise
+    stable = config.stable_coefficient * lagged_driver + stable_noise
     return SVF0WorldPoint(
         learner_event=LearnerEvent(
             step=step,
@@ -92,10 +99,11 @@ def svf0_negative_control_point(
     config: SVF0NegativeControlConfig,
 ) -> SVF0WorldPoint:
     driver = _symmetric(seed, step, 10)
+    lagged_driver = _previous_driver(seed, step, 10)
     changed_noise = config.noise_half_width * _symmetric(seed, step, 11)
     stable_noise = config.noise_half_width * _symmetric(seed, step, 12)
-    changed = config.coefficient * driver + changed_noise
-    stable = config.stable_coefficient * driver + stable_noise
+    changed = config.coefficient * lagged_driver + changed_noise
+    stable = config.stable_coefficient * lagged_driver + stable_noise
     return SVF0WorldPoint(
         learner_event=LearnerEvent(
             step=step,
