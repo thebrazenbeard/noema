@@ -199,8 +199,9 @@ def execute_svf0_step(
             config.recurrent,
             config.replay,
         )
+        eligible_prior_count = max(0, len(live.replay.items) - 1)
         replay_indices = select_most_recent_replay_indices(
-            item_count=len(live.replay.items),
+            item_count=eligible_prior_count,
             max_updates=config.replay.max_replay_updates_per_event,
         )
         updated = transition_recurrent_c2_replay(
