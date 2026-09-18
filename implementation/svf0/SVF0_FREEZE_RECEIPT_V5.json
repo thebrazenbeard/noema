@@ -1,0 +1,119 @@
+{
+  "schema_id": "NOEMA_SVF0_FREEZE_RECEIPT_V5",
+  "classification": "IP_CONFIDENTIAL",
+  "created_at": "2026-09-18T18:49:00-04:00",
+  "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V4",
+  "status": "FROZEN_INERT_UNTIL_SEPARATE_E0_AUTHORITY",
+  "repository": "thebrazenbeard/noema",
+  "research_parent": {
+    "pull_request": 32,
+    "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33"
+  },
+  "implementation_source": {
+    "commit": "b376526e32945c6a7688b3ef7b0312881aede5de",
+    "subject_manifest": {
+      "commit": "37f8f8f96018bf44e1daca9e987a8520d8ca12de",
+      "path": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
+      "git_blob": "b43e32f9eeb40f42517cc19db6d675e2e5f80d6f"
+    },
+    "i1_receipt": {
+      "commit": "2eb1455c946b0c47d3a7196abeaba738588bbbcd",
+      "path": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
+      "git_blob": "e29a474c720c642fd5d1a9e5d4083fc5038b5329"
+    },
+    "deterministic_tests_present": 103,
+    "known_failures": 0,
+    "focused_execution_evaluation_tests": {
+      "executed": 34,
+      "passed": 34
+    },
+    "e0_valid_path_executed": false
+  },
+  "support": {
+    "commit": "ade4aa6eb84e2a7fc695fb85ee441fe1425506ac",
+    "bundle": {
+      "path": "implementation/svf0/SUPPORT_BUNDLE_V5.json",
+      "git_blob": "ca357087616c790b1087aecd484b98bc38dde757"
+    },
+    "execution_policy": {
+      "path": "implementation/svf0/EXECUTION_POLICY_V3.json",
+      "git_blob": "427df72b7e021998b0b239a481807d6975dcfd1f"
+    },
+    "parameter_distribution": {
+      "path": "implementation/svf0/PARAMETER_DISTRIBUTION_V5.json",
+      "git_blob": "782d7e9bc6a6d83ce38de2bdebbad26527ea853e",
+      "sha256": "7f9975815d669f3312f45cba4d2020ce84e2eefd1567f5bf60310be42b5251f2"
+    },
+    "state_scope": {
+      "path": "implementation/svf0/STATE_SCOPE_MANIFEST_V5.json",
+      "git_blob": "6491c62632352e9c64b144faa08f8519188a5905"
+    },
+    "resource_contract": {
+      "path": "implementation/svf0/RESOURCE_MEASUREMENT_CONTRACT_V5.json",
+      "git_blob": "f7d6d2ef956815fa7bac432b707ac7dbfeaca790"
+    },
+    "negative_control": {
+      "path": "implementation/svf0/NEGATIVE_CONTROL_SPEC_V5.json",
+      "git_blob": "946ff950e3731567b72f0bcec406b246cb00f2b1"
+    },
+    "scoring": {
+      "path": "implementation/svf0/SCORING_AND_DECISION_RULES_V5.json",
+      "git_blob": "d4f37b05d7fc9f3791d9aa9ea799ca051fbdcc2f"
+    },
+    "seed_manifest": {
+      "path": "implementation/svf0/SEED_MANIFEST_V1.json",
+      "git_blob": "47d43c5cb8269f5ce4e06c7ad9b4ebcd73b53c5c",
+      "sha256": "f68ee0307f9a7e9d735a0893c0c7c65bda938682e9d668bdd6bf5ccb2818dd5b"
+    }
+  },
+  "preregistration": {
+    "commit": "5d5db9a299cacd6f30766cee6b1de6d02f51586b",
+    "path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R5.json",
+    "git_blob": "afb0d9d5ce93afd2a95d6bc7a000c6da6f7d658b",
+    "canonical_schema_validation": {
+      "status": "PASS",
+      "errors": 0
+    },
+    "semantic_provenance_mirror": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "implementation_validator_exact_manifest_execution": "NOT_EXECUTED_IN_THIS_RUNTIME"
+  },
+  "supersession": {
+    "r4_rejected": {
+      "commit": "8457f594ccd0e13890f7a91da47454fcd9188561",
+      "path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R4.json",
+      "git_blob": "e2b3d7788894be10a11d7da828d09bc654005254",
+      "status": "HISTORICAL_REJECTED_SCHEMA",
+      "reason": "Two redundant strict-prior replay detail fields violated the closed canonical V2 schema; no schema weakening was performed."
+    },
+    "r3": {
+      "commit": "6e71fd4b197a817835894e1eb32cca747b53bbb2",
+      "path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R3.json",
+      "git_blob": "f6decc7d6f9516183fd3ab9370bc88bf946278f2",
+      "status": "HISTORICAL_SUPERSEDED_SOURCE"
+    },
+    "r2": {
+      "commit": "7fd2f0eac73759efbad856c9ace7cc50b42f192c",
+      "path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R2.json",
+      "git_blob": "593fc355dfa8d610b8923891850a8dc65607865d",
+      "status": "HISTORICAL_SUPERSEDED_SOURCE"
+    }
+  },
+  "authority": {
+    "i0_implementation_source": "AUTHORIZED",
+    "i1_deterministic_non_learning_verification": "AUTHORIZED",
+    "e0_learning_training_experiment_execution": "NOT_AUTHORIZED",
+    "p0_protected_effects": "NOT_AUTHORIZED",
+    "merge": "NOT_AUTHORIZED",
+    "deployment": "NOT_AUTHORIZED",
+    "publication": "NOT_AUTHORIZED",
+    "paid_or_hosted_compute": "NOT_AUTHORIZED"
+  },
+  "claims": {
+    "pass_frozen_valid": false,
+    "empirical_gate1_result": false,
+    "training_or_experiment_executed": false
+  }
+}
