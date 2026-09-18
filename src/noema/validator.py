@@ -241,6 +241,20 @@ def _cross_field_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
                 "candidate_scope_policy_unresolved",
                 f"candidate {candidate.get('candidate_id')!r} scope_policy_id is not frozen",
             )
+        parent_id = candidate.get("variant_of_candidate_id")
+        if parent_id is not None:
+            if parent_id == candidate.get("candidate_id"):
+                return _result(
+                    ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+                    "candidate_variant_self_reference",
+                    f"candidate {candidate.get('candidate_id')!r} cannot be its own variant parent",
+                )
+            if parent_id not in set(ids):
+                return _result(
+                    ValidationStatus.FAIL_CROSS_FIELD_INVARIANT,
+                    "candidate_variant_parent_unresolved",
+                    f"candidate {candidate.get('candidate_id')!r} variant parent does not resolve",
+                )
 
     scoring = manifest.get("scoring_contract")
     if isinstance(scoring, Mapping):
@@ -306,23 +320,26 @@ def _resource_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     return None
 
 
-_VAGUE_DECISION_RULES = {
-    "materially better",
-    "reasonable compute",
-    "substantially intact",
-    "good calibration",
-    "enough support",
-    "similar performance",
-    "small overhead",
-    "small overhead allowed",
-    "stop when stable",
-    "use appropriate correction",
-    "held-out transfer succeeds",
-}
+_EXPR_TERM = re.compile(
+    r"^[a-z][a-z0-9_]*(?:<=|>=|==|!=|<|>)(?:-?\\d+(?:\\.\\d+)?|true|false|[a-z][a-z0-9_]*)$"
+)
+_ALGO_RULE = re.compile(r"^algo:[a-z][a-z0-9_]*@v[1-9][0-9]*(?::[a-z0-9_.=,-]+)?$")
 
 
 def _normalized_rule(value: object) -> str:
     return " ".join(str(value).strip().lower().split())
+
+
+def _is_expression_rule(value: object) -> bool:
+    rule = _normalized_rule(value)
+    if not rule.startswith("expr:"):
+        return False
+    terms = rule[5:].replace(" ", "").split("&&")
+    return bool(terms) and all(_EXPR_TERM.fullmatch(term) for term in terms)
+
+
+def _is_algorithm_rule(value: object) -> bool:
+    return bool(_ALGO_RULE.fullmatch(_normalized_rule(value).replace(" ", "")))
 
 
 def _scoring_decidability_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
@@ -331,25 +348,53 @@ def _scoring_decidability_result(manifest: Mapping[str, Any]) -> ValidationResul
         for metric in scoring.get("primary_metrics", ()):
             if not isinstance(metric, Mapping):
                 continue
-            for key in ("aggregation_rule", "threshold_rule", "support_requirement"):
-                if key not in metric:
-                    continue
-                rule = _normalized_rule(metric.get(key))
-                if not rule or rule in _VAGUE_DECISION_RULES:
+            metric_id = metric.get("metric_id")
+            aggregation = metric.get("aggregation_rule")
+            if aggregation is not None and not _is_algorithm_rule(aggregation):
+                return _result(
+                    ValidationStatus.FAIL_SCORING_CONTRACT,
+                    "undecidable_primary_aggregation",
+                    f"primary metric {metric_id!r} aggregation_rule is not a frozen algorithm identifier",
+                )
+            for key in ("threshold_rule", "support_requirement"):
+                if key in metric and not _is_expression_rule(metric.get(key)):
                     return _result(
                         ValidationStatus.FAIL_SCORING_CONTRACT,
                         "undecidable_primary_rule",
-                        f"primary metric {metric.get('metric_id')!r} {key} is not mechanically decidable",
+                        f"primary metric {metric_id!r} {key} is not a mechanically decidable expression",
                     )
+
     world = manifest.get("world")
     if isinstance(world, Mapping) and "negative_control_acceptance_rule" in world:
-        rule = _normalized_rule(world.get("negative_control_acceptance_rule"))
-        if not rule or rule in _VAGUE_DECISION_RULES:
+        if not _is_expression_rule(world.get("negative_control_acceptance_rule")):
             return _result(
                 ValidationStatus.FAIL_SCORING_CONTRACT,
                 "undecidable_negative_control_rule",
-                "negative-control acceptance rule is not mechanically decidable",
+                "negative-control acceptance rule is not a mechanically decidable expression",
             )
+
+    statistics = manifest.get("statistics_contract")
+    if isinstance(statistics, Mapping):
+        for key in ("uncertainty_method", "multiple_comparison_rule"):
+            if key in statistics and not _is_algorithm_rule(statistics.get(key)):
+                return _result(
+                    ValidationStatus.FAIL_SCORING_CONTRACT,
+                    "undecidable_statistics_algorithm",
+                    f"{key} is not a frozen algorithm identifier",
+                )
+        if "stopping_rule" in statistics and not _is_expression_rule(statistics.get("stopping_rule")):
+            return _result(
+                ValidationStatus.FAIL_SCORING_CONTRACT,
+                "undecidable_stopping_rule",
+                "stopping_rule is not a mechanically decidable expression",
+            )
+        for criterion in statistics.get("kill_criteria", ()):
+            if not _is_expression_rule(criterion):
+                return _result(
+                    ValidationStatus.FAIL_SCORING_CONTRACT,
+                    "undecidable_kill_criterion",
+                    "kill criteria must be mechanically decidable expressions",
+                )
     return None
 
 
