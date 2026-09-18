@@ -632,6 +632,83 @@ def _cross_field_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     return None
 
 
+_FIRST_CORE_SVF0_ID = "NOEMA_SVF0_RECURRENT_GATE1_V1"
+_FIRST_CORE_SVF0_METRICS = {
+    "P_C1_VS_RESET_LATE_POST": {
+        "claim": "P",
+        "direction": "LOWER_IS_BETTER",
+        "comparator_candidate_id": "reset_ref",
+        "aggregation_rule": "algo:mean_seed_window_delta@v1",
+        "threshold_rule": "expr:mean_nll_delta<=-0.02&&upper_ci_delta<0",
+        "support_requirement": "expr:scored_count==expected_count&&worlds_completed==maximum_worlds&&resource_accounting_complete==true",
+    },
+    "P_C2_VS_RESET_LATE_POST": {
+        "claim": "P",
+        "direction": "LOWER_IS_BETTER",
+        "comparator_candidate_id": "reset_ref",
+        "aggregation_rule": "algo:mean_seed_window_delta@v1",
+        "threshold_rule": "expr:mean_nll_delta<=-0.02&&upper_ci_delta<0",
+        "support_requirement": "expr:scored_count==expected_count&&worlds_completed==maximum_worlds&&resource_accounting_complete==true",
+    },
+}
+
+
+def _first_core_svf0_metric_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
+    subject = manifest.get("subject", {})
+    if subject.get("manifest_logical_id") != _FIRST_CORE_SVF0_ID:
+        return None
+    if subject.get("stage") != "SVF-0":
+        return _result(
+            ValidationStatus.FAIL_SCORING_CONTRACT,
+            "first_core_profile_wrong_stage",
+            "first-core recurrent Gate-1 profile is defined only for SVF-0",
+        )
+    candidates = {
+        candidate.get("candidate_id"): candidate
+        for candidate in manifest.get("candidates", ())
+        if isinstance(candidate, Mapping)
+    }
+    required_roles = {
+        "c1_recurrent": ("C1", True),
+        "c2_recurrent_replay": ("C2", True),
+        "reset_ref": ("REFERENCE", False),
+    }
+    for candidate_id, (role, eligible) in required_roles.items():
+        candidate = candidates.get(candidate_id)
+        if (
+            not isinstance(candidate, Mapping)
+            or candidate.get("role") != role
+            or candidate.get("developmental_evidence_eligible") is not eligible
+        ):
+            return _result(
+                ValidationStatus.FAIL_SCORING_CONTRACT,
+                "first_core_candidate_profile",
+                f"{candidate_id} does not match the frozen first-core candidate role",
+            )
+    scoring = manifest.get("scoring_contract", {})
+    metrics = scoring.get("primary_metrics", ())
+    by_id = {
+        metric.get("metric_id"): metric
+        for metric in metrics
+        if isinstance(metric, Mapping)
+    }
+    if set(by_id) != set(_FIRST_CORE_SVF0_METRICS):
+        return _result(
+            ValidationStatus.FAIL_SCORING_CONTRACT,
+            "first_core_metric_set",
+            "first-core SVF-0 primary metric set differs from the frozen profile",
+        )
+    for metric_id, expected in _FIRST_CORE_SVF0_METRICS.items():
+        metric = by_id[metric_id]
+        if any(metric.get(key) != value for key, value in expected.items()):
+            return _result(
+                ValidationStatus.FAIL_SCORING_CONTRACT,
+                "first_core_metric_semantics",
+                f"{metric_id} differs from the frozen first-core metric semantics",
+            )
+    return None
+
+
 def _resource_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     resource = manifest.get("resource_contract")
     if not isinstance(resource, Mapping):
@@ -877,6 +954,7 @@ def validate_manifest(
         lambda: _world_schedule_result(manifest),
         lambda: _cross_field_result(manifest),
         lambda: _c1_c2_replay_isolation_result(manifest),
+        lambda: _first_core_svf0_metric_result(manifest),
         lambda: _scoring_decidability_result(manifest),
         lambda: _resource_result(manifest),
         lambda: _resource_measurement_artifact_result(manifest, resolved),
