@@ -16,8 +16,10 @@
     "verification_mode": "COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING"
   },
   "git_blob_reconstruction": {
-    "matched": 17,
-    "mismatched": 0
+    "status": "PARTIAL_COMPOSITE",
+    "exact_bound_artifact_blobs_verified_through_github_connector": true,
+    "full_private_repo_clean_checkout": "UNAVAILABLE_IN_LOCAL_SANDBOX",
+    "mismatches_known": 0
   },
   "authority": {
     "i0_implementation_source": "AUTHORIZED",
@@ -30,6 +32,18 @@
     "paid_or_hosted_compute": "NOT_AUTHORIZED"
   },
   "staleness_rule": "Any source/test/config change after the frozen implementation source creates a new subject requiring fresh exact-head reconciliation and fresh I1 verification.",
-  "source_of_truth": "Fresh GitHub source readback outranks this snapshot.",
-  "svf0_support_commit": "2dc20443e33af326f2f26ec74b144579ac1ae268"
+  "source_of_truth": "Fresh GitHub source readback outranks this snapshot. Qualification labels are exact-subject-bound.",
+  "svf0_support_commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+  "preregistration": {
+    "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V1",
+    "status": "FROZEN_INERT_UNTIL_SEPARATE_E0_AUTHORITY",
+    "manifest_path": "implementation/svf0/SVF0_PREREGISTRATION_V2.json",
+    "manifest_commit": "33f08d7ceb30e0f9cb5c445a27c67f7a8c90af9b",
+    "manifest_git_blob": "005157c2c7a3840dc33a80e84ac79411d2695bff",
+    "freeze_receipt_path": "implementation/svf0/SVF0_FREEZE_RECEIPT_V1.json",
+    "freeze_receipt_commit": "cc60f91cf265ae7d5cfc5d2afc1e4fd2f595732c",
+    "canonical_schema_validation": "PASS",
+    "independent_semantic_mirror": "PASS",
+    "implementation_validator_exact_manifest_execution": "NOT_EXECUTED_IN_THIS_RUNTIME"
+  }
 }
