@@ -7,15 +7,12 @@
   "research_governance_remediation_pull_request": 35,
   "implementation_pull_request": 36,
   "implementation_branch": "impl/noema-minimal-source-i0-20260913",
-  "frozen_implementation_source": "9eb234f07e85b20b7c801ed5c8f0bac55a1633a1",
+  "frozen_implementation_source": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
   "implementation_subject_manifest": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
   "i1_verification_receipt": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
   "deterministic_tests": {
-    "covered": 67,
+    "present": 68,
     "known_failed": 0,
-    "validator_exact_executed": 22,
-    "recurrent_lagged_semantic_executed": 7,
-    "meter_reset_selector_semantic_executed": 5,
     "verification_mode": "COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING"
   },
   "git_blob_reconstruction": {
@@ -33,5 +30,6 @@
     "paid_or_hosted_compute": "NOT_AUTHORIZED"
   },
   "staleness_rule": "Any source/test/config change after the frozen implementation source creates a new subject requiring fresh exact-head reconciliation and fresh I1 verification.",
-  "source_of_truth": "Fresh GitHub source readback outranks this snapshot."
+  "source_of_truth": "Fresh GitHub source readback outranks this snapshot.",
+  "svf0_support_commit": "2dc20443e33af326f2f26ec74b144579ac1ae268"
 }
