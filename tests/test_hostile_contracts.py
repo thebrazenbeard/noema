@@ -293,3 +293,31 @@ def test_validator_exposes_all_normative_v2_result_classes():
         "BLOCKED_UNAVAILABLE_EVIDENCE",
     }
     assert {status.value for status in ValidationStatus} == expected
+
+
+def test_prose_world_randomization_rule_fails_world_integrity():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    manifest["world"]["hidden_family_randomization_rule"] = "balanced"
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_WORLD_SCHEDULE_INTEGRITY
+
+
+def test_prose_resource_measurement_method_fails_resource_accounting():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    manifest["resource_contract"]["measurement_method"] = "reasonable measurement"
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_RESOURCE_ACCOUNTING
+
+
+def test_prose_proper_scoring_rule_fails_scoring_contract():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    manifest["scoring_contract"] = {
+        "proper_scoring_rule": "appropriate scoring",
+        "primary_claims": [],
+        "primary_metrics": [],
+    }
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_SCORING_CONTRACT
