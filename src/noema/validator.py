@@ -294,6 +294,62 @@ def _resource_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
             "resource_measurement_unbound",
             "resource measurement must be an immutable artifact",
         )
+    restart = manifest.get("restart_contract")
+    scoring = manifest.get("scoring_contract")
+    has_primary_claim = isinstance(scoring, Mapping) and bool(scoring.get("primary_claims"))
+    if isinstance(restart, Mapping) and restart.get("checkpointing_used") is True and has_primary_claim:
+        return _result(
+            ValidationStatus.FAIL_RESOURCE_ACCOUNTING,
+            "checkpointed_primary_v2",
+            "V2 primary fixed-envelope evidence cannot use checkpointing without an explicit checkpoint resource axis",
+        )
+    return None
+
+
+_VAGUE_DECISION_RULES = {
+    "materially better",
+    "reasonable compute",
+    "substantially intact",
+    "good calibration",
+    "enough support",
+    "similar performance",
+    "small overhead",
+    "small overhead allowed",
+    "stop when stable",
+    "use appropriate correction",
+    "held-out transfer succeeds",
+}
+
+
+def _normalized_rule(value: object) -> str:
+    return " ".join(str(value).strip().lower().split())
+
+
+def _scoring_decidability_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
+    scoring = manifest.get("scoring_contract")
+    if isinstance(scoring, Mapping):
+        for metric in scoring.get("primary_metrics", ()):
+            if not isinstance(metric, Mapping):
+                continue
+            for key in ("aggregation_rule", "threshold_rule", "support_requirement"):
+                if key not in metric:
+                    continue
+                rule = _normalized_rule(metric.get(key))
+                if not rule or rule in _VAGUE_DECISION_RULES:
+                    return _result(
+                        ValidationStatus.FAIL_SCORING_CONTRACT,
+                        "undecidable_primary_rule",
+                        f"primary metric {metric.get('metric_id')!r} {key} is not mechanically decidable",
+                    )
+    world = manifest.get("world")
+    if isinstance(world, Mapping) and "negative_control_acceptance_rule" in world:
+        rule = _normalized_rule(world.get("negative_control_acceptance_rule"))
+        if not rule or rule in _VAGUE_DECISION_RULES:
+            return _result(
+                ValidationStatus.FAIL_SCORING_CONTRACT,
+                "undecidable_negative_control_rule",
+                "negative-control acceptance rule is not mechanically decidable",
+            )
     return None
 
 
@@ -425,6 +481,7 @@ def validate_manifest(
         lambda: _commitment_integrity_result(manifest, resolved),
         lambda: _information_boundary_result(manifest),
         lambda: _cross_field_result(manifest),
+        lambda: _scoring_decidability_result(manifest),
         lambda: _resource_result(manifest),
         lambda: _lineage_result(manifest),
     ):
