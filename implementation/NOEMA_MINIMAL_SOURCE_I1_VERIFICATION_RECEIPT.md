@@ -8,56 +8,95 @@ Date: 2026-09-18
 
 Research parent: `be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33`
 
-Execution-complete frozen source/test/config commit: `6d40befe2ee260586270610c4c9e864a8e84403e`
-
-Support V4 commit: `7d1b3ff7c9c25cc56d16a4f2114e094da7dd5619`
+Final hardened source/test/config commit: `b376526e32945c6a7688b3ef7b0312881aede5de`
 
 Implementation subject manifest:
-- `implementation/NOEMA_MINIMAL_SUBJECT_V1.json`
-- binds `source_commit=6d40befe2ee260586270610c4c9e864a8e84403e`
+- path: `implementation/NOEMA_MINIMAL_SUBJECT_V1.json`
+- commit: `37f8f8f96018bf44e1daca9e987a8520d8ca12de`
+- Git blob: `b43e32f9eeb40f42517cc19db6d675e2e5f80d6f`
+- binds `source_commit=b376526e32945c6a7688b3ef7b0312881aede5de`
 
-## Exact source inventory
+Support V5:
+- commit: `ade4aa6eb84e2a7fc695fb85ee441fe1425506ac`
+- bundle: `implementation/svf0/SUPPORT_BUNDLE_V5.json`
+- bundle Git blob: `ca357087616c790b1087aecd484b98bc38dde757`
 
-- 13 deterministic test files;
-- **88** `test_*` cases present at the frozen source commit;
+Current inert preregistration:
+- logical subject: `NOEMA_SVF0_RECURRENT_GATE1_V4`
+- path: `implementation/svf0/SVF0_PREREGISTRATION_V2_R5.json`
+- commit: `5d5db9a299cacd6f30766cee6b1de6d02f51586b`
+- Git blob: `afb0d9d5ce93afd2a95d6bc7a000c6da6f7d658b`
+
+## Exact inventory
+
+At the final source line:
+- **14** deterministic test files;
+- **103** `test_*` cases present;
 - **0 known failures**.
 
-## Newly executed I1 verification
+The local exact reconstruction available in this runtime contains the hardened execution/evaluation slice, not every legacy private-repository module. Therefore this receipt does **not** claim a clean 103/103 full-suite rerun.
 
-The new execution-layer source was verified without running a developmental learner trajectory:
+## Focused I1 execution/evaluation verification
 
-- single-step runner contract: **7/7 PASS**;
-- deterministic scoring/statistics primitives: **7/7 PASS**;
-- E0 orchestration guard: **5/5 PASS**;
-- combined new execution layer: **19/19 PASS**.
+The exact execution/evaluation slice was run without entering a valid E0 learner trajectory:
 
-The E0 guard tests prove:
-- missing E0 authority fails before world generation;
-- authority for the wrong logical subject fails before world generation;
-- an unfrozen seed fails before world generation;
-- the valid subject+seed E0 path was **not executed**.
+- runner: **8 tests**;
+- deterministic statistics: **9 tests**;
+- E0 experiment/plan guard: **8 tests**;
+- Gate-1 evaluator/provenance integrity: **9 tests**;
+- focused total: **34/34 PASS**.
 
-The single-step runner tests prove:
-- C1, C2, and reset prediction tickets commit before outcome reveal;
-- C1/C2 receive the same revealed outcome;
-- C2 performs live update before at most one bounded replay update;
-- reset carries zero durable state;
-- SVF-0 intervention packets are rejected;
-- resource violations remain fail-closed and invalidate the whole comparison point.
+The focused verification covers:
+- prediction commitment before outcome reveal;
+- identical learner-visible outcome for C1/C2;
+- C2 live update followed by at most one **strictly prior** replay update;
+- the just-stored current transition is not same-step replay eligible;
+- reset-reference statelessness;
+- SVF-0 intervention rejection;
+- real process RSS / working-set resource accounting and whole-point fail-closed invalidation;
+- per-channel Gaussian NLL persistence;
+- exact frozen seeds, world parameters, learner parameters, replay limits, and resource envelope;
+- deterministic experiment-plan commitment;
+- E0 denial before world generation when authority is absent or mismatched;
+- frozen score windows;
+- n=8 Student-t confidence intervals and exact df=7 two-sided p-values;
+- Holm-Bonferroni step-down decisions;
+- persistence, adaptation, stable-retention, negative-control, six-flag kill, and overall Gate-1 evaluation;
+- prediction-ticket commitment recomputation;
+- per-channel and total Gaussian-NLL recomputation;
+- candidate/outcome/resource evidence consistency;
+- logical-subject and plan-commitment consistency through top-level experiment result evaluation.
 
-The deterministic statistics tests prove the frozen:
-- score windows;
-- target-minus-comparator window delta;
-- n=8 Student-t interval with df=7 critical value 2.364624251;
-- primary persistence effect + support-completeness gate;
-- Holm-Bonferroni step-down rule;
-- Gate-1 kill semantics.
+The valid E0 subject+seed path was **not executed**.
 
-## Existing source posture
+## Manifest qualification
 
-The earlier recurrent, lagged-world, source-binding, resource-meter, and hostile-validator evidence remains applicable only where the exact underlying Git blobs are unchanged. The validator/profile identifier moved to `NOEMA_SVF0_RECURRENT_GATE1_V3`; a clean full-suite rerun was not available in this sandbox and is not claimed.
+R4 historical rejected attempt:
+- path: `implementation/svf0/SVF0_PREREGISTRATION_V2_R4.json`
+- commit: `8457f594ccd0e13890f7a91da47454fcd9188561`
+- Git blob: `e2b3d7788894be10a11d7da828d09bc654005254`
+- canonical V2 schema result: **FAIL / 2 errors** because two redundant strict-prior fields were outside the closed schema.
+- no schema weakening was performed; the extra detail remains immutably represented in support V5 / execution policy V3.
 
-No learner trajectory, training loop, primary world run, negative-control run, hosted CI, or paid compute was executed.
+Current R5:
+- canonical V2 JSON-Schema validation: **PASS / 0 errors**;
+- independent semantic/provenance mirror: **PASS / 0 findings**;
+- parameter-distribution SHA-256: `7f9975815d669f3312f45cba4d2020ce84e2eefd1567f5bf60310be42b5251f2`;
+- seed-manifest SHA-256: `f68ee0307f9a7e9d735a0893c0c7c65bda938682e9d668bdd6bf5ccb2818dd5b`.
+
+The Python implementation validator has **not** been directly executed against the exact R5 manifest in this runtime. Therefore this receipt does not claim `PASS_FROZEN_VALID`.
+
+## Scientific hardening completed before freeze
+
+The V4 subject closes defects found during hostile implementation review:
+- real process resident-memory measurement replaces Python-allocation peak as the resident-memory axis;
+- recurrent prediction uses one-step-lagged observable context;
+- the world dependency is one-step lagged so pre-outcome prediction can actually test temporal dependency learning;
+- C2 replay cannot reuse the just-observed current transition in the same step;
+- the exact plan is content-addressed and seed results bind subject + plan commitment;
+- required per-channel diagnostics are computable;
+- Student-t p-values actually exist for Holm correction;
+- evaluation recomputes commitments and scores rather than trusting stored evidence.
 
 ## Authority ceiling
 
@@ -72,4 +111,4 @@ This receipt does **not** authorize or claim:
 - protected-system connection;
 - BT2 R1 remediation/requalification.
 
-Any source/test/config change after `6d40befe2ee260586270610c4c9e864a8e84403e` creates a new source subject and requires fresh I1 qualification.
+Any source/test/config mutation after `b376526e32945c6a7688b3ef7b0312881aede5de` creates a new source subject and requires fresh I1 qualification.
