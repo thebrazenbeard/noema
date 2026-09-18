@@ -242,6 +242,17 @@ def predict_recurrent(state: RecurrentGaussianState) -> Prediction:
     return Prediction(mean=mean, variance=state.variance)
 
 
+def predict_reset_reference(*, dimension: int, variance: float) -> Prediction:
+    if dimension < 1:
+        raise ValueError("dimension must be at least 1")
+    if not math.isfinite(variance) or variance <= 0:
+        raise ValueError("variance must be finite and positive")
+    return Prediction(
+        mean=tuple(0.0 for _ in range(dimension)),
+        variance=tuple(float(variance) for _ in range(dimension)),
+    )
+
+
 def _learn_recurrent_pair(
     state: RecurrentGaussianState,
     *,
