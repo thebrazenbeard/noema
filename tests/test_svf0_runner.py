@@ -106,9 +106,9 @@ def test_c2_live_update_then_bounded_replay_without_stream_divergence():
     assert len(c2_record.channel_scores) == 3
     assert math.isclose(sum(c1_record.channel_scores), c1_record.score)
     assert math.isclose(sum(c2_record.channel_scores), c2_record.score)
-    assert c2_record.replay_updates == 1
+    assert c2_record.replay_updates == 0
     assert result.state.c1.count == 2
-    assert result.state.c2.base.count == 3
+    assert result.state.c2.base.count == 2
     assert result.state.c2.base.previous == result.state.c1.previous == (0.5, 0.4, -0.2)
 
 
@@ -214,3 +214,32 @@ def test_any_resource_failure_invalidates_the_whole_point():
     )
     assert result.point_valid is False
     assert result.invalid_candidate_ids
+
+
+def test_c2_replays_most_recent_strictly_prior_transition_not_current_event():
+    cfg = _config()
+    seeded = RecurrentGaussianState(
+        weights=((0.0, 0.0, 0.0),) * 3,
+        variance=(1.0, 1.0, 1.0),
+        previous=(2.0, 0.0, 0.0),
+        count=2,
+    )
+    prior = RecurrentReplayBuffer.empty(cfg.replay).append(
+        context=(1.0, 0.0, 0.0),
+        outcome=(2.0, 0.0, 0.0),
+    )
+    result = runner.execute_svf0_step(
+        sealed=runner.SealedLearnerEvent(
+            step=2,
+            reveal=lambda: LearnerEvent(step=2, channels=(3.0, 0.0, 0.0), intervention=None),
+        ),
+        state=runner.SVF0RuntimeState(
+            c1=seeded,
+            c2=RecurrentC2State(base=seeded, replay=prior),
+        ),
+        config=cfg,
+    )
+    c2_record = result.candidate_records[1]
+    assert c2_record.replay_updates == 1
+    assert result.state.c2.replay.items[-1].outcome == (3.0, 0.0, 0.0)
+    assert result.state.c2.base.count == result.state.c1.count + 1
