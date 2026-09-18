@@ -7,12 +7,14 @@
   "research_governance_remediation_pull_request": 35,
   "implementation_pull_request": 36,
   "implementation_branch": "impl/noema-minimal-source-i0-20260913",
-  "frozen_implementation_source": "8ac5512c396c112f7a16ab86dcf63d5d3e6a0b46",
+  "frozen_implementation_source": "0fc57c1d8023e0bc1cd4d48e63002f7131e2c563",
   "implementation_subject_manifest": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
   "i1_verification_receipt": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
   "deterministic_tests": {
-    "passed": 50,
-    "failed": 0
+    "covered": 55,
+    "failed": 0,
+    "changed_surface_executed": 22,
+    "unchanged_prior_pass": 33
   },
   "git_blob_reconstruction": {
     "matched": 17,
