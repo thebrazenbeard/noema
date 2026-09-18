@@ -321,3 +321,202 @@ def test_prose_proper_scoring_rule_fails_scoring_contract():
     }
     result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
     assert result.status is ValidationStatus.FAIL_SCORING_CONTRACT
+
+
+def _full_v2_svf0_manifest():
+    subject_bytes = real_subject_bytes()
+    manifest, records = base_manifest(subject_bytes)
+    research = "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33"
+    source = "b" * 40
+    manifest["schema_version"] = "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V2"
+    manifest["subject"]["design_base_commit"] = research
+    manifest["subject"]["implementation_subject_commit"] = source
+    manifest["subject"].update({
+        "schema_artifact": ref("docs/working-design/EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json", research),
+        "validator_artifact": ref("docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md", research),
+        "comparator_fairness_artifact": ref("docs/working-design/C0_C4_FAIR_COMPARISON_AND_CLAIM_BOUNDARY_MATRIX.md", research),
+        "resource_addendum_artifact": ref("docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_RESOURCE_ADDENDUM.md", research),
+        "decidability_addendum_artifact": ref("docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_DECIDABILITY_ADDENDUM.md", research),
+        "comparator_matrix_addendum_artifact": ref("docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md", research),
+        "comparator_interface_artifact": ref("docs/working-design/C2_C4_COMPARATOR_INTERFACE_CONTRACT.md", research),
+    })
+    manifest["comparator_fairness_contract"] = ref(
+        "docs/working-design/C0_C4_FAIR_COMPARISON_AND_CLAIM_BOUNDARY_MATRIX.md", research
+    )
+    c1 = _bound_c1_candidate()
+    c2 = dict(c1)
+    c2.update({
+        "candidate_id": "c2",
+        "role": "C2",
+        "variant_of_candidate_id": "c1",
+        "variant_dimension": "REPLAY",
+    })
+    manifest["candidates"] = [c1, c2]
+    manifest["world"].update({
+        "hidden_family_randomization_rule": "algo:fixed_none@v1",
+        "intervention_mode": "NONE",
+        "schedule_may_adapt_to_hidden_family": False,
+        "schedule_may_adapt_to_candidate_predictions": False,
+        "schedule_may_adapt_to_scored_outcomes": False,
+        "schedule_may_adapt_to_evaluator_diagnostics": False,
+        "passive_observational_equivalence_required": False,
+        "observational_equivalence_verification": None,
+        "negative_control_acceptance_rule": "expr:negative_control_mean_nll_delta<=0.02",
+    })
+    manifest["audition_scope_contract"].update({
+        "learned_scope_primary_claim_allowed": False,
+        "simple_audition_rival_required": False,
+        "simple_audition_probability": None,
+    })
+    manifest["resource_contract"].update({
+        "measurement_method": "algo:noema_svf0_python_fixed_envelope@v1",
+        "fixed_total_envelope": {
+            "max_resident_memory_bytes": 8388608,
+            "max_durable_state_bytes": 1048576,
+            "max_update_cpu_seconds_per_event": 0.05,
+            "max_query_cpu_seconds_per_event": 0.01,
+            "max_shadow_auditions_per_event": 0,
+        },
+        "replay_limits": {
+            "replay_policy_id": "replay-1",
+            "raw_buffer_capacity_events": 32,
+            "max_replay_updates_per_event": 1,
+            "replay_compute_charged": True,
+            "priority_provenance_declared": True,
+        },
+    })
+    manifest["scoring_contract"] = {
+        "proper_scoring_rule": "algo:gaussian_nll_sum@v1",
+        "primary_claims": ["P"],
+        "primary_metrics": [{
+            "metric_id": "p-c1-v-reset",
+            "claim": "P",
+            "comparator_candidate_id": "c1",
+            "aggregation_rule": "algo:mean@v1",
+            "threshold_rule": "expr:mean_nll_delta<=-0.02",
+            "support_requirement": "expr:scored_count==expected_count",
+        }],
+        "c2_vs_c4_external_comparison_required": False,
+    }
+    manifest["restart_contract"] = {
+        "checkpointing_used": False,
+        "restart_equivalence_claimed": False,
+    }
+    learner_schema = canonical_json_bytes({
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["channels"],
+        "properties": {"channels": {"type": "array"}},
+    })
+    evaluator_schema = canonical_json_bytes({
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["hidden_family"],
+        "properties": {"hidden_family": {"type": "string"}},
+    })
+    resource_artifact = canonical_json_bytes({
+        "schema_id": "NOEMA_SVF0_RESOURCE_MEASUREMENT_V1",
+        "measurement_method_id": "NOEMA_SVF0_PYTHON_FIXED_ENVELOPE_V1",
+        "rules": {
+            "cpu_clock": "time.process_time_ns",
+            "resident_memory": "tracemalloc",
+            "durable_state": "pickle protocol 5",
+            "update_cpu": "charged",
+            "query_cpu": "charged",
+            "replay": "charged",
+            "shared_overhead": "candidate-specific",
+            "absent_feature_zero": "only absent invoked paths",
+            "missing_measurement": "INVALIDATE_FIXED_ENVELOPE_POINT",
+            "over_budget": "INVALIDATE_FIXED_ENVELOPE_POINT",
+        },
+        "envelope": manifest["resource_contract"]["fixed_total_envelope"],
+        "replay": {
+            "raw_buffer_capacity_events": 32,
+            "max_replay_updates_per_event": 1,
+        },
+    })
+    for value in manifest["subject"].values():
+        if isinstance(value, dict) and {"repository", "commit", "path"}.issubset(value):
+            records[(value["repository"], value["commit"], value["path"])] = ArtifactRecord(b"bound")
+    fair = manifest["comparator_fairness_contract"]
+    records[(fair["repository"], fair["commit"], fair["path"])] = ArtifactRecord(b"bound")
+    for candidate in manifest["candidates"]:
+        for value in candidate["source_artifacts"]:
+            records[(value["repository"], value["commit"], value["path"])] = ArtifactRecord(b"source")
+    learner_ref = manifest["information_boundary"]["learner_visible_schema"]
+    evaluator_ref = manifest["information_boundary"]["evaluator_only_schema"]
+    records[(learner_ref["repository"], learner_ref["commit"], learner_ref["path"])] = ArtifactRecord(learner_schema)
+    records[(evaluator_ref["repository"], evaluator_ref["commit"], evaluator_ref["path"])] = ArtifactRecord(evaluator_schema)
+    measurement_ref = manifest["resource_contract"]["measurement_artifact"]
+    records[(measurement_ref["repository"], measurement_ref["commit"], measurement_ref["path"])] = ArtifactRecord(resource_artifact)
+    return manifest, records
+
+
+def test_full_v2_svf0_stage_semantics_fail_closed():
+    manifest, records = _full_v2_svf0_manifest()
+    manifest["scoring_contract"]["primary_claims"] = ["S"]
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_STAGE_SEMANTICS
+
+
+def test_full_v2_information_schemas_must_be_closed_and_match_declared_fields():
+    manifest, records = _full_v2_svf0_manifest()
+    learner_ref = manifest["information_boundary"]["learner_visible_schema"]
+    records[(learner_ref["repository"], learner_ref["commit"], learner_ref["path"])] = ArtifactRecord(
+        canonical_json_bytes({
+            "type": "object",
+            "additionalProperties": True,
+            "properties": {"channels": {"type": "array"}},
+        })
+    )
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_INFORMATION_BOUNDARY
+
+
+def test_full_v2_c1_c2_replay_isolation_requires_shared_base_and_replay_variant():
+    manifest, records = _full_v2_svf0_manifest()
+    manifest["candidates"][1]["base_substrate_id"] = "stronger-base"
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_COMPARATOR_FAIRNESS
+
+    manifest, records = _full_v2_svf0_manifest()
+    manifest["candidates"][1]["variant_dimension"] = "OTHER_PREREGISTERED"
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_COMPARATOR_FAIRNESS
+
+
+def test_full_v2_resource_meter_must_match_frozen_envelope_and_fail_closed():
+    manifest, records = _full_v2_svf0_manifest()
+    measurement_ref = manifest["resource_contract"]["measurement_artifact"]
+    artifact = {
+        "schema_id": "NOEMA_SVF0_RESOURCE_MEASUREMENT_V1",
+        "measurement_method_id": "NOEMA_SVF0_PYTHON_FIXED_ENVELOPE_V1",
+        "rules": {
+            "cpu_clock": "time.process_time_ns",
+            "resident_memory": "tracemalloc",
+            "durable_state": "pickle protocol 5",
+            "update_cpu": "charged",
+            "query_cpu": "charged",
+            "replay": "charged",
+            "shared_overhead": "candidate-specific",
+            "absent_feature_zero": "only absent invoked paths",
+            "missing_measurement": "TREAT_AS_ZERO",
+            "over_budget": "INVALIDATE_FIXED_ENVELOPE_POINT",
+        },
+        "envelope": dict(manifest["resource_contract"]["fixed_total_envelope"]),
+        "replay": {"raw_buffer_capacity_events": 32, "max_replay_updates_per_event": 1},
+    }
+    records[(measurement_ref["repository"], measurement_ref["commit"], measurement_ref["path"])] = ArtifactRecord(
+        canonical_json_bytes(artifact)
+    )
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_RESOURCE_ACCOUNTING
+
+
+def test_full_v2_normative_research_tuple_must_match_reviewed_subject():
+    manifest, records = _full_v2_svf0_manifest()
+    manifest["subject"]["schema_artifact"]["commit"] = "c" * 40
+    bad_ref = manifest["subject"]["schema_artifact"]
+    records[(bad_ref["repository"], bad_ref["commit"], bad_ref["path"])] = ArtifactRecord(b"bound")
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_SOURCE_BINDING
