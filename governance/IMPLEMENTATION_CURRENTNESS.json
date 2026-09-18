@@ -7,15 +7,15 @@
   "research_governance_remediation_pull_request": 35,
   "implementation_pull_request": 36,
   "implementation_branch": "impl/noema-minimal-source-i0-20260913",
-  "frozen_implementation_source": "22d280a65dfae772a9651213392cabafd374d07b",
+  "frozen_implementation_source": "3e4ffa49e7038f4326fb5cc74309ee57831347b5",
   "implementation_subject_manifest": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
   "i1_verification_receipt": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
   "deterministic_tests": {
-    "passed": 32,
+    "passed": 47,
     "failed": 0
   },
   "git_blob_reconstruction": {
-    "matched": 15,
+    "matched": 17,
     "mismatched": 0
   },
   "authority": {
@@ -28,6 +28,6 @@
     "publication": "NOT_AUTHORIZED",
     "paid_or_hosted_compute": "NOT_AUTHORIZED"
   },
-  "staleness_rule": "Any movement of the research subject or any source change after the frozen implementation source creates a new subject requiring fresh exact-head reconciliation and, for source changes, fresh I1 verification.",
+  "staleness_rule": "Any movement of the research subject or any source/test change after the frozen implementation source creates a new subject requiring fresh exact-head reconciliation and fresh I1 verification.",
   "source_of_truth": "Fresh GitHub source readback outranks this snapshot."
 }
