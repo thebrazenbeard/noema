@@ -2,7 +2,7 @@
   "schema": "NOEMA_IMPLEMENTATION_SUBJECT_V1",
   "classification": "IP_CONFIDENTIAL",
   "research_parent_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
-  "source_commit": "8460f5e279c0178d6305e115cbb5ddcb29bebf03",
+  "source_commit": "6d40befe2ee260586270610c4c9e864a8e84403e",
   "source_paths": [
     "src/noema/__init__.py",
     "src/noema/provenance.py",
@@ -15,7 +15,11 @@
     "implementation/svf0/RECURRENT_BASE_CONFIG_V1.json",
     "implementation/svf0/REPLAY_CONFIG_V1.json",
     "implementation/svf0/RESET_REFERENCE_CONFIG_V1.json",
-    "implementation/svf0/EXECUTION_POLICY_V1.json"
+    "implementation/svf0/EXECUTION_POLICY_V1.json",
+    "src/noema/svf0_runner.py",
+    "src/noema/svf0_statistics.py",
+    "src/noema/svf0_experiment.py",
+    "implementation/svf0/EXECUTION_POLICY_V2.json"
   ],
   "test_paths": [
     "tests/test_package_boundary.py",
@@ -27,7 +31,10 @@
     "tests/test_validator.py",
     "tests/test_hostile_contracts.py",
     "tests/test_svf0.py",
-    "tests/test_recurrent_c1_c2.py"
+    "tests/test_recurrent_c1_c2.py",
+    "tests/test_svf0_runner.py",
+    "tests/test_svf0_statistics.py",
+    "tests/test_svf0_experiment.py"
   ],
   "instrumentation_paths": [
     "src/noema/accounting.py",
@@ -51,16 +58,16 @@
   },
   "verification": {
     "verified_at": "2026-09-18",
-    "mode": "COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING",
-    "deterministic_tests_present": 69,
+    "mode": "COMPOSITE_I1_EXECUTION_SHELL_VERIFICATION",
+    "deterministic_tests_present": 88,
     "known_failures": 0,
-    "test_files": 10,
-    "exact_test_inventory_confirmed": true,
-    "validator_surface_prior_pass": 22,
-    "recurrent_and_lagged_semantic_checks_pass": 7,
-    "meter_reset_selector_semantic_checks_pass": 5,
-    "first_core_metric_profile_semantic_check_pass": 1,
-    "resident_memory_correction_checks_pass": 2,
+    "new_execution_layer_tests_executed": 19,
+    "new_execution_layer_tests_passed": 19,
+    "runner_tests_passed": 7,
+    "statistics_tests_passed": 7,
+    "e0_guard_tests_passed": 5,
+    "e0_valid_path_executed": false,
+    "prior_source_verification": "carried only for unchanged prior blobs; validator/profile identifier changed to V3 and was not clean-suite rerun",
     "limitation": "Local sandbox cannot network-clone the private GitHub repository; hosted CI was not used."
   }
 }
