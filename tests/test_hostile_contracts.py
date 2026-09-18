@@ -524,3 +524,52 @@ def test_full_v2_normative_research_tuple_must_match_reviewed_subject():
     records[(bad_ref["repository"], bad_ref["commit"], bad_ref["path"])] = ArtifactRecord(b"bound")
     result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
     assert result.status is ValidationStatus.FAIL_SOURCE_BINDING
+
+
+def test_first_core_svf0_profile_requires_exact_primary_metric_semantics():
+    manifest, records = _full_v2_svf0_manifest()
+    manifest["subject"]["manifest_logical_id"] = "NOEMA_SVF0_RECURRENT_GATE1_V1"
+    manifest["candidates"][0]["candidate_id"] = "c1_recurrent"
+    manifest["candidates"][1]["candidate_id"] = "c2_recurrent_replay"
+    manifest["candidates"][1]["variant_of_candidate_id"] = "c1_recurrent"
+    manifest["candidates"].append({
+        "candidate_id": "reset_ref",
+        "role": "REFERENCE",
+        "source_commit": "b" * 40,
+        "source_artifacts": [ref("src/noema/candidates.py", commit="b" * 40)],
+        "base_substrate_id": None,
+        "variant_of_candidate_id": None,
+        "variant_dimension": "RESET_REFIT",
+        "information_condition_id": "info-1",
+        "opportunity_condition_id": "opp-1",
+        "resource_condition_id": "res-1",
+        "replay_policy_id": "replay-1",
+        "scope_policy_id": "scope-1",
+        "developmental_evidence_eligible": False,
+    })
+    manifest["scoring_contract"]["primary_metrics"] = [
+        {
+            "metric_id": "P_C1_VS_RESET_LATE_POST",
+            "claim": "P",
+            "direction": "LOWER_IS_BETTER",
+            "comparator_candidate_id": "reset_ref",
+            "aggregation_rule": "algo:mean_seed_window_delta@v1",
+            "threshold_rule": "expr:mean_nll_delta<=-0.02&&upper_ci_delta<0",
+            "support_requirement": "expr:scored_count==expected_count&&worlds_completed==maximum_worlds&&resource_accounting_complete==true",
+        },
+        {
+            "metric_id": "P_C2_VS_RESET_LATE_POST",
+            "claim": "P",
+            "direction": "LOWER_IS_BETTER",
+            "comparator_candidate_id": "reset_ref",
+            "aggregation_rule": "algo:mean_seed_window_delta@v1",
+            "threshold_rule": "expr:mean_nll_delta<=-0.02&&upper_ci_delta<0",
+            "support_requirement": "expr:scored_count==expected_count&&worlds_completed==maximum_worlds&&resource_accounting_complete==true",
+        },
+    ]
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.PASS_FROZEN_VALID
+
+    manifest["scoring_contract"]["primary_metrics"][0]["threshold_rule"] = "expr:mean_nll_delta<=0"
+    result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
+    assert result.status is ValidationStatus.FAIL_SCORING_CONTRACT
