@@ -435,8 +435,12 @@ def _full_v2_svf0_manifest():
             "max_replay_updates_per_event": 1,
         },
     })
-    for value in manifest["subject"].values():
-        if isinstance(value, dict) and {"repository", "commit", "path"}.issubset(value):
+    for key, value in manifest["subject"].items():
+        if (
+            key != "implementation_subject_manifest"
+            and isinstance(value, dict)
+            and {"repository", "commit", "path"}.issubset(value)
+        ):
             records[(value["repository"], value["commit"], value["path"])] = ArtifactRecord(b"bound")
     fair = manifest["comparator_fairness_contract"]
     records[(fair["repository"], fair["commit"], fair["path"])] = ArtifactRecord(b"bound")
