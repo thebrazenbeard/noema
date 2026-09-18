@@ -32,6 +32,19 @@ class SVF0WorldConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class SVF0NegativeControlConfig:
+    coefficient: float
+    stable_coefficient: float
+    noise_half_width: float
+
+    def __post_init__(self) -> None:
+        for name in ("coefficient", "stable_coefficient", "noise_half_width"):
+            _finite(float(getattr(self, name)), name=name)
+        if self.noise_half_width < 0:
+            raise ValueError("noise_half_width must be nonnegative")
+
+
+@dataclass(frozen=True, slots=True)
 class SVF0WorldPoint:
     learner_event: LearnerEvent
     changed_coefficient: float
@@ -68,6 +81,28 @@ def svf0_point(*, seed: int, step: int, config: SVF0WorldConfig) -> SVF0WorldPoi
             intervention=None,
         ),
         changed_coefficient=changed_coefficient,
+        stable_coefficient=config.stable_coefficient,
+    )
+
+
+def svf0_negative_control_point(
+    *,
+    seed: int,
+    step: int,
+    config: SVF0NegativeControlConfig,
+) -> SVF0WorldPoint:
+    driver = _symmetric(seed, step, 10)
+    changed_noise = config.noise_half_width * _symmetric(seed, step, 11)
+    stable_noise = config.noise_half_width * _symmetric(seed, step, 12)
+    changed = config.coefficient * driver + changed_noise
+    stable = config.stable_coefficient * driver + stable_noise
+    return SVF0WorldPoint(
+        learner_event=LearnerEvent(
+            step=step,
+            channels=(driver, changed, stable),
+            intervention=None,
+        ),
+        changed_coefficient=config.coefficient,
         stable_coefficient=config.stable_coefficient,
     )
 
