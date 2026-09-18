@@ -327,7 +327,7 @@ def _resource_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
 
 
 _EXPR_TERM = re.compile(
-    r"^[a-z][a-z0-9_]*(?:<=|>=|==|!=|<|>)(?:-?\\d+(?:\\.\\d+)?|true|false|[a-z][a-z0-9_]*)$"
+    r"^[a-z][a-z0-9_]*(?:<=|>=|==|!=|<|>)(?:-?\d+(?:\.\d+)?|true|false|[a-z][a-z0-9_]*)$"
 )
 _ALGO_RULE = re.compile(r"^algo:[a-z][a-z0-9_]*@v[1-9][0-9]*(?::[a-z0-9_.=,-]+)?$")
 
