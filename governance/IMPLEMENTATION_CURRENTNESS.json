@@ -15,8 +15,8 @@
   },
   "i1_verification_receipt": {
     "path": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
-    "commit": "937b98021558305a16423f02d6eead33fd75fd92",
-    "git_blob": "257c56e54157051c6b04db60084589d400e9ae6e"
+    "commit": "e91c10ab3e90db2e5efecc325a103876f91bff2f",
+    "git_blob": "5fe964512331875e964e34cee8beef0f11311670"
   },
   "deterministic_tests": {
     "present": 103,
@@ -56,9 +56,9 @@
     "manifest_path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R6.json",
     "manifest_commit": "7975e3678939c6b0d04e9fa85997c3c244c900d6",
     "manifest_git_blob": "785c481b1365ae88d965ee17b538173646c858ca",
-    "freeze_receipt_path": "implementation/svf0/SVF0_FREEZE_RECEIPT_V6.json",
-    "freeze_receipt_commit": "083a11a190e4b5a721f9e974ad94c4d25da78ebe",
-    "freeze_receipt_git_blob": "cb11a210ba2016ab67d16d36fdd4897dd8960bc0",
+    "freeze_receipt_path": "implementation/svf0/SVF0_FREEZE_RECEIPT_V7.json",
+    "freeze_receipt_commit": "cd52f5d4cfba3ca115dd200e0b58be3521f87d2b",
+    "freeze_receipt_git_blob": "0fabaf578bbc6779155637f3a9b705038f9c1184",
     "validator_execution_receipt": {
       "path": "implementation/svf0/SVF0_VALIDATOR_EXECUTION_RECEIPT_V1.json",
       "commit": "c497d8b17acb64379884b33c21d0fceb2247e1c9",
@@ -76,6 +76,16 @@
       "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V4",
       "manifest_commit": "5d5db9a299cacd6f30766cee6b1de6d02f51586b",
       "reason": "Corrected 64-bit Windows resident-memory ABI and requalified exact source on frozen Python 3.13.5."
+    },
+    "scope_contract": {
+      "commit": "aa554f2eccd8622de99d3084b1c953808f280d9b",
+      "path": "governance/IMPLEMENTATION_SUBJECT_SCOPE_V1.json",
+      "git_blob": "075e3d8e30b8827d3328874a8964cb80466f30c6"
+    },
+    "freeze_receipt_v6": {
+      "commit": "083a11a190e4b5a721f9e974ad94c4d25da78ebe",
+      "git_blob": "cb11a210ba2016ab67d16d36fdd4897dd8960bc0",
+      "status": "HISTORICAL_SUPERSEDED_QUALIFICATION_SCOPE"
     }
   },
   "windows_resource_repair": {
@@ -98,11 +108,18 @@
     "status": "PASS",
     "frozen_subject": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
     "exact_i1_evidence": "103/103 PASS + PASS_FROZEN_VALID",
-    "checked_through": "aa554f2eccd8622de99d3084b1c953808f280d9b",
-    "compare_ahead_by": 8,
+    "checked_through": "cd52f5d4cfba3ca115dd200e0b58be3521f87d2b",
+    "compare_ahead_by": 11,
     "compare_behind_by": 0,
-    "changed_paths_count": 13,
+    "changed_paths_count": 14,
     "changed_implementation_scope_paths": [],
+    "scope_contract": {
+      "commit": "aa554f2eccd8622de99d3084b1c953808f280d9b",
+      "path": "governance/IMPLEMENTATION_SUBJECT_SCOPE_V1.json",
+      "git_blob": "075e3d8e30b8827d3328874a8964cb80466f30c6",
+      "rule_id": "MANIFEST_ENUMERATED_IMPLEMENTATION_PATH_SET_V1",
+      "unique_path_count": 33
+    },
     "extension_rule": "A later branch head preserves implementation I1 currentness iff the compare from frozen_subject to that head changes no path in the exact frozen implementation path union.",
     "fresh_i1_rerun_required_for_checked_delta": false,
     "reason": "All checked post-freeze changes are qualification/governance artifacts outside the frozen implementation path set."
