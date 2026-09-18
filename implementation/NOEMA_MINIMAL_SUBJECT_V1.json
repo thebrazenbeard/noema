@@ -2,7 +2,7 @@
   "schema": "NOEMA_IMPLEMENTATION_SUBJECT_V1",
   "classification": "IP_CONFIDENTIAL",
   "research_parent_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
-  "source_commit": "d19a55edd2d29403e90231532070d37979852772",
+  "source_commit": "22d280a65dfae772a9651213392cabafd374d07b",
   "source_paths": [
     "src/noema/__init__.py",
     "src/noema/provenance.py",
@@ -41,5 +41,12 @@
     "merge_authorized": false,
     "deployment_authorized": false,
     "publication_authorized": false
+  },
+  "verification": {
+    "verified_at": "2026-09-18",
+    "deterministic_tests": 32,
+    "deterministic_failures": 0,
+    "git_blob_matches": 15,
+    "git_blob_mismatches": 0
   }
 }
