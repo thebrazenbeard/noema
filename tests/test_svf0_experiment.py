@@ -169,3 +169,51 @@ def test_full_experiment_without_e0_authority_fails_before_any_seed(monkeypatch)
     else:
         raise AssertionError("full experiment proceeded without E0 authority")
     assert called is False
+
+
+def test_plan_rejects_wrong_seed_values_and_mutated_world_or_resource_contract():
+    plan = _plan()
+    cases = [
+        dict(seeds=(1, 2, 3, 4, 5, 6, 7, 8)),
+        dict(world=SVF0WorldConfig(64, 0.81, -0.4, 0.3, 0.05)),
+        dict(runner=SVF0RunnerConfig(
+            plan.runner.recurrent,
+            plan.runner.replay,
+            plan.runner.reset_variance,
+            FixedEnvelope(536870912, 1048576, 0.05, 0.01, 0),
+        )),
+    ]
+    for mutation in cases:
+        values = dict(
+            logical_subject_id=SUBJECT,
+            seeds=plan.seeds,
+            max_events=plan.max_events,
+            world=plan.world,
+            negative_control=plan.negative_control,
+            runner=plan.runner,
+        )
+        values.update(mutation)
+        try:
+            experiment.SVF0ExperimentPlan(**values)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"mutated frozen plan accepted: {mutation}")
+
+
+def test_plan_commitment_is_deterministic_and_changes_with_subject():
+    plan = _plan()
+    first = experiment.experiment_plan_commitment(plan)
+    second = experiment.experiment_plan_commitment(plan)
+    assert first == second
+    assert len(first) == 64
+
+    other = experiment.SVF0ExperimentPlan(
+        logical_subject_id="NOEMA_SVF0_RECURRENT_GATE1_OTHER",
+        seeds=plan.seeds,
+        max_events=plan.max_events,
+        world=plan.world,
+        negative_control=plan.negative_control,
+        runner=plan.runner,
+    )
+    assert experiment.experiment_plan_commitment(other) != first
