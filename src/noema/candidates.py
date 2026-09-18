@@ -166,6 +166,267 @@ def transition_c2_replay(
     )
     return C2State(base=updated_base, replay=state.replay)
 
+@dataclass(frozen=True, slots=True)
+class RecurrentConfig:
+    learning_rate: float
+    variance_alpha: float
+    variance_floor: float
+
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.learning_rate) or not (0.0 < self.learning_rate <= 1.0):
+            raise ValueError("learning_rate must be in (0, 1]")
+        if not math.isfinite(self.variance_alpha) or not (0.0 < self.variance_alpha <= 1.0):
+            raise ValueError("variance_alpha must be in (0, 1]")
+        if not math.isfinite(self.variance_floor) or self.variance_floor <= 0:
+            raise ValueError("variance_floor must be finite and positive")
+
+
+@dataclass(frozen=True, slots=True)
+class RecurrentGaussianState:
+    weights: tuple[tuple[float, ...], ...]
+    variance: tuple[float, ...]
+    previous: tuple[float, ...] | None
+    count: int
+
+    def __post_init__(self) -> None:
+        if not self.weights:
+            raise ValueError("weights must not be empty")
+        dimension = len(self.weights)
+        if any(len(row) != dimension for row in self.weights):
+            raise ValueError("weights must be a square target-by-context matrix")
+        for row in self.weights:
+            _check_vector(row, name="weight row")
+        _check_vector(self.variance, name="variance")
+        if len(self.variance) != dimension:
+            raise ValueError("variance dimension must match recurrent state dimension")
+        if any(value <= 0 for value in self.variance):
+            raise ValueError("variance must be strictly positive")
+        if self.previous is not None:
+            _check_vector(self.previous, name="previous")
+            if len(self.previous) != dimension:
+                raise ValueError("previous observation dimension mismatch")
+        if self.count < 0:
+            raise ValueError("count must be nonnegative")
+
+    @classmethod
+    def zeros(cls, *, dimension: int, initial_variance: float) -> "RecurrentGaussianState":
+        if dimension < 1:
+            raise ValueError("dimension must be at least 1")
+        if not math.isfinite(initial_variance) or initial_variance <= 0:
+            raise ValueError("initial_variance must be finite and positive")
+        return cls(
+            weights=tuple(tuple(0.0 for _ in range(dimension)) for _ in range(dimension)),
+            variance=tuple(float(initial_variance) for _ in range(dimension)),
+            previous=None,
+            count=0,
+        )
+
+
+def _matrix_vector(
+    weights: tuple[tuple[float, ...], ...],
+    context: tuple[float, ...],
+) -> tuple[float, ...]:
+    return tuple(
+        sum(weight * value for weight, value in zip(row, context, strict=True))
+        for row in weights
+    )
+
+
+def predict_recurrent(state: RecurrentGaussianState) -> Prediction:
+    dimension = len(state.weights)
+    mean = (
+        tuple(0.0 for _ in range(dimension))
+        if state.previous is None
+        else _matrix_vector(state.weights, state.previous)
+    )
+    return Prediction(mean=mean, variance=state.variance)
+
+
+def _learn_recurrent_pair(
+    state: RecurrentGaussianState,
+    *,
+    context: tuple[float, ...],
+    outcome: tuple[float, ...],
+    config: RecurrentConfig,
+    preserve_previous: bool,
+) -> RecurrentGaussianState:
+    _check_vector(context, name="context")
+    _check_vector(outcome, name="outcome")
+    dimension = len(state.weights)
+    if len(context) != dimension or len(outcome) != dimension:
+        raise ValueError("recurrent context/outcome dimension mismatch")
+
+    prediction = _matrix_vector(state.weights, context)
+    next_weights: list[tuple[float, ...]] = []
+    next_variance: list[float] = []
+    for row, old_var, predicted, observed in zip(
+        state.weights,
+        state.variance,
+        prediction,
+        outcome,
+        strict=True,
+    ):
+        error = observed - predicted
+        next_weights.append(
+            tuple(
+                weight + config.learning_rate * error * value
+                for weight, value in zip(row, context, strict=True)
+            )
+        )
+        residual_variance = error * error
+        next_variance.append(
+            max(
+                config.variance_floor,
+                (1.0 - config.variance_alpha) * old_var
+                + config.variance_alpha * residual_variance,
+            )
+        )
+    return RecurrentGaussianState(
+        weights=tuple(next_weights),
+        variance=tuple(next_variance),
+        previous=state.previous if preserve_previous else outcome,
+        count=state.count + 1,
+    )
+
+
+def transition_recurrent(
+    state: RecurrentGaussianState,
+    observation: tuple[float, ...],
+    config: RecurrentConfig,
+) -> RecurrentGaussianState:
+    _check_vector(observation, name="observation")
+    if len(observation) != len(state.weights):
+        raise ValueError("observation dimension mismatch")
+    if state.previous is None:
+        return RecurrentGaussianState(
+            weights=state.weights,
+            variance=state.variance,
+            previous=tuple(observation),
+            count=state.count + 1,
+        )
+    return _learn_recurrent_pair(
+        state,
+        context=state.previous,
+        outcome=tuple(observation),
+        config=config,
+        preserve_previous=False,
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class RecurrentTransition:
+    context: tuple[float, ...]
+    outcome: tuple[float, ...]
+
+    def __post_init__(self) -> None:
+        _check_vector(self.context, name="replay context")
+        _check_vector(self.outcome, name="replay outcome")
+        if len(self.context) != len(self.outcome):
+            raise ValueError("replay context/outcome dimensions must match")
+
+
+@dataclass(frozen=True, slots=True)
+class RecurrentReplayConfig:
+    capacity: int
+    max_replay_updates_per_event: int
+
+    def __post_init__(self) -> None:
+        if self.capacity < 0:
+            raise ValueError("capacity must be nonnegative")
+        if self.max_replay_updates_per_event < 0:
+            raise ValueError("max_replay_updates_per_event must be nonnegative")
+
+
+@dataclass(frozen=True, slots=True)
+class RecurrentReplayBuffer:
+    items: tuple[RecurrentTransition, ...]
+    capacity: int
+
+    def __post_init__(self) -> None:
+        if self.capacity < 0:
+            raise ValueError("capacity must be nonnegative")
+        if len(self.items) > self.capacity:
+            raise ValueError("recurrent replay buffer exceeds capacity")
+        dimensions = {len(item.context) for item in self.items}
+        if len(dimensions) > 1:
+            raise ValueError("recurrent replay transitions must share one dimension")
+
+    @classmethod
+    def empty(cls, config: RecurrentReplayConfig) -> "RecurrentReplayBuffer":
+        return cls(items=(), capacity=config.capacity)
+
+    def append(
+        self,
+        *,
+        context: tuple[float, ...],
+        outcome: tuple[float, ...],
+    ) -> "RecurrentReplayBuffer":
+        transition = RecurrentTransition(tuple(context), tuple(outcome))
+        if self.capacity == 0:
+            return self
+        if self.items and len(transition.context) != len(self.items[0].context):
+            raise ValueError("recurrent replay transition dimension mismatch")
+        next_items = (*self.items, transition)
+        if len(next_items) > self.capacity:
+            next_items = next_items[-self.capacity :]
+        return RecurrentReplayBuffer(items=next_items, capacity=self.capacity)
+
+
+@dataclass(frozen=True, slots=True)
+class RecurrentC2State:
+    base: RecurrentGaussianState
+    replay: RecurrentReplayBuffer
+
+
+def transition_recurrent_c2_once(
+    state: RecurrentC2State,
+    observation: tuple[float, ...],
+    config: RecurrentConfig,
+    replay_config: RecurrentReplayConfig,
+) -> RecurrentC2State:
+    if state.replay.capacity != replay_config.capacity:
+        raise ValueError("state replay capacity does not match replay configuration")
+    context = state.base.previous
+    updated_base = transition_recurrent(state.base, observation, config)
+    updated_replay = state.replay
+    if context is not None:
+        updated_replay = updated_replay.append(context=context, outcome=tuple(observation))
+    return RecurrentC2State(base=updated_base, replay=updated_replay)
+
+
+def transition_recurrent_c2_replay(
+    state: RecurrentC2State,
+    replay_indices: tuple[int, ...],
+    config: RecurrentConfig,
+    replay_config: RecurrentReplayConfig,
+) -> RecurrentC2State:
+    if state.replay.capacity != replay_config.capacity:
+        raise ValueError("state replay capacity does not match replay configuration")
+    if len(replay_indices) > replay_config.max_replay_updates_per_event:
+        raise ValueError("replay_indices exceed max_replay_updates_per_event")
+    updated = state.base
+    live_previous = state.base.previous
+    for index in replay_indices:
+        if (
+            isinstance(index, bool)
+            or not isinstance(index, int)
+            or index < 0
+            or index >= len(state.replay.items)
+        ):
+            raise ValueError("replay index is outside frozen recurrent replay buffer")
+        transition = state.replay.items[index]
+        updated = _learn_recurrent_pair(
+            updated,
+            context=transition.context,
+            outcome=transition.outcome,
+            config=config,
+            preserve_previous=True,
+        )
+    if updated.previous != live_previous:
+        raise RuntimeError("replay must not alter live recurrent context")
+    return RecurrentC2State(base=updated, replay=state.replay)
+
+
 from enum import Enum
 
 _SEMANTIC_STRUCTURAL_TOKENS = (
