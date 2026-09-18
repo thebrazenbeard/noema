@@ -1,3 +1,4 @@
+import math
 import noema.svf0_runner as runner
 from noema.accounting import FixedEnvelope
 from noema.boundary import LearnerEvent
@@ -101,6 +102,10 @@ def test_c2_live_update_then_bounded_replay_without_stream_divergence():
     )
     c1_record, c2_record, _ = result.candidate_records
     assert c1_record.outcome == c2_record.outcome == (0.5, 0.4, -0.2)
+    assert len(c1_record.channel_scores) == 3
+    assert len(c2_record.channel_scores) == 3
+    assert math.isclose(sum(c1_record.channel_scores), c1_record.score)
+    assert math.isclose(sum(c2_record.channel_scores), c2_record.score)
     assert c2_record.replay_updates == 1
     assert result.state.c1.count == 2
     assert result.state.c2.base.count == 3
