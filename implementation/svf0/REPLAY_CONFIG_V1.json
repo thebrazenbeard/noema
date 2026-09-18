@@ -1,0 +1,15 @@
+{
+  "schema_id": "NOEMA_SVF0_REPLAY_CONFIG_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "base_config_path": "implementation/svf0/RECURRENT_BASE_CONFIG_V1.json",
+  "state_type": "RecurrentC2State",
+  "live_update": "transition_recurrent_c2_once",
+  "replay_update": "transition_recurrent_c2_replay",
+  "raw_buffer_capacity_events": 32,
+  "max_replay_updates_per_event": 1,
+  "sampling_policy": "DETERMINISTIC_MOST_RECENT_ELIGIBLE_V1",
+  "replay_record": "opaque (previous observation, current observation) transition pair",
+  "replay_may_change_live_context": false,
+  "evaluator_annotations_allowed": false
+}
