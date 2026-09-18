@@ -2,107 +2,125 @@
 
 Classification: **IP_CONFIDENTIAL**
 
-Status: **I0 SOURCE FROZEN / I1 COMPOSITE DETERMINISTIC VERIFICATION PASS / NO E0 OR P0 AUTHORITY**
+Status: **I0 SOURCE FROZEN / I1 EXACT VERIFICATION PASS / PASS_FROZEN_VALID / NO E0 OR P0 AUTHORITY**
 
 Date: 2026-09-18
 
 Research parent: `be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33`
 
-Final hardened source/test/config commit: `b376526e32945c6a7688b3ef7b0312881aede5de`
+Final frozen source/test/config commit: `dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7`
 
 Implementation subject manifest:
 - path: `implementation/NOEMA_MINIMAL_SUBJECT_V1.json`
-- commit: `37f8f8f96018bf44e1daca9e987a8520d8ca12de`
-- Git blob: `b43e32f9eeb40f42517cc19db6d675e2e5f80d6f`
-- binds `source_commit=b376526e32945c6a7688b3ef7b0312881aede5de`
+- commit: `9b4797aa0bb664a1db17a3ef09288b6d2909b2d1`
+- Git blob: `7892a2b9e1779fb5c31209bca0b9d1037bc9e2d2`
 
-Support V5:
-- commit: `ade4aa6eb84e2a7fc695fb85ee441fe1425506ac`
-- bundle: `implementation/svf0/SUPPORT_BUNDLE_V5.json`
-- bundle Git blob: `ca357087616c790b1087aecd484b98bc38dde757`
+Support V6:
+- commit: `45e6d6b42921e90e57be2ef4678836418e6bd295`
+- bundle: `implementation/svf0/SUPPORT_BUNDLE_V6.json`
+- bundle Git blob: `b2ae8995aa210363a4e88c96e06919610e6fce30`
 
 Current inert preregistration:
-- logical subject: `NOEMA_SVF0_RECURRENT_GATE1_V4`
-- path: `implementation/svf0/SVF0_PREREGISTRATION_V2_R5.json`
-- commit: `5d5db9a299cacd6f30766cee6b1de6d02f51586b`
-- Git blob: `afb0d9d5ce93afd2a95d6bc7a000c6da6f7d658b`
+- logical subject: `NOEMA_SVF0_RECURRENT_GATE1_V5`
+- path: `implementation/svf0/SVF0_PREREGISTRATION_V2_R6.json`
+- commit: `7975e3678939c6b0d04e9fa85997c3c244c900d6`
+- Git blob: `785c481b1365ae88d965ee17b538173646c858ca`
 
-## Exact inventory
+Exact validator execution receipt:
+- path: `implementation/svf0/SVF0_VALIDATOR_EXECUTION_RECEIPT_V1.json`
+- commit: `c497d8b17acb64379884b33c21d0fceb2247e1c9`
 
-At the final source line:
-- **14** deterministic test files;
-- **103** `test_*` cases present;
-- **0 known failures**.
+## Exact full-suite verification
 
-The local exact reconstruction available in this runtime contains the hardened execution/evaluation slice, not every legacy private-repository module. Therefore this receipt does **not** claim a clean 103/103 full-suite rerun.
+A detached worktree was checked out at the exact current source lineage on the user-controlled Windows machine and executed with the frozen runtime:
+- Windows;
+- CPython **3.13.5**;
+- jsonschema **4.26.0**;
+- pytest **9.0.2**.
 
-## Focused I1 execution/evaluation verification
+At final frozen source `dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7`:
+- deterministic tests present: **103**;
+- deterministic tests executed: **103**;
+- passed: **103**;
+- failed: **0**;
+- exact tracked worktree: clean;
+- valid E0 learner path executed: **false**.
 
-The exact execution/evaluation slice was run without entering a valid E0 learner trajectory:
+Final run: **103/103 PASS**.
 
-- runner: **8 tests**;
-- deterministic statistics: **9 tests**;
-- E0 experiment/plan guard: **8 tests**;
-- Gate-1 evaluator/provenance integrity: **9 tests**;
-- focused total: **34/34 PASS**.
+## Windows resident-memory defect found and repaired
 
-The focused verification covers:
-- prediction commitment before outcome reveal;
-- identical learner-visible outcome for C1/C2;
-- C2 live update followed by at most one **strictly prior** replay update;
-- the just-stored current transition is not same-step replay eligible;
-- reset-reference statelessness;
-- SVF-0 intervention rejection;
-- real process RSS / working-set resource accounting and whole-point fail-closed invalidation;
-- per-channel Gaussian NLL persistence;
-- exact frozen seeds, world parameters, learner parameters, replay limits, and resource envelope;
-- deterministic experiment-plan commitment;
-- E0 denial before world generation when authority is absent or mismatched;
-- frozen score windows;
+The first exact Windows/Python-3.13.5 full-suite run exposed a real defect: the Windows `GetCurrentProcess` / `GetProcessMemoryInfo` ctypes calls relied on implicit signatures, causing the real-process resident-memory path to fail on 64-bit Python.
+
+The source was repaired to use explicit Windows ABI types:
+- `HANDLE` for the process handle;
+- `DWORD` for size/count fields;
+- `BOOL` return type;
+- explicit `argtypes` / `restype`;
+- last-error reporting enabled.
+
+Corrected accounting source Git blob:
+`2be0259949e977f303ddd9f09d2b390de1707ccb`
+
+The complete exact suite then passed 103/103 at the final V5 source.
+
+## Exact R6 qualification
+
+Canonical V2 JSON Schema:
+- **PASS / 0 errors**
+
+Independent semantic/provenance mirror:
+- **PASS / 0 findings**
+
+Actual repository implementation validator:
+- implementation: `src/noema/validator.py::validate_manifest`
+- validator Git blob: `6a03912cf7160ece2f2b373a6a3dc379783697e6`
+- immutable resolver records loaded: **22**
+- artifact source: exact Git objects by immutable `commit:path`
+- status: **PASS_FROZEN_VALID**
+- findings: **0**
+
+This is no longer a mirror-only or composite qualification claim.
+
+## Frozen scientific/implementation properties
+
+The current subject binds:
+- recurrent one-step conditional prediction over previous opaque observation;
+- one-step-lagged SVF-0 world dependency;
+- matched C2 bounded replay with strictly-prior eligibility;
+- no same-step replay of the just-observed transition;
+- stateless reset reference;
+- pre-outcome prediction commitments;
+- real process peak RSS / working-set accounting;
+- 256 MiB fixed resident-memory envelope;
+- whole-point fail-closed resource invalidation;
+- per-channel Gaussian NLL evidence;
 - n=8 Student-t confidence intervals and exact df=7 two-sided p-values;
-- Holm-Bonferroni step-down decisions;
-- persistence, adaptation, stable-retention, negative-control, six-flag kill, and overall Gate-1 evaluation;
-- prediction-ticket commitment recomputation;
-- per-channel and total Gaussian-NLL recomputation;
-- candidate/outcome/resource evidence consistency;
-- logical-subject and plan-commitment consistency through top-level experiment result evaluation.
+- Holm-Bonferroni correction;
+- exact frozen-plan commitment;
+- evaluator recomputation of prediction commitments and channel/total scores;
+- logical-subject and plan-commitment integrity through top-level evaluation;
+- E0 authority guard before world execution.
 
-The valid E0 subject+seed path was **not executed**.
+## Historical preregistration provenance
 
-## Manifest qualification
+Historical R4 rejected schema attempt remains preserved:
+- commit `8457f594ccd0e13890f7a91da47454fcd9188561`
+- canonical schema: FAIL / 2 closed-schema errors
+- schema was not weakened.
 
-R4 historical rejected attempt:
-- path: `implementation/svf0/SVF0_PREREGISTRATION_V2_R4.json`
-- commit: `8457f594ccd0e13890f7a91da47454fcd9188561`
-- Git blob: `e2b3d7788894be10a11d7da828d09bc654005254`
-- canonical V2 schema result: **FAIL / 2 errors** because two redundant strict-prior fields were outside the closed schema.
-- no schema weakening was performed; the extra detail remains immutably represented in support V5 / execution policy V3.
+R5:
+- commit `5d5db9a299cacd6f30766cee6b1de6d02f51586b`
+- was schema-clean and semantically valid for the prior source;
+- is now historical because the Windows ABI source correction created a new exact subject.
 
-Current R5:
-- canonical V2 JSON-Schema validation: **PASS / 0 errors**;
-- independent semantic/provenance mirror: **PASS / 0 findings**;
-- parameter-distribution SHA-256: `7f9975815d669f3312f45cba4d2020ce84e2eefd1567f5bf60310be42b5251f2`;
-- seed-manifest SHA-256: `f68ee0307f9a7e9d735a0893c0c7c65bda938682e9d668bdd6bf5ccb2818dd5b`.
-
-The Python implementation validator has **not** been directly executed against the exact R5 manifest in this runtime. Therefore this receipt does not claim `PASS_FROZEN_VALID`.
-
-## Scientific hardening completed before freeze
-
-The V4 subject closes defects found during hostile implementation review:
-- real process resident-memory measurement replaces Python-allocation peak as the resident-memory axis;
-- recurrent prediction uses one-step-lagged observable context;
-- the world dependency is one-step lagged so pre-outcome prediction can actually test temporal dependency learning;
-- C2 replay cannot reuse the just-observed current transition in the same step;
-- the exact plan is content-addressed and seed results bind subject + plan commitment;
-- required per-channel diagnostics are computable;
-- Student-t p-values actually exist for Holm correction;
-- evaluation recomputes commitments and scores rather than trusting stored evidence.
+R6 is the current preregistration for the corrected V5 source.
 
 ## Authority ceiling
 
 This receipt does **not** authorize or claim:
 - E0 learning/training/experiment execution;
-- empirical Gate-1 results;
+- empirical Gate-1 outcomes;
 - merge or deployment;
 - publication;
 - paid/hosted compute;
@@ -111,4 +129,6 @@ This receipt does **not** authorize or claim:
 - protected-system connection;
 - BT2 R1 remediation/requalification.
 
-Any source/test/config mutation after `b376526e32945c6a7688b3ef7b0312881aede5de` creates a new source subject and requires fresh I1 qualification.
+No learner trajectory or frozen experiment was executed during I1 qualification.
+
+Any source/test/config mutation after `dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7` creates a new subject and requires fresh exact-head I1 qualification.
