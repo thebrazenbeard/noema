@@ -1,0 +1,33 @@
+{
+  "schema_id": "NOEMA_IMPLEMENTATION_CURRENTNESS_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "repository": "thebrazenbeard/noema",
+  "research_pull_request": 32,
+  "research_subject": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "research_governance_remediation_pull_request": 35,
+  "implementation_pull_request": 36,
+  "implementation_branch": "impl/noema-minimal-source-i0-20260913",
+  "frozen_implementation_source": "22d280a65dfae772a9651213392cabafd374d07b",
+  "implementation_subject_manifest": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
+  "i1_verification_receipt": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
+  "deterministic_tests": {
+    "passed": 32,
+    "failed": 0
+  },
+  "git_blob_reconstruction": {
+    "matched": 15,
+    "mismatched": 0
+  },
+  "authority": {
+    "i0_implementation_source": "AUTHORIZED",
+    "i1_deterministic_non_learning_verification": "AUTHORIZED",
+    "e0_learning_training_experiment_execution": "NOT_AUTHORIZED",
+    "p0_protected_effects": "NOT_AUTHORIZED",
+    "merge": "NOT_AUTHORIZED",
+    "deployment": "NOT_AUTHORIZED",
+    "publication": "NOT_AUTHORIZED",
+    "paid_or_hosted_compute": "NOT_AUTHORIZED"
+  },
+  "staleness_rule": "Any movement of the research subject or any source change after the frozen implementation source creates a new subject requiring fresh exact-head reconciliation and, for source changes, fresh I1 verification.",
+  "source_of_truth": "Fresh GitHub source readback outranks this snapshot."
+}
