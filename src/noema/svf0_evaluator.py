@@ -4,6 +4,8 @@ from dataclasses import dataclass
 import math
 import statistics
 
+from .boundary import commit_prediction
+from .svf0 import gaussian_nll
 from .svf0_experiment import SVF0SeedResult
 from .svf0_statistics import (
     FROZEN_WINDOWS,
@@ -60,9 +62,80 @@ def _validate_seed_result(result: SVF0SeedResult, *, negative_control: bool) -> 
         raise ValueError(f"expected {kind} seed result")
     if len(result.steps) != 128:
         raise ValueError("SVF-0 seed result must contain exactly 128 steps")
+    expected_candidates = {"c1_recurrent", "c2_recurrent_replay", "reset_ref"}
     for expected_step, step_result in enumerate(result.steps):
-        if step_result.learner_event.step != expected_step:
+        event = step_result.learner_event
+        if event.step != expected_step:
             raise ValueError("SVF-0 seed result steps must be contiguous 0..127")
+        if event.intervention is not None:
+            raise ValueError("SVF-0 evidence must not contain intervention packets")
+        by_candidate = {
+            record.ticket.candidate_id: record
+            for record in step_result.candidate_records
+        }
+        if set(by_candidate) != expected_candidates or len(step_result.candidate_records) != 3:
+            raise ValueError("each SVF-0 step must contain exactly the three frozen candidate records")
+        outcome = tuple(event.channels)
+        for candidate_id, record in by_candidate.items():
+            if record.ticket.step != expected_step:
+                raise ValueError("prediction ticket step does not match evidence step")
+            if record.outcome != outcome:
+                raise ValueError("candidate outcome differs from the learner-visible event")
+            expected_ticket = commit_prediction(
+                candidate_id,
+                expected_step,
+                record.ticket.prediction,
+            )
+            if expected_ticket.commitment != record.ticket.commitment:
+                raise ValueError("prediction commitment does not match the frozen prediction payload")
+            if len(record.channel_scores) != len(outcome):
+                raise ValueError("channel score vector dimension does not match the outcome")
+            recomputed = tuple(
+                gaussian_nll(
+                    outcome=(observed,),
+                    mean=(mean,),
+                    variance=(variance,),
+                )
+                for observed, mean, variance in zip(
+                    outcome,
+                    record.ticket.prediction.mean,
+                    record.ticket.prediction.variance,
+                    strict=True,
+                )
+            )
+            if any(
+                not math.isclose(stored, actual, rel_tol=1e-12, abs_tol=1e-12)
+                for stored, actual in zip(record.channel_scores, recomputed, strict=True)
+            ):
+                raise ValueError("persisted channel score does not match recomputed Gaussian NLL")
+            if not math.isclose(
+                record.score,
+                sum(recomputed),
+                rel_tol=1e-12,
+                abs_tol=1e-12,
+            ):
+                raise ValueError("persisted total score does not match recomputed channel scores")
+            resources = record.resources
+            numeric_resources = (
+                resources.query_cpu_seconds,
+                resources.update_cpu_seconds,
+                float(resources.resident_memory_bytes),
+                float(resources.durable_state_bytes),
+                float(resources.python_peak_allocated_bytes),
+            )
+            if not all(math.isfinite(value) and value >= 0 for value in numeric_resources):
+                raise ValueError("candidate resource evidence must be finite and nonnegative")
+            if resources.envelope_valid and resources.violations:
+                raise ValueError("valid resource evidence cannot carry violations")
+            if not resources.envelope_valid and not resources.violations:
+                raise ValueError("invalid resource evidence must name at least one violation")
+        if by_candidate["c1_recurrent"].replay_updates != 0:
+            raise ValueError("C1 evidence cannot contain replay updates")
+        if by_candidate["reset_ref"].replay_updates != 0:
+            raise ValueError("reset reference evidence cannot contain replay updates")
+        expected_c2_replays = 0 if expected_step == 0 else 1
+        if by_candidate["c2_recurrent_replay"].replay_updates != expected_c2_replays:
+            raise ValueError("C2 replay evidence does not match the frozen strictly-prior policy")
 
 
 def _candidate_record(seed_result: SVF0SeedResult, step: int, candidate_id: str):
