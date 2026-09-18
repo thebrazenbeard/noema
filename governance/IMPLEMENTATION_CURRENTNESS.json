@@ -7,29 +7,31 @@
   "research_governance_remediation_pull_request": 35,
   "implementation_pull_request": 36,
   "implementation_branch": "impl/noema-minimal-source-i0-20260913",
-  "frozen_implementation_source": "b376526e32945c6a7688b3ef7b0312881aede5de",
+  "frozen_implementation_source": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
   "implementation_subject_manifest": {
     "path": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
-    "commit": "37f8f8f96018bf44e1daca9e987a8520d8ca12de",
-    "git_blob": "b43e32f9eeb40f42517cc19db6d675e2e5f80d6f"
+    "commit": "9b4797aa0bb664a1db17a3ef09288b6d2909b2d1",
+    "git_blob": "7892a2b9e1779fb5c31209bca0b9d1037bc9e2d2"
   },
   "i1_verification_receipt": {
     "path": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
-    "commit": "2eb1455c946b0c47d3a7196abeaba738588bbbcd",
-    "git_blob": "e29a474c720c642fd5d1a9e5d4083fc5038b5329"
+    "commit": "937b98021558305a16423f02d6eead33fd75fd92",
+    "git_blob": "257c56e54157051c6b04db60084589d400e9ae6e"
   },
   "deterministic_tests": {
     "present": 103,
+    "executed": 103,
+    "passed": 103,
     "known_failed": 0,
-    "focused_execution_evaluation_executed": 34,
-    "focused_execution_evaluation_passed": 34,
-    "full_legacy_suite_rerun": "NOT_EXECUTED_IN_THIS_RUNTIME",
-    "verification_mode": "COMPOSITE_I1_EXACT_EXECUTION_EVALUATION_SLICE"
-  },
-  "git_blob_reconstruction": {
-    "exact_focus_blobs_verified": true,
-    "full_private_repo_clean_checkout": "UNAVAILABLE_IN_LOCAL_SANDBOX",
-    "mismatches_known": 0
+    "verification_mode": "EXACT_I1_FULL_SUITE_WINDOWS_PYTHON_3_13_5",
+    "runtime": {
+      "platform": "Windows",
+      "python": "3.13.5",
+      "jsonschema": "4.26.0",
+      "pytest": "9.0.2"
+    },
+    "exact_tracked_worktree": "CLEAN",
+    "e0_valid_path_executed": false
   },
   "authority": {
     "i0_implementation_source": "AUTHORIZED",
@@ -44,35 +46,42 @@
   "staleness_rule": "Any source/test/config change after the frozen implementation source creates a new subject requiring fresh exact-head reconciliation and fresh I1 verification.",
   "source_of_truth": "Fresh GitHub source readback outranks this snapshot. Qualification labels are exact-subject-bound.",
   "svf0_support": {
-    "commit": "ade4aa6eb84e2a7fc695fb85ee441fe1425506ac",
-    "bundle_path": "implementation/svf0/SUPPORT_BUNDLE_V5.json",
-    "bundle_git_blob": "ca357087616c790b1087aecd484b98bc38dde757"
+    "commit": "45e6d6b42921e90e57be2ef4678836418e6bd295",
+    "bundle_path": "implementation/svf0/SUPPORT_BUNDLE_V6.json",
+    "bundle_git_blob": "b2ae8995aa210363a4e88c96e06919610e6fce30"
   },
   "preregistration": {
-    "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V4",
-    "status": "FROZEN_INERT_UNTIL_SEPARATE_E0_AUTHORITY",
-    "manifest_path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R5.json",
-    "manifest_commit": "5d5db9a299cacd6f30766cee6b1de6d02f51586b",
-    "manifest_git_blob": "afb0d9d5ce93afd2a95d6bc7a000c6da6f7d658b",
-    "freeze_receipt_path": "implementation/svf0/SVF0_FREEZE_RECEIPT_V5.json",
-    "freeze_receipt_commit": "c6683bdcaf98c341bd83d0e0baf0ac138d30749e",
-    "freeze_receipt_git_blob": "0d9e1b9b4dfd1fadd3675b90c3cf291c3cf494bd",
+    "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V5",
+    "status": "PASS_FROZEN_VALID_INERT_UNTIL_SEPARATE_E0_AUTHORITY",
+    "manifest_path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R6.json",
+    "manifest_commit": "7975e3678939c6b0d04e9fa85997c3c244c900d6",
+    "manifest_git_blob": "785c481b1365ae88d965ee17b538173646c858ca",
+    "freeze_receipt_path": "implementation/svf0/SVF0_FREEZE_RECEIPT_V6.json",
+    "freeze_receipt_commit": "083a11a190e4b5a721f9e974ad94c4d25da78ebe",
+    "freeze_receipt_git_blob": "cb11a210ba2016ab67d16d36fdd4897dd8960bc0",
+    "validator_execution_receipt": {
+      "path": "implementation/svf0/SVF0_VALIDATOR_EXECUTION_RECEIPT_V1.json",
+      "commit": "c497d8b17acb64379884b33c21d0fceb2247e1c9",
+      "git_blob": "ad988210bccc2707e10a33e4aa36ab79d862ded5"
+    },
     "canonical_schema_validation": "PASS",
     "canonical_schema_errors": 0,
     "independent_semantic_mirror": "PASS",
     "independent_semantic_findings": 0,
-    "implementation_validator_exact_manifest_execution": "NOT_EXECUTED_IN_THIS_RUNTIME",
-    "pass_frozen_valid_claim": false,
-    "r4_rejected_schema": {
-      "manifest_commit": "8457f594ccd0e13890f7a91da47454fcd9188561",
-      "manifest_git_blob": "e2b3d7788894be10a11d7da828d09bc654005254",
-      "status": "HISTORICAL_REJECTED_SCHEMA"
-    },
+    "implementation_validator_exact_manifest_execution": "PASS_FROZEN_VALID",
+    "implementation_validator_findings": 0,
+    "implementation_validator_resolver_records": 22,
+    "pass_frozen_valid_claim": true,
     "supersedes": {
-      "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V3",
-      "manifest_commit": "6e71fd4b197a817835894e1eb32cca747b53bbb2",
-      "reason": "Source was hardened with strict-prior replay, per-channel diagnostics, actual Student-t p-values, plan commitments, and provenance-checking evaluation."
+      "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V4",
+      "manifest_commit": "5d5db9a299cacd6f30766cee6b1de6d02f51586b",
+      "reason": "Corrected 64-bit Windows resident-memory ABI and requalified exact source on frozen Python 3.13.5."
     }
+  },
+  "windows_resource_repair": {
+    "accounting_git_blob": "2be0259949e977f303ddd9f09d2b390de1707ccb",
+    "pre_repair_exact_windows_suite": "FAILED",
+    "post_repair_exact_windows_suite": "103/103 PASS"
   },
   "bt2_r1": "FROZEN_SEPARATE_UNCHANGED"
 }
