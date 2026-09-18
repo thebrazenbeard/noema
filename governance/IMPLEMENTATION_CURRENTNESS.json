@@ -7,13 +7,14 @@
   "research_governance_remediation_pull_request": 35,
   "implementation_pull_request": 36,
   "implementation_branch": "impl/noema-minimal-source-i0-20260913",
-  "frozen_implementation_source": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+  "frozen_implementation_source": "8460f5e279c0178d6305e115cbb5ddcb29bebf03",
   "implementation_subject_manifest": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
   "i1_verification_receipt": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
   "deterministic_tests": {
-    "present": 68,
+    "present": 69,
     "known_failed": 0,
-    "verification_mode": "COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING"
+    "verification_mode": "COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING",
+    "clean_private_repo_checkout": "UNAVAILABLE_IN_LOCAL_SANDBOX"
   },
   "git_blob_reconstruction": {
     "status": "PARTIAL_COMPOSITE",
@@ -32,18 +33,24 @@
     "paid_or_hosted_compute": "NOT_AUTHORIZED"
   },
   "staleness_rule": "Any source/test/config change after the frozen implementation source creates a new subject requiring fresh exact-head reconciliation and fresh I1 verification.",
-  "source_of_truth": "Fresh GitHub source readback outranks this snapshot. Qualification labels are exact-subject-bound.",
-  "svf0_support_commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+  "source_of_truth": "Fresh GitHub source readback outranks this snapshot. Qualification labels are exact-subject-bound; the V1 preregistration remains historical provenance only.",
+  "svf0_support_commit": "d44bfb26764571aaf8ff8f3d156d3a449f65f120",
   "preregistration": {
-    "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V1",
+    "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V2",
     "status": "FROZEN_INERT_UNTIL_SEPARATE_E0_AUTHORITY",
-    "manifest_path": "implementation/svf0/SVF0_PREREGISTRATION_V2.json",
-    "manifest_commit": "33f08d7ceb30e0f9cb5c445a27c67f7a8c90af9b",
-    "manifest_git_blob": "005157c2c7a3840dc33a80e84ac79411d2695bff",
-    "freeze_receipt_path": "implementation/svf0/SVF0_FREEZE_RECEIPT_V1.json",
-    "freeze_receipt_commit": "cc60f91cf265ae7d5cfc5d2afc1e4fd2f595732c",
+    "manifest_path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R2.json",
+    "manifest_commit": "7fd2f0eac73759efbad856c9ace7cc50b42f192c",
+    "manifest_git_blob": "593fc355dfa8d610b8923891850a8dc65607865d",
+    "freeze_receipt_path": "implementation/svf0/SVF0_FREEZE_RECEIPT_V2.json",
+    "freeze_receipt_commit": "9f2967c42fe437a2b812466f58b088beb16a6b06",
     "canonical_schema_validation": "PASS",
     "independent_semantic_mirror": "PASS",
-    "implementation_validator_exact_manifest_execution": "NOT_EXECUTED_IN_THIS_RUNTIME"
+    "implementation_validator_exact_manifest_execution": "NOT_EXECUTED_IN_THIS_RUNTIME",
+    "supersedes": {
+      "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V1",
+      "manifest_commit": "33f08d7ceb30e0f9cb5c445a27c67f7a8c90af9b",
+      "freeze_receipt_commit": "cc60f91cf265ae7d5cfc5d2afc1e4fd2f595732c",
+      "reason": "Corrected resident-memory measurement from Python allocation peak to real process peak RSS/working set and refroze the resource envelope."
+    }
   }
 }
