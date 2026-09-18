@@ -7,6 +7,8 @@ from noema.svf0_statistics import (
     mean_seed_window_delta,
     primary_persistence_result,
     student_t_ci_n8,
+    student_t_two_sided_p_df7,
+    student_t_two_sided_p_n8,
     gate1_kill_required,
 )
 
@@ -100,3 +102,31 @@ def test_gate1_kill_triggers_if_any_required_pass_is_false():
         c2_changed_dependency_adaptation_pass=True,
         c2_stable_dependency_retention_pass=True,
     ) is True
+
+
+def test_student_t_two_sided_df7_matches_frozen_reference_points():
+    assert math.isclose(
+        student_t_two_sided_p_df7(2.364624251),
+        0.05,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    )
+    assert math.isclose(
+        student_t_two_sided_p_df7(3.0),
+        0.019942126131992536,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+
+def test_student_t_two_sided_n8_matches_explicit_t_statistic():
+    values = (-0.08, -0.07, -0.06, -0.05, -0.04, -0.03, -0.02, -0.01)
+    mean = sum(values) / 8
+    sample_sd = math.sqrt(sum((value - mean) ** 2 for value in values) / 7)
+    t_statistic = mean / (sample_sd / math.sqrt(8.0))
+    assert math.isclose(
+        student_t_two_sided_p_n8(values),
+        student_t_two_sided_p_df7(t_statistic),
+        rel_tol=0.0,
+        abs_tol=1e-15,
+    )
