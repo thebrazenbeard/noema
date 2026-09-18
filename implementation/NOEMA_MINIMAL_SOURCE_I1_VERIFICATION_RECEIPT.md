@@ -116,6 +116,22 @@ R5:
 
 R6 is the current preregistration for the corrected V5 source.
 
+## Implementation-subject staleness scope
+
+Implementation I1 currentness is governed by the frozen machine-readable scope contract:
+
+- path: `governance/IMPLEMENTATION_SUBJECT_SCOPE_V1.json`
+- commit: `aa554f2eccd8622de99d3084b1c953808f280d9b`
+- Git blob: `075e3d8e30b8827d3328874a8964cb80466f30c6`
+- rule: `MANIFEST_ENUMERATED_IMPLEMENTATION_PATH_SET_V1`
+- unique implementation qualification paths: **33**
+
+The exact implementation qualification path set is the union of the bound subject manifest's `source_paths`, `test_paths`, and `instrumentation_paths`.
+
+A post-freeze commit makes implementation I1 stale **only if it changes one or more paths in that frozen exact union**. Governance/currentness files, verification receipts, support bundles, preregistration manifests, freeze receipts, and validator-execution receipts are separate exact-bound qualification layers unless their paths are also members of the frozen implementation set.
+
+This scope clarification does not alter the frozen source, test surface, scientific plan, or the 103/103 exact I1 result. It makes the previous generic phrase “source/test/config” mechanically precise.
+
 ## Authority ceiling
 
 This receipt does **not** authorize or claim:
@@ -131,4 +147,4 @@ This receipt does **not** authorize or claim:
 
 No learner trajectory or frozen experiment was executed during I1 qualification.
 
-Any source/test/config mutation after `dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7` creates a new subject and requires fresh exact-head I1 qualification.
+Any post-freeze mutation to a path in the exact 33-path implementation qualification union defined by `governance/IMPLEMENTATION_SUBJECT_SCOPE_V1.json` creates a new implementation subject and requires fresh exact-head I1 qualification. Qualification-layer changes outside that path set are separately exact-bound and do not by themselves stale implementation I1.
