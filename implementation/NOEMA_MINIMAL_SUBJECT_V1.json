@@ -2,7 +2,7 @@
   "schema": "NOEMA_IMPLEMENTATION_SUBJECT_V1",
   "classification": "IP_CONFIDENTIAL",
   "research_parent_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
-  "source_commit": "0fc57c1d8023e0bc1cd4d48e63002f7131e2c563",
+  "source_commit": "9eb234f07e85b20b7c801ed5c8f0bac55a1633a1",
   "source_paths": [
     "src/noema/__init__.py",
     "src/noema/provenance.py",
@@ -11,7 +11,11 @@
     "src/noema/accounting.py",
     "src/noema/comparator.py",
     "src/noema/validator.py",
-    "src/noema/svf0.py"
+    "src/noema/svf0.py",
+    "implementation/svf0/RECURRENT_BASE_CONFIG_V1.json",
+    "implementation/svf0/REPLAY_CONFIG_V1.json",
+    "implementation/svf0/RESET_REFERENCE_CONFIG_V1.json",
+    "implementation/svf0/EXECUTION_POLICY_V1.json"
   ],
   "test_paths": [
     "tests/test_package_boundary.py",
@@ -22,7 +26,8 @@
     "tests/test_accounting_comparator.py",
     "tests/test_validator.py",
     "tests/test_hostile_contracts.py",
-    "tests/test_svf0.py"
+    "tests/test_svf0.py",
+    "tests/test_recurrent_c1_c2.py"
   ],
   "instrumentation_paths": [
     "src/noema/accounting.py",
@@ -46,12 +51,13 @@
   },
   "verification": {
     "verified_at": "2026-09-18",
-    "mode": "COMPOSITE_EXACT_BLOB_I1",
-    "deterministic_tests_covered": 55,
-    "deterministic_failures": 0,
-    "changed_surface_tests_executed": 22,
-    "unchanged_prior_pass_tests": 33,
-    "git_blob_matches": 17,
-    "git_blob_mismatches": 0
+    "mode": "COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING",
+    "deterministic_tests_covered": 67,
+    "deterministic_failures_known": 0,
+    "validator_surface_exact_pass": 22,
+    "recurrent_lagged_world_new_semantic_checks": 7,
+    "meter_reset_selector_new_semantic_checks": 5,
+    "prior_unchanged_or_compatibility_cases": 33,
+    "limitation": "Private-repo clean clone unavailable in sandbox; no hosted CI used."
   }
 }
