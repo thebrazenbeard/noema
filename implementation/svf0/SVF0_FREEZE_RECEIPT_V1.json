@@ -1,0 +1,114 @@
+{
+  "schema_id": "NOEMA_SVF0_FREEZE_RECEIPT_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "status": "FROZEN_PREREGISTRATION_NO_EXECUTION_AUTHORITY",
+  "freeze_time": "2026-09-18T16:45:01-04:00",
+  "logical_experiment_id": "NOEMA_SVF0_RECURRENT_GATE1_V1",
+  "repository": "thebrazenbeard/noema",
+  "manifest": {
+    "path": "implementation/svf0/SVF0_PREREGISTRATION_V2.json",
+    "commit": "33f08d7ceb30e0f9cb5c445a27c67f7a8c90af9b",
+    "git_blob": "005157c2c7a3840dc33a80e84ac79411d2695bff",
+    "schema_version": "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V2"
+  },
+  "research_subject": {
+    "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+    "normative_artifacts": [
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json",
+        "git_blob": "cda8446b473ccb38ef2424ad8f68e9aee4d41b47"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md",
+        "git_blob": "deac889fc6c377ebe1490b23d952439885d6bd2a"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_SOURCE_BINDING_ADDENDUM.md",
+        "git_blob": "44e6c12ee90cc80f6ec7b3b9a7947e48cb27896b"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_RESOURCE_ADDENDUM.md",
+        "git_blob": "e7bde812596308c8eff9cf687b56514e0020c24b"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_DECIDABILITY_ADDENDUM.md",
+        "git_blob": "f8761541e2f2848db87f80e1eda687f297360c54"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md",
+        "git_blob": "725bfcd4dbd14f7bb505cb95e4f9f93b763c3ee6"
+      },
+      {
+        "path": "docs/working-design/C0_C4_FAIR_COMPARISON_AND_CLAIM_BOUNDARY_MATRIX.md",
+        "git_blob": "eed4c71d9d342ab93b61c75dba0a9578c4b062d8"
+      },
+      {
+        "path": "docs/working-design/C2_C4_COMPARATOR_INTERFACE_CONTRACT.md",
+        "git_blob": "0e9e5dcedfee242ab8920fcc16075cb674f9aa40"
+      }
+    ]
+  },
+  "implementation_subject": {
+    "source_commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+    "manifest": {
+      "path": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
+      "commit": "ba4df03780d5f80e8e7b6b9b1378c1d628a5cab1",
+      "git_blob": "3d54b865ba66bd51b78cabbb9749aa7cfae774e5"
+    }
+  },
+  "support_subject": {
+    "commit": "2dc20443e33af326f2f26ec74b144579ac1ae268",
+    "support_bundle": {
+      "path": "implementation/svf0/SUPPORT_BUNDLE_V2.json",
+      "git_blob": "d15f52b25ccfcdd7a4e83184c250b7c918fc4ab4"
+    },
+    "resource_measurement": {
+      "path": "implementation/svf0/RESOURCE_MEASUREMENT_CONTRACT_V2.json",
+      "git_blob": "b3294303e9213a16a868de2152cdc8de11eb7cd6"
+    },
+    "lineage_state_scope": {
+      "path": "implementation/svf0/STATE_SCOPE_MANIFEST_V2.json",
+      "git_blob": "914b9dacc6444173f2044f87de97ef1db6dae595"
+    },
+    "scoring_decisions": {
+      "path": "implementation/svf0/SCORING_AND_DECISION_RULES_V2.json",
+      "git_blob": "493b529cee244ba77a15fd5be480e34cca317f79"
+    },
+    "negative_control": {
+      "path": "implementation/svf0/NEGATIVE_CONTROL_SPEC_V2.json",
+      "git_blob": "71a4bd54b1d624266e131dd3daf3c2640e7b935b"
+    }
+  },
+  "commitments": {
+    "parameter_distribution_sha256": "7040245524d81cc48492782e369115e70b38c6d9ecfb40bc15f6afcb5f8333fc",
+    "seed_manifest_sha256": "f68ee0307f9a7e9d735a0893c0c7c65bda938682e9d668bdd6bf5ccb2818dd5b"
+  },
+  "qualification_evidence": {
+    "canonical_schema_validation": {
+      "status": "PASS",
+      "schema_git_blob": "cda8446b473ccb38ef2424ad8f68e9aee4d41b47",
+      "manifest_git_blob": "005157c2c7a3840dc33a80e84ac79411d2695bff",
+      "errors": []
+    },
+    "independent_semantic_mirror": {
+      "status": "PASS",
+      "findings": []
+    },
+    "implementation_validator_exact_manifest_execution": {
+      "status": "NOT_EXECUTED_IN_THIS_RUNTIME",
+      "reason": "Local sandbox cannot network-clone the private repository and hosted CI/compute is outside current authority."
+    },
+    "source_i1_receipt": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md"
+  },
+  "authority": {
+    "i0_implementation_source": "AUTHORIZED",
+    "i1_deterministic_non_learning_verification": "AUTHORIZED",
+    "e0_learning_training_experiment_execution": "NOT_AUTHORIZED",
+    "p0_protected_effects": "NOT_AUTHORIZED",
+    "merge": "NOT_AUTHORIZED",
+    "deployment": "NOT_AUTHORIZED",
+    "publication": "NOT_AUTHORIZED",
+    "paid_or_hosted_compute": "NOT_AUTHORIZED"
+  },
+  "mutation_rule": "Any change to the manifest, bound research artifacts, implementation source subject, support artifacts, resource meter, lineage state scope, scoring decisions, parameter commitment, or seed commitment creates a new preregistration subject and requires a new freeze receipt."
+}
