@@ -10,15 +10,15 @@ Research parent: `be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33`
 
 Implementation branch: `impl/noema-minimal-source-i0-20260913`
 
-Frozen implementation source commit: `3e4ffa49e7038f4326fb5cc74309ee57831347b5`
+Frozen implementation source commit: `8ac5512c396c112f7a16ab86dcf63d5d3e6a0b46`
 
 Implementation subject manifest:
 - `implementation/NOEMA_MINIMAL_SUBJECT_V1.json`
-- binds `source_commit=3e4ffa49e7038f4326fb5cc74309ee57831347b5`
+- binds `source_commit=8ac5512c396c112f7a16ab86dcf63d5d3e6a0b46`
 
 ## Verification evidence
 
-A clean local reconstruction was verified against the exact GitHub source/test blob identities for the frozen source subject.
+A clean local reconstruction was verified against exact GitHub source/test blob identities.
 
 Runtime:
 - Python 3.13.5
@@ -26,31 +26,20 @@ Runtime:
 - pytest 9.0.2
 
 Deterministic suite:
-- 47 tests collected
-- 47 passed
+- 50 tests collected
+- 50 passed
 - 0 failed
 
 Exact Git-object identity check:
-- 17 source/test files used by the suite were hashed with the Git blob preimage rule `sha1("blob " + len + NUL + bytes)`
-- 17/17 local blob IDs match the exact GitHub blob IDs
+- 17 source/test files used by the suite were hashed with `sha1("blob " + len + NUL + bytes)`
+- 17/17 local blob IDs match GitHub
 - 0 mismatches
-- exact validator blob: `63d1c884a6fe643d0ddf3a948a02252afd95335f`
+- exact validator blob: `6d521dd1b90806549b427148c8eb6d342e391625`
 
-The passing suite covers:
-- C1 immutable one-step prediction/update behavior;
-- C2 bounded raw replay storage and explicit bounded replay updates;
-- C4 generic structural proposal semantics, semantic-label rejection, population caps, matched replay behavior, and structure preservation;
-- learner/evaluator separation and pre-outcome commitments;
-- resource/support accounting;
-- immutable SHA-256 and Git-blob provenance;
-- V2 implementation-source binding, commitment checks, comparator/reference closure, and variant-parent closure;
-- fail-closed checkpointed-primary V2 resource accounting;
-- mechanically decidable primary/negative-control/stopping/kill rule syntax;
-- all normative V2 result classes;
-- deterministic inert SVF-0 world, regime boundary, negative control, and single-observation Gaussian NLL scoring.
+The suite covers C1/C2/C4 bounded source behavior; learner/evaluator separation; pre-outcome commitments; resource/support accounting; SHA-256 and Git-blob provenance; implementation-source and commitment binding; comparator and variant closure; checkpointed-primary V2 rejection; mechanically decidable primary, negative-control, stopping, kill, world-randomization, resource-measurement, and proper-scoring rules; all normative V2 result classes; and deterministic inert SVF-0 primary/negative-control world plus single-observation Gaussian NLL scoring.
 
 ## Authority ceiling
 
 This receipt is source-verification evidence only. It does **not** authorize or claim learning/training, developmental trajectories, experiment execution, paid/hosted compute, deployment, merge, publication, repository-visibility change, provider/credential/ruleset mutation, protected-system connection, empirical architecture advantage, or BT2 R1 remediation/requalification.
 
-Any source/test change after `3e4ffa49e7038f4326fb5cc74309ee57831347b5` creates a new implementation source subject and requires fresh I1 verification before inheriting this PASS.
+Any source/test change after `8ac5512c396c112f7a16ab86dcf63d5d3e6a0b46` creates a new implementation source subject and requires fresh I1 verification before inheriting this PASS.
