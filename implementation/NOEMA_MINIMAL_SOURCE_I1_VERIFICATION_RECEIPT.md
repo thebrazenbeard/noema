@@ -8,54 +8,68 @@ Date: 2026-09-18
 
 Research parent: `be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33`
 
-Corrected frozen implementation source/test/config commit: `8460f5e279c0178d6305e115cbb5ddcb29bebf03`
+Execution-complete frozen source/test/config commit: `6d40befe2ee260586270610c4c9e864a8e84403e`
 
-Corrected recurrent SVF-0 support commit: `d44bfb26764571aaf8ff8f3d156d3a449f65f120`
+Support V4 commit: `7d1b3ff7c9c25cc56d16a4f2114e094da7dd5619`
 
 Implementation subject manifest:
 - `implementation/NOEMA_MINIMAL_SUBJECT_V1.json`
-- binds `source_commit=8460f5e279c0178d6305e115cbb5ddcb29bebf03`
+- binds `source_commit=6d40befe2ee260586270610c4c9e864a8e84403e`
 
-## Verification evidence
+## Exact source inventory
 
-Verification mode: **COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING**
+- 13 deterministic test files;
+- **88** `test_*` cases present at the frozen source commit;
+- **0 known failures**.
 
-Exact source inventory:
-- 10 deterministic test files;
-- 69 `test_*` cases present at the corrected source commit;
-- 0 known deterministic failures.
+## Newly executed I1 verification
 
-Executed deterministic slices:
-- validator-facing V2 closure: 22/22 PASS before the subject-specific resource correction;
-- recurrent C1/C2 mechanics: 5/5 PASS;
-- lagged SVF-0 world mechanics: 2/2 PASS;
-- meter/reset/replay-selector mechanics: 5/5 PASS;
-- first-core metric-profile semantics: 1/1 PASS;
-- corrected real process-resident-memory path: 2/2 PASS.
+The new execution-layer source was verified without running a developmental learner trajectory:
 
-The resident-memory repair is material:
-- the earlier subject incorrectly used `tracemalloc` Python allocation peak as the resident-memory measure;
-- the corrected source measures process peak resident set / peak working set;
-- Python allocation peak remains a separate diagnostic and is never substituted for resident memory;
-- local deterministic measurement confirmed a real process peak well above the superseded 8 MiB envelope, so that old resource subject is not carried forward;
-- support V3 freezes a 256 MiB resident-memory ceiling.
+- single-step runner contract: **7/7 PASS**;
+- deterministic scoring/statistics primitives: **7/7 PASS**;
+- E0 orchestration guard: **5/5 PASS**;
+- combined new execution layer: **19/19 PASS**.
 
-Scientific subject:
-- recurrent linear-Gaussian C1 over the previous opaque observation;
-- same-base C2 plus bounded opaque transition-pair replay;
-- deterministic most-recent replay selector;
-- stateless reset reference;
-- one-step-lagged primary and negative-control worlds;
-- fail-closed resource adjudication;
-- subject-specific first-core metric profile.
+The E0 guard tests prove:
+- missing E0 authority fails before world generation;
+- authority for the wrong logical subject fails before world generation;
+- an unfrozen seed fails before world generation;
+- the valid subject+seed E0 path was **not executed**.
 
-Limitation:
-- this sandbox cannot obtain a clean authenticated checkout of the private repository;
-- no hosted CI, paid compute, learner trajectory, training loop, or experiment was used;
-- therefore this is a composite I1 source-verification receipt, not a clean-checkout qualification claim.
+The single-step runner tests prove:
+- C1, C2, and reset prediction tickets commit before outcome reveal;
+- C1/C2 receive the same revealed outcome;
+- C2 performs live update before at most one bounded replay update;
+- reset carries zero durable state;
+- SVF-0 intervention packets are rejected;
+- resource violations remain fail-closed and invalidate the whole comparison point.
+
+The deterministic statistics tests prove the frozen:
+- score windows;
+- target-minus-comparator window delta;
+- n=8 Student-t interval with df=7 critical value 2.364624251;
+- primary persistence effect + support-completeness gate;
+- Holm-Bonferroni step-down rule;
+- Gate-1 kill semantics.
+
+## Existing source posture
+
+The earlier recurrent, lagged-world, source-binding, resource-meter, and hostile-validator evidence remains applicable only where the exact underlying Git blobs are unchanged. The validator/profile identifier moved to `NOEMA_SVF0_RECURRENT_GATE1_V3`; a clean full-suite rerun was not available in this sandbox and is not claimed.
+
+No learner trajectory, training loop, primary world run, negative-control run, hosted CI, or paid compute was executed.
 
 ## Authority ceiling
 
-This receipt does **not** authorize or claim E0 learning/training/experiment execution, paid/hosted compute, deployment, merge, publication, repository-visibility change, provider/credential/ruleset mutation, protected-system connection, empirical architecture advantage, or BT2 R1 remediation/requalification.
+This receipt does **not** authorize or claim:
+- E0 learning/training/experiment execution;
+- empirical Gate-1 results;
+- merge or deployment;
+- publication;
+- paid/hosted compute;
+- provider/credential/ruleset mutation;
+- repository-visibility change;
+- protected-system connection;
+- BT2 R1 remediation/requalification.
 
-Any source/test/config change after `8460f5e279c0178d6305e115cbb5ddcb29bebf03` creates a new source subject and requires fresh I1 verification before inheriting this PASS.
+Any source/test/config change after `6d40befe2ee260586270610c4c9e864a8e84403e` creates a new source subject and requires fresh I1 qualification.
