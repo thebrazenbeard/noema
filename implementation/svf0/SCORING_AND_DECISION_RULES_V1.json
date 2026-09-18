@@ -1,0 +1,45 @@
+{
+  "schema_id": "NOEMA_SVF0_SCORING_DECISION_RULES_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "proper_scoring_rule": {
+    "id": "GAUSSIAN_NLL_SUM_V1",
+    "implementation": "src/noema/svf0.py::gaussian_nll",
+    "direction": "LOWER_IS_BETTER"
+  },
+  "aggregation": {
+    "id": "algo:mean@v1",
+    "definition": "arithmetic mean over the frozen scored opportunity set; invalid/missing observations are not coerced to zero"
+  },
+  "primary_variables": {
+    "mean_nll_delta": "candidate mean Gaussian NLL minus comparator mean Gaussian NLL over the metric's frozen scored window",
+    "scored_count": "number of valid scored observations in the frozen window",
+    "expected_count": "preregistered count for that window",
+    "stable_dependency_nll_increase": "post-change stable-channel mean NLL minus pre-change stable-channel mean NLL",
+    "post_change_nll_delta": "late post-change mean NLL minus early post-change mean NLL",
+    "resource_accounting_complete": "true only when every required candidate resource observation is present and within its frozen envelope",
+    "c1_persistence_pass": "true only when every C1 primary P metric threshold passes",
+    "c2_persistence_pass": "true only when every C2 primary P metric threshold and resource requirement passes",
+    "worlds_completed": "number of complete valid seed-worlds",
+    "maximum_worlds": "frozen maximum world count"
+  },
+  "thresholds": {
+    "persistence_vs_reset": "expr:mean_nll_delta<=-0.02",
+    "stable_dependency_retention": "expr:stable_dependency_nll_increase<=0.02",
+    "changed_dependency_adaptation": "expr:post_change_nll_delta<=-0.02",
+    "complete_scoring": "expr:scored_count==expected_count",
+    "resource_tradeoff_recorded": "expr:resource_accounting_complete==true"
+  },
+  "statistics": {
+    "seed_count": 8,
+    "confidence_level": 0.95,
+    "uncertainty_method": "algo:student_t_ci@v1:n=8",
+    "student_t_two_sided_critical_value_df7": 2.364624251,
+    "multiple_comparison_rule": "algo:holm_bonferroni@v1",
+    "stopping_rule": "expr:worlds_completed==maximum_worlds",
+    "kill_criteria": [
+      "expr:c1_persistence_pass==false",
+      "expr:c2_persistence_pass==false"
+    ]
+  }
+}

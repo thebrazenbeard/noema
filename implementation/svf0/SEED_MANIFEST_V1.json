@@ -1,0 +1,18 @@
+{
+  "schema_id": "NOEMA_SVF0_SEED_MANIFEST_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "seeds": [
+    101,
+    202,
+    303,
+    404,
+    505,
+    606,
+    707,
+    808
+  ],
+  "seed_count": 8,
+  "ordering": "ASCENDING_AS_LISTED",
+  "post_freeze_seed_substitution_allowed": false
+}
