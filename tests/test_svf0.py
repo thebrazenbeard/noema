@@ -54,3 +54,13 @@ def test_gaussian_nll_rejects_dimension_mismatch():
         assert "dimension" in str(exc).lower()
     else:
         raise AssertionError("dimension mismatch accepted")
+
+
+def test_negative_control_has_no_regime_change_and_is_deterministic():
+    from noema.svf0 import SVF0NegativeControlConfig, svf0_negative_control_point
+    config = SVF0NegativeControlConfig(coefficient=0.4, stable_coefficient=-0.2, noise_half_width=0.05)
+    early = svf0_negative_control_point(seed=31, step=1, config=config)
+    late = svf0_negative_control_point(seed=31, step=99, config=config)
+    assert early.changed_coefficient == 0.4
+    assert late.changed_coefficient == 0.4
+    assert svf0_negative_control_point(seed=31, step=99, config=config) == late
