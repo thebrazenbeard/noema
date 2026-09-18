@@ -78,6 +78,7 @@ class CandidateStepRecord:
     ticket: PredictionTicket
     outcome: tuple[float, ...]
     score: float
+    channel_scores: tuple[float, ...]
     resources: StepResources
     replay_updates: int
 
@@ -135,6 +136,22 @@ def _resources(
     )
 
 
+def _channel_scores(ticket: PredictionTicket, outcome: tuple[float, ...]) -> tuple[float, ...]:
+    return tuple(
+        gaussian_nll(
+            outcome=(observed,),
+            mean=(expected,),
+            variance=(variance,),
+        )
+        for observed, expected, variance in zip(
+            outcome,
+            ticket.prediction.mean,
+            ticket.prediction.variance,
+            strict=True,
+        )
+    )
+
+
 def execute_svf0_step(
     *,
     sealed: SealedLearnerEvent,
@@ -164,21 +181,12 @@ def execute_svf0_step(
         raise ValueError("SVF-0 runner rejects intervention packets")
     outcome = tuple(event.channels)
 
-    c1_score = gaussian_nll(
-        outcome=outcome,
-        mean=c1_ticket.prediction.mean,
-        variance=c1_ticket.prediction.variance,
-    )
-    c2_score = gaussian_nll(
-        outcome=outcome,
-        mean=c2_ticket.prediction.mean,
-        variance=c2_ticket.prediction.variance,
-    )
-    reset_score = gaussian_nll(
-        outcome=outcome,
-        mean=reset_ticket.prediction.mean,
-        variance=reset_ticket.prediction.variance,
-    )
+    c1_channel_scores = _channel_scores(c1_ticket, outcome)
+    c2_channel_scores = _channel_scores(c2_ticket, outcome)
+    reset_channel_scores = _channel_scores(reset_ticket, outcome)
+    c1_score = sum(c1_channel_scores)
+    c2_score = sum(c2_channel_scores)
+    reset_score = sum(reset_channel_scores)
 
     c1_update = measure_operation(
         lambda: transition_recurrent(state.c1, outcome, config.recurrent)
@@ -230,6 +238,7 @@ def execute_svf0_step(
             ticket=c1_ticket,
             outcome=outcome,
             score=c1_score,
+            channel_scores=c1_channel_scores,
             resources=c1_resources,
             replay_updates=0,
         ),
@@ -237,6 +246,7 @@ def execute_svf0_step(
             ticket=c2_ticket,
             outcome=outcome,
             score=c2_score,
+            channel_scores=c2_channel_scores,
             resources=c2_resources,
             replay_updates=replay_updates,
         ),
@@ -244,6 +254,7 @@ def execute_svf0_step(
             ticket=reset_ticket,
             outcome=outcome,
             score=reset_score,
+            channel_scores=reset_channel_scores,
             resources=reset_resources,
             replay_updates=0,
         ),
