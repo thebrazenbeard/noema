@@ -141,6 +141,7 @@ def test_primary_fixed_envelope_checkpointing_fails_resource_accounting():
         "checkpointing_used": True,
         "restart_equivalence_claimed": False,
     }
+    manifest["scoring_contract"] = {"primary_claims": ["P"], "primary_metrics": []}
     result = validate_manifest(manifest, schema(), DictArtifactResolver(records))
     assert result.status.value == "FAIL_RESOURCE_ACCOUNTING"
 
