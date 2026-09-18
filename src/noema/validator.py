@@ -210,6 +210,21 @@ def _information_boundary_result(manifest: Mapping[str, Any]) -> ValidationResul
     return None
 
 
+def _world_schedule_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
+    world = manifest.get("world")
+    if not isinstance(world, Mapping):
+        return None
+    if "hidden_family_randomization_rule" in world and not _is_algorithm_rule(
+        world.get("hidden_family_randomization_rule")
+    ):
+        return _result(
+            ValidationStatus.FAIL_WORLD_SCHEDULE_INTEGRITY,
+            "undecidable_hidden_family_randomization",
+            "hidden_family_randomization_rule is not a frozen algorithm identifier",
+        )
+    return None
+
+
 def _cross_field_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     candidates = [c for c in manifest.get("candidates", ()) if isinstance(c, Mapping)]
     ids = [c.get("candidate_id") for c in candidates]
@@ -314,6 +329,12 @@ def _resource_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
             "resource_measurement_unbound",
             "resource measurement must be an immutable artifact",
         )
+    if "measurement_method" in resource and not _is_algorithm_rule(resource.get("measurement_method")):
+        return _result(
+            ValidationStatus.FAIL_RESOURCE_ACCOUNTING,
+            "undecidable_resource_measurement_method",
+            "resource measurement_method is not a frozen algorithm identifier",
+        )
     restart = manifest.get("restart_contract")
     scoring = manifest.get("scoring_contract")
     has_primary_claim = isinstance(scoring, Mapping) and bool(scoring.get("primary_claims"))
@@ -351,6 +372,12 @@ def _is_algorithm_rule(value: object) -> bool:
 def _scoring_decidability_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     scoring = manifest.get("scoring_contract")
     if isinstance(scoring, Mapping):
+        if "proper_scoring_rule" in scoring and not _is_algorithm_rule(scoring.get("proper_scoring_rule")):
+            return _result(
+                ValidationStatus.FAIL_SCORING_CONTRACT,
+                "undecidable_proper_scoring_rule",
+                "proper_scoring_rule is not a frozen algorithm identifier",
+            )
         for metric in scoring.get("primary_metrics", ()):
             if not isinstance(metric, Mapping):
                 continue
@@ -531,6 +558,7 @@ def validate_manifest(
         lambda: _candidate_source_binding_result(manifest, resolved),
         lambda: _commitment_integrity_result(manifest, resolved),
         lambda: _information_boundary_result(manifest),
+        lambda: _world_schedule_result(manifest),
         lambda: _cross_field_result(manifest),
         lambda: _scoring_decidability_result(manifest),
         lambda: _resource_result(manifest),
