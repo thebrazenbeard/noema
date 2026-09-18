@@ -162,3 +162,50 @@ def test_reveal_step_must_match_frozen_step():
         assert "revealed event step" in str(exc)
     else:
         raise AssertionError("mismatched revealed step was accepted")
+
+
+def test_svf0_runner_rejects_intervention_packets():
+    from noema.boundary import InterventionPacket
+    try:
+        runner.execute_svf0_step(
+            sealed=runner.SealedLearnerEvent(
+                step=0,
+                reveal=lambda: LearnerEvent(
+                    step=0,
+                    channels=(0.0, 0.0, 0.0),
+                    intervention=InterventionPacket(target=0, commanded_value=1.0),
+                ),
+            ),
+            state=runner.SVF0RuntimeState(c1=_initial_base(), c2=_initial_c2(_config().replay)),
+            config=_config(),
+        )
+    except ValueError as exc:
+        assert "intervention" in str(exc)
+    else:
+        raise AssertionError("SVF-0 intervention packet was accepted")
+
+
+def test_any_resource_failure_invalidates_the_whole_point():
+    cfg = _config()
+    tiny = runner.SVF0RunnerConfig(
+        recurrent=cfg.recurrent,
+        replay=cfg.replay,
+        reset_variance=cfg.reset_variance,
+        envelope=FixedEnvelope(
+            max_resident_memory_bytes=1,
+            max_durable_state_bytes=1,
+            max_update_cpu_seconds_per_event=0.000000001,
+            max_query_cpu_seconds_per_event=0.000000001,
+            max_shadow_auditions_per_event=0,
+        ),
+    )
+    result = runner.execute_svf0_step(
+        sealed=runner.SealedLearnerEvent(
+            step=0,
+            reveal=lambda: LearnerEvent(step=0, channels=(0.0, 0.0, 0.0), intervention=None),
+        ),
+        state=runner.SVF0RuntimeState(c1=_initial_base(), c2=_initial_c2(tiny.replay)),
+        config=tiny,
+    )
+    assert result.point_valid is False
+    assert result.invalid_candidate_ids
