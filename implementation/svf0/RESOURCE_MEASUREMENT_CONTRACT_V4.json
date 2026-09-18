@@ -1,0 +1,45 @@
+{
+  "schema_id": "NOEMA_SVF0_RESOURCE_MEASUREMENT_V4",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "implementation_source_commit": "6d40befe2ee260586270610c4c9e864a8e84403e",
+  "measurement_method_id": "NOEMA_SVF0_PYTHON_FIXED_ENVELOPE_V4",
+  "source": {
+    "module": "src/noema/accounting.py",
+    "measure_operation": "measure_operation",
+    "process_peak_resident_memory_bytes": "process_peak_resident_memory_bytes",
+    "durable_state_bytes": "durable_state_bytes",
+    "envelope_adjudication": "adjudicate_fixed_envelope",
+    "point_adjudication": "src/noema/svf0_runner.py::SVF0StepResult.point_valid"
+  },
+  "runtime": "CPython 3.13.5",
+  "rules": {
+    "cpu_clock": "time.process_time_ns",
+    "resident_memory": "process peak resident set / peak working set from platform process accounting; not tracemalloc",
+    "python_allocation_peak": "tracemalloc peak bytes recorded as a diagnostic only and not substituted for resident memory",
+    "durable_state": "len(pickle.dumps(state, protocol=5))",
+    "update_cpu": "live update plus any replay updates are charged together to max_update_cpu_seconds_per_event",
+    "query_cpu": "prediction call only",
+    "replay": "every replay update is counted and charged; missing replay timing invalidates the point",
+    "shared_overhead": "candidate-specific orchestration overhead is charged to that candidate; evaluator-only world generation is excluded from learner resource comparison",
+    "absent_feature_zero": "a resource class may be exact zero only when the frozen candidate source exposes no invoked path for that class",
+    "missing_measurement": "INVALIDATE_FIXED_ENVELOPE_POINT",
+    "over_budget": "INVALIDATE_FIXED_ENVELOPE_POINT",
+    "point_validity": "ANY_CANDIDATE_RESOURCE_FAILURE_INVALIDATES_POINT"
+  },
+  "envelope": {
+    "max_resident_memory_bytes": 268435456,
+    "max_durable_state_bytes": 1048576,
+    "max_update_cpu_seconds_per_event": 0.05,
+    "max_query_cpu_seconds_per_event": 0.01,
+    "max_shadow_auditions_per_event": 0
+  },
+  "replay": {
+    "replay_policy_id": "replay_most_recent_v1",
+    "raw_buffer_capacity_events": 32,
+    "max_replay_updates_per_event": 1,
+    "sampling_policy": "src/noema/candidates.py::select_most_recent_replay_indices",
+    "replay_record": "opaque previous/current learner-visible observation pair",
+    "priority_provenance": "LEARNER_VISIBLE_TEMPORAL_ORDER_ONLY"
+  }
+}
