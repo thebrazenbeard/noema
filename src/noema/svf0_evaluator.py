@@ -6,7 +6,7 @@ import statistics
 
 from .boundary import commit_prediction
 from .svf0 import gaussian_nll
-from .svf0_experiment import SVF0SeedResult
+from .svf0_experiment import SVF0ExperimentResult, SVF0SeedResult
 from .svf0_statistics import (
     FROZEN_WINDOWS,
     Gate1MetricResult,
@@ -428,4 +428,20 @@ def evaluate_gate1(
         negative_control_pass=negative_pass,
         kill_required=kill,
         overall_pass=(not kill) and negative_pass,
+    )
+
+
+def evaluate_experiment_result(result: SVF0ExperimentResult) -> Gate1Evaluation:
+    if not result.authorization_id:
+        raise ValueError("top-level experiment result must bind a nonempty authorization_id")
+    all_results = (*result.primary_results, *result.negative_control_results)
+    if not all_results:
+        raise ValueError("top-level experiment result contains no seed evidence")
+    if any(seed.logical_subject_id != result.logical_subject_id for seed in all_results):
+        raise ValueError("top-level logical subject differs from seed evidence")
+    if any(seed.plan_commitment != result.plan_commitment for seed in all_results):
+        raise ValueError("top-level plan commitment differs from seed evidence")
+    return evaluate_gate1(
+        primary_results=result.primary_results,
+        negative_control_results=result.negative_control_results,
     )
