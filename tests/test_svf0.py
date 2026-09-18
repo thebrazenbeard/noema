@@ -64,3 +64,21 @@ def test_negative_control_has_no_regime_change_and_is_deterministic():
     assert early.changed_coefficient == 0.4
     assert late.changed_coefficient == 0.4
     assert svf0_negative_control_point(seed=31, step=99, config=config) == late
+
+
+def test_svf0_dependencies_are_one_step_lagged_and_preoutcome_predictable():
+    config = SVF0WorldConfig(5, 0.75, -0.25, 0.5, 0.0)
+    previous = svf0_point(seed=19, step=2, config=config)
+    current = svf0_point(seed=19, step=3, config=config)
+    previous_driver = previous.learner_event.channels[0]
+    assert current.learner_event.channels[1] == 0.75 * previous_driver
+    assert current.learner_event.channels[2] == 0.5 * previous_driver
+
+
+def test_svf0_changed_dependency_switches_on_outcome_step_without_changing_stable_dependency():
+    config = SVF0WorldConfig(5, 0.75, -0.25, 0.5, 0.0)
+    previous = svf0_point(seed=29, step=4, config=config)
+    current = svf0_point(seed=29, step=5, config=config)
+    previous_driver = previous.learner_event.channels[0]
+    assert current.learner_event.channels[1] == -0.25 * previous_driver
+    assert current.learner_event.channels[2] == 0.5 * previous_driver
