@@ -43,12 +43,19 @@ def test_durable_state_bytes_uses_pickle_protocol_5():
     assert durable_state_bytes(state) == len(pickle.dumps(state, protocol=5))
 
 
-def test_measure_operation_returns_result_cpu_and_peak_memory_without_hiding_measurement():
+def test_process_peak_resident_memory_is_real_process_memory():
+    from noema.accounting import process_peak_resident_memory_bytes
+    assert process_peak_resident_memory_bytes() > 0
+
+
+def test_measure_operation_returns_result_cpu_resident_and_python_allocation_memory():
     from noema.accounting import measure_operation
     measured = measure_operation(lambda: sum(range(100)))
     assert measured.result == 4950
     assert measured.cpu_seconds >= 0.0
-    assert measured.peak_memory_bytes >= 0
+    assert measured.resident_memory_bytes > 0
+    assert measured.python_peak_allocated_bytes >= 0
+    assert measured.peak_memory_bytes == measured.python_peak_allocated_bytes
 
 
 def test_fixed_envelope_fails_closed_on_missing_or_over_budget_measurement():
