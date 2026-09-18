@@ -2,7 +2,7 @@
   "schema": "NOEMA_IMPLEMENTATION_SUBJECT_V1",
   "classification": "IP_CONFIDENTIAL",
   "research_parent_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
-  "source_commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+  "source_commit": "8460f5e279c0178d6305e115cbb5ddcb29bebf03",
   "source_paths": [
     "src/noema/__init__.py",
     "src/noema/provenance.py",
@@ -52,13 +52,15 @@
   "verification": {
     "verified_at": "2026-09-18",
     "mode": "COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING",
-    "deterministic_tests_present": 68,
+    "deterministic_tests_present": 69,
     "known_failures": 0,
-    "exact_validator_surface_pass": 22,
+    "test_files": 10,
+    "exact_test_inventory_confirmed": true,
+    "validator_surface_prior_pass": 22,
     "recurrent_and_lagged_semantic_checks_pass": 7,
     "meter_reset_selector_semantic_checks_pass": 5,
     "first_core_metric_profile_semantic_check_pass": 1,
-    "prior_compatibility_surface_preserved": 33,
-    "limitation": "Local sandbox cannot network-clone private GitHub; hosted CI was not used."
+    "resident_memory_correction_checks_pass": 2,
+    "limitation": "Local sandbox cannot network-clone the private GitHub repository; hosted CI was not used."
   }
 }
