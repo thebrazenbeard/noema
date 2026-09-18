@@ -2,11 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+import ctypes
 import math
 import pickle
+import sys
 import time
 import tracemalloc
 from typing import Callable, Generic, TypeVar
+
+try:
+    import resource as _resource
+except ImportError:  # pragma: no cover - Windows path
+    _resource = None
 
 _RESOURCE_CLASSES = {
     "resident_memory",
@@ -93,7 +100,49 @@ _T = TypeVar("_T")
 class OperationMeasurement(Generic[_T]):
     result: _T
     cpu_seconds: float
-    peak_memory_bytes: int
+    resident_memory_bytes: int
+    python_peak_allocated_bytes: int
+
+    @property
+    def peak_memory_bytes(self) -> int:
+        return self.python_peak_allocated_bytes
+
+
+def process_peak_resident_memory_bytes() -> int:
+    if sys.platform.startswith("win"):  # pragma: no cover - platform specific
+        class _PROCESS_MEMORY_COUNTERS(ctypes.Structure):
+            _fields_ = [
+                ("cb", ctypes.c_ulong),
+                ("PageFaultCount", ctypes.c_ulong),
+                ("PeakWorkingSetSize", ctypes.c_size_t),
+                ("WorkingSetSize", ctypes.c_size_t),
+                ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                ("PagefileUsage", ctypes.c_size_t),
+                ("PeakPagefileUsage", ctypes.c_size_t),
+            ]
+        counters = _PROCESS_MEMORY_COUNTERS()
+        counters.cb = ctypes.sizeof(counters)
+        process = ctypes.windll.kernel32.GetCurrentProcess()
+        ok = ctypes.windll.psapi.GetProcessMemoryInfo(
+            process,
+            ctypes.byref(counters),
+            counters.cb,
+        )
+        if not ok:
+            raise OSError("GetProcessMemoryInfo failed")
+        return int(counters.PeakWorkingSetSize)
+
+    if _resource is None:
+        raise RuntimeError("process peak resident-memory measurement is unavailable")
+    peak = _resource.getrusage(_resource.RUSAGE_SELF).ru_maxrss
+    if peak <= 0:
+        raise RuntimeError("process peak resident-memory measurement returned a nonpositive value")
+    if sys.platform == "darwin":
+        return int(peak)
+    return int(peak * 1024)
 
 
 def durable_state_bytes(value: object) -> int:
@@ -106,13 +155,15 @@ def measure_operation(operation: Callable[[], _T]) -> OperationMeasurement[_T]:
     try:
         result = operation()
         end = time.process_time_ns()
-        _, peak = tracemalloc.get_traced_memory()
+        _, python_peak = tracemalloc.get_traced_memory()
+        resident_peak = process_peak_resident_memory_bytes()
     finally:
         tracemalloc.stop()
     return OperationMeasurement(
         result=result,
         cpu_seconds=max(0.0, (end - start) / 1_000_000_000.0),
-        peak_memory_bytes=max(0, int(peak)),
+        resident_memory_bytes=resident_peak,
+        python_peak_allocated_bytes=max(0, int(python_peak)),
     )
 
 
