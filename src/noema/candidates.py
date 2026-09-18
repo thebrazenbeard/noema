@@ -131,6 +131,41 @@ def transition_c2_once(
     updated_replay = state.replay.append(observation)
     return C2State(base=updated_base, replay=updated_replay)
 
+
+def _apply_replay_indices(
+    base: GaussianState,
+    replay: ReplayBuffer,
+    replay_indices: tuple[int, ...],
+    c1_config: C1Config,
+    replay_config: ReplayConfig,
+) -> GaussianState:
+    if replay.capacity != replay_config.capacity:
+        raise ValueError("state replay capacity does not match replay configuration")
+    if len(replay_indices) > replay_config.max_replay_updates_per_event:
+        raise ValueError("replay_indices exceed max_replay_updates_per_event")
+    updated = base
+    for index in replay_indices:
+        if isinstance(index, bool) or not isinstance(index, int) or index < 0 or index >= len(replay.items):
+            raise ValueError("replay index is outside frozen replay buffer")
+        updated = transition_c1(updated, replay.items[index], c1_config)
+    return updated
+
+
+def transition_c2_replay(
+    state: C2State,
+    replay_indices: tuple[int, ...],
+    c1_config: C1Config,
+    replay_config: ReplayConfig,
+) -> C2State:
+    updated_base = _apply_replay_indices(
+        state.base,
+        state.replay,
+        replay_indices,
+        c1_config,
+        replay_config,
+    )
+    return C2State(base=updated_base, replay=state.replay)
+
 from enum import Enum
 
 _SEMANTIC_STRUCTURAL_TOKENS = (
@@ -195,6 +230,7 @@ class C4Config:
 class C4State:
     base: GaussianState
     hypotheses: tuple[StructuralHypothesis, ...]
+    replay: ReplayBuffer | None = None
 
     def validate(self, config: C4Config) -> "C4State":
         if len(self.hypotheses) > config.max_active_hypotheses:
@@ -210,6 +246,45 @@ class C4State:
                 if abs(dependency.weight) > config.max_abs_weight:
                     raise ValueError("dependency weight exceeds configured cap")
         return self
+
+
+def transition_c4_base_once(
+    state: C4State,
+    observation: tuple[float, ...],
+    c1_config: C1Config,
+    replay_config: ReplayConfig,
+) -> C4State:
+    if state.replay is None:
+        raise ValueError("C4 replay state is required for matched C2/C4 replay conditions")
+    if state.replay.capacity != replay_config.capacity:
+        raise ValueError("state replay capacity does not match replay configuration")
+    return C4State(
+        base=transition_c1(state.base, observation, c1_config),
+        hypotheses=state.hypotheses,
+        replay=state.replay.append(observation),
+    )
+
+
+def transition_c4_replay(
+    state: C4State,
+    replay_indices: tuple[int, ...],
+    c1_config: C1Config,
+    replay_config: ReplayConfig,
+) -> C4State:
+    if state.replay is None:
+        raise ValueError("C4 replay state is required for matched C2/C4 replay conditions")
+    updated_base = _apply_replay_indices(
+        state.base,
+        state.replay,
+        replay_indices,
+        c1_config,
+        replay_config,
+    )
+    return C4State(
+        base=updated_base,
+        hypotheses=state.hypotheses,
+        replay=state.replay,
+    )
 
 
 class ProposalKind(str, Enum):
@@ -265,6 +340,7 @@ def _replace_hypothesis(
         hypotheses=tuple(
             replacement if h.handle == replacement.handle else h for h in state.hypotheses
         ),
+        replay=state.replay,
     )
 
 
@@ -347,7 +423,7 @@ def apply_structural_proposal(
             current.confidence / 2.0,
         )
         replaced = tuple(retained if h.handle == current.handle else h for h in state.hypotheses)
-        return C4State(state.base, (*replaced, branch)).validate(config)
+        return C4State(base=state.base, hypotheses=(*replaced, branch), replay=state.replay).validate(config)
 
     if proposal.kind is ProposalKind.MERGE_RETIRE:
         if not proposal.retire_handle or proposal.retire_handle == current.handle:
@@ -365,6 +441,6 @@ def apply_structural_proposal(
             for h in state.hypotheses
             if h.handle != proposal.retire_handle
         )
-        return C4State(state.base, remaining).validate(config)
+        return C4State(base=state.base, hypotheses=remaining, replay=state.replay).validate(config)
 
     raise ValueError(f"unsupported proposal kind: {proposal.kind}")
