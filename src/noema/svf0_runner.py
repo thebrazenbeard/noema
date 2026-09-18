@@ -88,6 +88,18 @@ class SVF0StepResult:
     learner_event: LearnerEvent
     candidate_records: tuple[CandidateStepRecord, ...]
 
+    @property
+    def point_valid(self) -> bool:
+        return all(record.resources.envelope_valid for record in self.candidate_records)
+
+    @property
+    def invalid_candidate_ids(self) -> tuple[str, ...]:
+        return tuple(
+            record.ticket.candidate_id
+            for record in self.candidate_records
+            if not record.resources.envelope_valid
+        )
+
 
 def _resources(
     *,
@@ -148,6 +160,8 @@ def execute_svf0_step(
     event = sealed.reveal()
     if event.step != sealed.step:
         raise ValueError("revealed event step does not match sealed step")
+    if event.intervention is not None:
+        raise ValueError("SVF-0 runner rejects intervention packets")
     outcome = tuple(event.channels)
 
     c1_score = gaussian_nll(
