@@ -1,0 +1,21 @@
+{
+  "schema_id": "NOEMA_SVF0_NEGATIVE_CONTROL_V2",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "implementation_source_commit": "fb29a4bed06567debdadcc092f72d5f68c63fd15",
+  "generator": "src/noema/svf0.py::svf0_negative_control_point",
+  "dependency_lag_events": 1,
+  "world": {
+    "coefficient": 0.4,
+    "stable_coefficient": -0.2,
+    "noise_half_width": 0.05,
+    "max_events": 128
+  },
+  "regime_change_present": false,
+  "purpose": "Detect apparent replay advantage when the preregistered changed-dependency event is absent.",
+  "derived_variable": {
+    "negative_control_mean_nll_delta": "C2 mean Gaussian NLL minus C1 mean Gaussian NLL over the frozen negative-control window"
+  },
+  "acceptance_rule": "expr:negative_control_mean_nll_delta<=0.02",
+  "destructive_search_not_applicable": true
+}
