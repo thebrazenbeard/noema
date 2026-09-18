@@ -63,6 +63,13 @@ class SVF0SeedResult:
     steps: tuple[SVF0StepResult, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class SVF0ExperimentResult:
+    logical_subject_id: str
+    primary_results: tuple[SVF0SeedResult, ...]
+    negative_control_results: tuple[SVF0SeedResult, ...]
+
+
 def initial_runtime_state(plan: SVF0ExperimentPlan) -> SVF0RuntimeState:
     base = RecurrentGaussianState.zeros(
         dimension=3,
@@ -155,4 +162,25 @@ def execute_negative_control_seed(
         seed=seed,
         negative_control=True,
         steps=tuple(steps),
+    )
+
+
+def execute_frozen_experiment(
+    *,
+    plan: SVF0ExperimentPlan,
+    authority: E0ExecutionAuthority | None,
+) -> SVF0ExperimentResult:
+    _require_e0(plan=plan, authority=authority)
+    primary_results = tuple(
+        execute_primary_seed(plan=plan, seed=seed, authority=authority)
+        for seed in plan.seeds
+    )
+    negative_control_results = tuple(
+        execute_negative_control_seed(plan=plan, seed=seed, authority=authority)
+        for seed in plan.seeds
+    )
+    return SVF0ExperimentResult(
+        logical_subject_id=plan.logical_subject_id,
+        primary_results=primary_results,
+        negative_control_results=negative_control_results,
     )
