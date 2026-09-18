@@ -187,6 +187,319 @@ def _implementation_subject_result(
     return None
 
 
+_FULL_V2 = "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V2"
+_RESEARCH_SUBJECT = "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33"
+_RESEARCH_REPOSITORY = "thebrazenbeard/noema"
+_NORMATIVE_SUBJECT_PATHS = {
+    "schema_artifact": "docs/working-design/EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json",
+    "validator_artifact": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md",
+    "comparator_fairness_artifact": "docs/working-design/C0_C4_FAIR_COMPARISON_AND_CLAIM_BOUNDARY_MATRIX.md",
+    "resource_addendum_artifact": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_RESOURCE_ADDENDUM.md",
+    "decidability_addendum_artifact": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_DECIDABILITY_ADDENDUM.md",
+    "comparator_matrix_addendum_artifact": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md",
+    "comparator_interface_artifact": "docs/working-design/C2_C4_COMPARATOR_INTERFACE_CONTRACT.md",
+}
+
+
+def _is_full_v2(manifest: Mapping[str, Any]) -> bool:
+    return manifest.get("schema_version") == _FULL_V2
+
+
+def _normative_contract_binding_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
+    if not _is_full_v2(manifest):
+        return None
+    subject = manifest.get("subject")
+    if not isinstance(subject, Mapping) or subject.get("design_base_commit") != _RESEARCH_SUBJECT:
+        return _result(
+            ValidationStatus.FAIL_SOURCE_BINDING,
+            "research_subject_mismatch",
+            "V2 design_base_commit must bind the reviewed PR #32 research subject",
+        )
+    for key, path in _NORMATIVE_SUBJECT_PATHS.items():
+        value = subject.get(key)
+        if not isinstance(value, Mapping):
+            return _result(
+                ValidationStatus.FAIL_SOURCE_BINDING,
+                "normative_artifact_missing",
+                f"{key} must bind the exact reviewed V2 artifact",
+            )
+        if (
+            value.get("repository") != _RESEARCH_REPOSITORY
+            or value.get("commit") != _RESEARCH_SUBJECT
+            or value.get("path") != path
+        ):
+            return _result(
+                ValidationStatus.FAIL_SOURCE_BINDING,
+                "normative_artifact_tuple_mismatch",
+                f"{key} does not bind the reviewed V2 artifact tuple",
+            )
+    fairness = manifest.get("comparator_fairness_contract")
+    expected_fairness = _NORMATIVE_SUBJECT_PATHS["comparator_fairness_artifact"]
+    if not isinstance(fairness, Mapping) or (
+        fairness.get("repository") != _RESEARCH_REPOSITORY
+        or fairness.get("commit") != _RESEARCH_SUBJECT
+        or fairness.get("path") != expected_fairness
+    ):
+        return _result(
+            ValidationStatus.FAIL_SOURCE_BINDING,
+            "comparator_fairness_tuple_mismatch",
+            "top-level comparator fairness contract must bind the reviewed research tuple",
+        )
+    return None
+
+
+def _stage_semantics_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
+    if not _is_full_v2(manifest):
+        return None
+    subject = manifest.get("subject", {})
+    stage = subject.get("stage")
+    roles = {
+        str(candidate.get("role"))
+        for candidate in manifest.get("candidates", ())
+        if isinstance(candidate, Mapping)
+    }
+    world = manifest.get("world", {})
+    audition = manifest.get("audition_scope_contract", {})
+    scoring = manifest.get("scoring_contract", {})
+    primary_claims = tuple(scoring.get("primary_claims", ()))
+
+    if stage == "SVF-0":
+        if not {"C1", "C2"}.issubset(roles):
+            return _result(
+                ValidationStatus.FAIL_STAGE_SEMANTICS,
+                "svf0_candidate_roles",
+                "SVF-0 requires C1 and C2 candidates",
+            )
+        if primary_claims != ("P",):
+            return _result(
+                ValidationStatus.FAIL_STAGE_SEMANTICS,
+                "svf0_primary_claims",
+                "SVF-0 primary claims must be exactly P",
+            )
+        conditions = (
+            scoring.get("c2_vs_c4_external_comparison_required") is False,
+            world.get("intervention_mode") == "NONE",
+            world.get("intervention_schedule_artifact") is None,
+            world.get("intervention_schedule_commitment") is None,
+            audition.get("learned_scope_primary_claim_allowed") is False,
+            audition.get("simple_audition_rival_required") is False,
+        )
+        if not all(conditions):
+            return _result(
+                ValidationStatus.FAIL_STAGE_SEMANTICS,
+                "svf0_stage_shape",
+                "SVF-0 stage semantics do not match the frozen Gate-1 contract",
+            )
+        return None
+
+    if stage == "SVF-1":
+        if not {"C2", "C4"}.issubset(roles):
+            return _result(
+                ValidationStatus.FAIL_STAGE_SEMANTICS,
+                "svf1_candidate_roles",
+                "SVF-1 requires C2 and C4 candidates",
+            )
+        if not primary_claims or any(claim not in {"S", "T", "L", "G"} for claim in primary_claims):
+            return _result(
+                ValidationStatus.FAIL_STAGE_SEMANTICS,
+                "svf1_primary_claims",
+                "SVF-1 primary claims must be nonempty and drawn from S/T/L/G",
+            )
+        probability = audition.get("simple_audition_probability")
+        verification = world.get("observational_equivalence_verification")
+        flags = (
+            "schedule_may_adapt_to_hidden_family",
+            "schedule_may_adapt_to_candidate_predictions",
+            "schedule_may_adapt_to_scored_outcomes",
+            "schedule_may_adapt_to_evaluator_diagnostics",
+        )
+        conditions = (
+            scoring.get("c2_vs_c4_external_comparison_required") is True,
+            world.get("intervention_mode") == "EXTERNALLY_SCHEDULED",
+            isinstance(world.get("intervention_schedule_artifact"), Mapping),
+            isinstance(world.get("intervention_schedule_commitment"), str),
+            isinstance(verification, Mapping),
+            audition.get("simple_audition_rival_required") is True,
+            isinstance(probability, (int, float)) and not isinstance(probability, bool) and probability > 0,
+            all(world.get(flag) is False for flag in flags),
+        )
+        if not all(conditions):
+            return _result(
+                ValidationStatus.FAIL_STAGE_SEMANTICS,
+                "svf1_stage_shape",
+                "SVF-1 stage semantics do not match the frozen structural-value contract",
+            )
+        return None
+
+    return _result(
+        ValidationStatus.FAIL_STAGE_SEMANTICS,
+        "unknown_stage",
+        "experiment stage must be SVF-0 or SVF-1",
+    )
+
+
+def _resolved_json_artifact(
+    value: Mapping[str, Any],
+    resolved: Mapping[tuple[str, str, str], bytes],
+) -> Mapping[str, Any]:
+    ref = _to_ref(value)
+    payload = json.loads(resolved[(ref.repository, ref.commit, ref.path)].decode("utf-8"))
+    if not isinstance(payload, Mapping):
+        raise ValueError("resolved artifact is not a JSON object")
+    return payload
+
+
+def _information_schema_closure_result(
+    manifest: Mapping[str, Any],
+    resolved: Mapping[tuple[str, str, str], bytes],
+) -> ValidationResult | None:
+    if not _is_full_v2(manifest):
+        return None
+    info = manifest.get("information_boundary")
+    if not isinstance(info, Mapping):
+        return None
+    for ref_key, field_key in (
+        ("learner_visible_schema", "learner_visible_field_names"),
+        ("evaluator_only_schema", "evaluator_only_field_names"),
+    ):
+        value = info.get(ref_key)
+        if not isinstance(value, Mapping):
+            return _result(
+                ValidationStatus.FAIL_INFORMATION_BOUNDARY,
+                "transport_schema_missing",
+                f"{ref_key} must be an immutable schema artifact",
+            )
+        try:
+            schema = _resolved_json_artifact(value, resolved)
+        except (KeyError, TypeError, ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            return _result(
+                ValidationStatus.FAIL_INFORMATION_BOUNDARY,
+                "transport_schema_invalid",
+                str(exc),
+            )
+        properties = schema.get("properties")
+        if (
+            schema.get("type") != "object"
+            or schema.get("additionalProperties") is not False
+            or not isinstance(properties, Mapping)
+            or schema.get("patternProperties")
+            or schema.get("unevaluatedProperties") not in (None, False)
+        ):
+            return _result(
+                ValidationStatus.FAIL_INFORMATION_BOUNDARY,
+                "transport_schema_open",
+                f"{ref_key} must be a closed object schema",
+            )
+        declared = set(info.get(field_key, ()))
+        if declared != set(properties):
+            return _result(
+                ValidationStatus.FAIL_INFORMATION_BOUNDARY,
+                "transport_field_set_mismatch",
+                f"{field_key} must exactly match the resolved schema properties",
+            )
+    return None
+
+
+def _c1_c2_replay_isolation_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
+    if not _is_full_v2(manifest) or manifest.get("subject", {}).get("stage") != "SVF-0":
+        return None
+    candidates = {
+        candidate.get("candidate_id"): candidate
+        for candidate in manifest.get("candidates", ())
+        if isinstance(candidate, Mapping)
+    }
+    c2s = [candidate for candidate in candidates.values() if candidate.get("role") == "C2"]
+    for c2 in c2s:
+        parent_id = c2.get("variant_of_candidate_id")
+        parent = candidates.get(parent_id)
+        if (
+            not isinstance(parent, Mapping)
+            or parent.get("role") != "C1"
+            or c2.get("variant_dimension") != "REPLAY"
+            or c2.get("base_substrate_id") != parent.get("base_substrate_id")
+            or c2.get("source_commit") != parent.get("source_commit")
+        ):
+            return _result(
+                ValidationStatus.FAIL_COMPARATOR_FAIRNESS,
+                "c1_c2_replay_isolation",
+                "SVF-0 C2 must be an explicit REPLAY variant of a C1 sharing one frozen base/source",
+            )
+    return None
+
+
+def _resource_measurement_artifact_result(
+    manifest: Mapping[str, Any],
+    resolved: Mapping[tuple[str, str, str], bytes],
+) -> ValidationResult | None:
+    if not _is_full_v2(manifest):
+        return None
+    resource = manifest.get("resource_contract")
+    if not isinstance(resource, Mapping):
+        return None
+    value = resource.get("measurement_artifact")
+    if not isinstance(value, Mapping):
+        return None
+    try:
+        artifact = _resolved_json_artifact(value, resolved)
+    except (KeyError, TypeError, ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        return _result(
+            ValidationStatus.FAIL_RESOURCE_ACCOUNTING,
+            "resource_measurement_artifact_invalid",
+            str(exc),
+        )
+    rules = artifact.get("rules")
+    required_rules = {
+        "cpu_clock",
+        "resident_memory",
+        "durable_state",
+        "update_cpu",
+        "query_cpu",
+        "replay",
+        "shared_overhead",
+        "absent_feature_zero",
+        "missing_measurement",
+        "over_budget",
+    }
+    if (
+        not isinstance(artifact.get("measurement_method_id"), str)
+        or not artifact.get("measurement_method_id")
+        or not isinstance(rules, Mapping)
+        or not required_rules.issubset(rules)
+    ):
+        return _result(
+            ValidationStatus.FAIL_RESOURCE_ACCOUNTING,
+            "resource_measurement_artifact_incomplete",
+            "resource measurement artifact does not close all required accounting routes",
+        )
+    if (
+        rules.get("missing_measurement") != "INVALIDATE_FIXED_ENVELOPE_POINT"
+        or rules.get("over_budget") != "INVALIDATE_FIXED_ENVELOPE_POINT"
+    ):
+        return _result(
+            ValidationStatus.FAIL_RESOURCE_ACCOUNTING,
+            "resource_measurement_fail_open",
+            "missing measurements and overruns must invalidate the fixed-envelope point",
+        )
+    if artifact.get("envelope") != resource.get("fixed_total_envelope"):
+        return _result(
+            ValidationStatus.FAIL_RESOURCE_ACCOUNTING,
+            "resource_envelope_mismatch",
+            "measurement artifact envelope differs from the manifest fixed_total_envelope",
+        )
+    replay = artifact.get("replay")
+    manifest_replay = resource.get("replay_limits", {})
+    if not isinstance(replay, Mapping) or (
+        replay.get("raw_buffer_capacity_events") != manifest_replay.get("raw_buffer_capacity_events")
+        or replay.get("max_replay_updates_per_event") != manifest_replay.get("max_replay_updates_per_event")
+    ):
+        return _result(
+            ValidationStatus.FAIL_RESOURCE_ACCOUNTING,
+            "resource_replay_meter_mismatch",
+            "measurement artifact replay limits differ from the manifest replay contract",
+        )
+    return None
+
+
 def _information_boundary_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     info = manifest.get("information_boundary")
     if not isinstance(info, Mapping):
@@ -555,13 +868,18 @@ def validate_manifest(
 
     for check in (
         lambda: _implementation_subject_result(manifest, resolved),
+        lambda: _normative_contract_binding_result(manifest),
+        lambda: _stage_semantics_result(manifest),
         lambda: _candidate_source_binding_result(manifest, resolved),
         lambda: _commitment_integrity_result(manifest, resolved),
         lambda: _information_boundary_result(manifest),
+        lambda: _information_schema_closure_result(manifest, resolved),
         lambda: _world_schedule_result(manifest),
         lambda: _cross_field_result(manifest),
+        lambda: _c1_c2_replay_isolation_result(manifest),
         lambda: _scoring_decidability_result(manifest),
         lambda: _resource_result(manifest),
+        lambda: _resource_measurement_artifact_result(manifest, resolved),
         lambda: _lineage_result(manifest),
     ):
         result = check()
