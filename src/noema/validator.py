@@ -632,7 +632,7 @@ def _cross_field_result(manifest: Mapping[str, Any]) -> ValidationResult | None:
     return None
 
 
-_FIRST_CORE_SVF0_ID = "NOEMA_SVF0_RECURRENT_GATE1_V3"
+_FIRST_CORE_SVF0_ID = "NOEMA_SVF0_RECURRENT_GATE1_V4"
 _FIRST_CORE_SVF0_METRICS = {
     "P_C1_VS_RESET_LATE_POST": {
         "claim": "P",
