@@ -44,6 +44,7 @@ def _to_ref(value: Mapping[str, Any]) -> ArtifactRef:
         repository=str(value["repository"]),
         commit=str(value["commit"]),
         path=str(value["path"]),
+        git_blob=str(value["git_blob"]) if value.get("git_blob") is not None else None,
         sha256=str(value["sha256"]) if value.get("sha256") is not None else None,
     )
 
