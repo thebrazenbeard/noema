@@ -110,3 +110,11 @@ def test_reset_reference_never_carries_cross_time_state():
     assert first == second
     assert first.mean == (0.0, 0.0, 0.0)
     assert first.variance == (1.0, 1.0, 1.0)
+
+
+def test_most_recent_eligible_replay_selector_is_deterministic_and_bounded():
+    from noema.candidates import select_most_recent_replay_indices
+    assert select_most_recent_replay_indices(item_count=0, max_updates=1) == ()
+    assert select_most_recent_replay_indices(item_count=4, max_updates=0) == ()
+    assert select_most_recent_replay_indices(item_count=4, max_updates=1) == (3,)
+    assert select_most_recent_replay_indices(item_count=4, max_updates=2) == (3, 2)
