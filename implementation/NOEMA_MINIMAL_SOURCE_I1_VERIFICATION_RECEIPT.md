@@ -8,42 +8,54 @@ Date: 2026-09-18
 
 Research parent: `be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33`
 
-Frozen implementation source/test/config commit: `fb29a4bed06567debdadcc092f72d5f68c63fd15`
+Corrected frozen implementation source/test/config commit: `8460f5e279c0178d6305e115cbb5ddcb29bebf03`
 
-Frozen recurrent SVF-0 support commit: `2dc20443e33af326f2f26ec74b144579ac1ae268`
+Corrected recurrent SVF-0 support commit: `d44bfb26764571aaf8ff8f3d156d3a449f65f120`
 
 Implementation subject manifest:
 - `implementation/NOEMA_MINIMAL_SUBJECT_V1.json`
-- binds `source_commit=fb29a4bed06567debdadcc092f72d5f68c63fd15`
+- binds `source_commit=8460f5e279c0178d6305e115cbb5ddcb29bebf03`
 
 ## Verification evidence
 
 Verification mode: **COMPOSITE_I1_WITH_EXACT_GITHUB_SOURCE_BINDING**
 
-- 68 deterministic test cases are present in the source subject.
-- 0 known deterministic failures remain.
-- 22/22 validator-facing cases were executed against exact persisted validator bytes before the final first-core profile addition.
-- recurrent C1/C2 mechanics: 5/5 pass.
-- lagged SVF-0 dependency mechanics: 2/2 pass.
-- concrete meter/reset/replay-selector mechanics: 5/5 pass.
-- first-core metric-profile semantics: 1/1 pass.
-- legacy EWMA/C4 APIs were preserved to avoid accidental compatibility regression while SVF-0 moved to the recurrent substrate.
+Exact source inventory:
+- 10 deterministic test files;
+- 69 `test_*` cases present at the corrected source commit;
+- 0 known deterministic failures.
 
-The source subject now contains:
-- recurrent linear-Gaussian C1;
-- identical-base C2 plus bounded transition-pair replay;
-- deterministic most-recent replay selection;
+Executed deterministic slices:
+- validator-facing V2 closure: 22/22 PASS before the subject-specific resource correction;
+- recurrent C1/C2 mechanics: 5/5 PASS;
+- lagged SVF-0 world mechanics: 2/2 PASS;
+- meter/reset/replay-selector mechanics: 5/5 PASS;
+- first-core metric-profile semantics: 1/1 PASS;
+- corrected real process-resident-memory path: 2/2 PASS.
+
+The resident-memory repair is material:
+- the earlier subject incorrectly used `tracemalloc` Python allocation peak as the resident-memory measure;
+- the corrected source measures process peak resident set / peak working set;
+- Python allocation peak remains a separate diagnostic and is never substituted for resident memory;
+- local deterministic measurement confirmed a real process peak well above the superseded 8 MiB envelope, so that old resource subject is not carried forward;
+- support V3 freezes a 256 MiB resident-memory ceiling.
+
+Scientific subject:
+- recurrent linear-Gaussian C1 over the previous opaque observation;
+- same-base C2 plus bounded opaque transition-pair replay;
+- deterministic most-recent replay selector;
 - stateless reset reference;
-- one-step-lagged SVF-0 primary and negative-control worlds;
-- concrete local resource metering and fail-closed envelope adjudication;
-- full-V2 validator closure for research tuples, stage semantics, information schemas, replay-isolation, resource-meter binding, and the exact first-core primary metric profile.
+- one-step-lagged primary and negative-control worlds;
+- fail-closed resource adjudication;
+- subject-specific first-core metric profile.
 
 Limitation:
-- the local execution sandbox cannot resolve github.com, so an authenticated clean clone of the private repository cannot be run here;
-- no hosted CI, paid compute, learner trajectory, or experiment was used.
+- this sandbox cannot obtain a clean authenticated checkout of the private repository;
+- no hosted CI, paid compute, learner trajectory, training loop, or experiment was used;
+- therefore this is a composite I1 source-verification receipt, not a clean-checkout qualification claim.
 
 ## Authority ceiling
 
-This receipt is source-verification evidence only. It does **not** authorize or claim learning/training, developmental trajectories, experiment execution, paid/hosted compute, deployment, merge, publication, repository-visibility change, provider/credential/ruleset mutation, protected-system connection, empirical architecture advantage, or BT2 R1 remediation/requalification.
+This receipt does **not** authorize or claim E0 learning/training/experiment execution, paid/hosted compute, deployment, merge, publication, repository-visibility change, provider/credential/ruleset mutation, protected-system connection, empirical architecture advantage, or BT2 R1 remediation/requalification.
 
-Any source/test/config change after `fb29a4bed06567debdadcc092f72d5f68c63fd15` creates a new source subject and requires fresh I1 verification before inheriting this PASS.
+Any source/test/config change after `8460f5e279c0178d6305e115cbb5ddcb29bebf03` creates a new source subject and requires fresh I1 verification before inheriting this PASS.
