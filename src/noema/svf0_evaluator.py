@@ -173,7 +173,7 @@ def _validate_result_set(
     results: tuple[SVF0SeedResult, ...],
     *,
     negative_control: bool,
-) -> None:
+) -> tuple[str, str]:
     if len(results) != 8:
         raise ValueError("first-core Gate-1 evaluation requires exactly 8 seed results")
     seeds = tuple(result.seed for result in results)
@@ -181,6 +181,13 @@ def _validate_result_set(
         raise ValueError("seed results must match the frozen ordered 8-seed manifest")
     for result in results:
         _validate_seed_result(result, negative_control=negative_control)
+    subjects = {result.logical_subject_id for result in results}
+    commitments = {result.plan_commitment for result in results}
+    if len(subjects) != 1:
+        raise ValueError("seed results must share one logical subject")
+    if len(commitments) != 1:
+        raise ValueError("seed results must share one plan commitment")
+    return next(iter(subjects)), next(iter(commitments))
 
 
 def _primary_metric(
@@ -235,8 +242,18 @@ def evaluate_gate1(
     primary_results: tuple[SVF0SeedResult, ...],
     negative_control_results: tuple[SVF0SeedResult, ...],
 ) -> Gate1Evaluation:
-    _validate_result_set(primary_results, negative_control=False)
-    _validate_result_set(negative_control_results, negative_control=True)
+    primary_subject, primary_commitment = _validate_result_set(
+        primary_results,
+        negative_control=False,
+    )
+    negative_subject, negative_commitment = _validate_result_set(
+        negative_control_results,
+        negative_control=True,
+    )
+    if primary_subject != negative_subject:
+        raise ValueError("primary and negative-control results must share one logical subject")
+    if primary_commitment != negative_commitment:
+        raise ValueError("primary and negative-control results must share one plan commitment")
 
     c1_metric, c1_p = _primary_metric(
         primary_results,
