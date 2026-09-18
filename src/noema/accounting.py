@@ -110,10 +110,12 @@ class OperationMeasurement(Generic[_T]):
 
 def process_peak_resident_memory_bytes() -> int:
     if sys.platform.startswith("win"):  # pragma: no cover - platform specific
+        from ctypes import wintypes
+
         class _PROCESS_MEMORY_COUNTERS(ctypes.Structure):
             _fields_ = [
-                ("cb", ctypes.c_ulong),
-                ("PageFaultCount", ctypes.c_ulong),
+                ("cb", wintypes.DWORD),
+                ("PageFaultCount", wintypes.DWORD),
                 ("PeakWorkingSetSize", ctypes.c_size_t),
                 ("WorkingSetSize", ctypes.c_size_t),
                 ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
@@ -123,16 +125,30 @@ def process_peak_resident_memory_bytes() -> int:
                 ("PagefileUsage", ctypes.c_size_t),
                 ("PeakPagefileUsage", ctypes.c_size_t),
             ]
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        psapi = ctypes.WinDLL("psapi", use_last_error=True)
+        kernel32.GetCurrentProcess.argtypes = []
+        kernel32.GetCurrentProcess.restype = wintypes.HANDLE
+        psapi.GetProcessMemoryInfo.argtypes = [
+            wintypes.HANDLE,
+            ctypes.POINTER(_PROCESS_MEMORY_COUNTERS),
+            wintypes.DWORD,
+        ]
+        psapi.GetProcessMemoryInfo.restype = wintypes.BOOL
+
         counters = _PROCESS_MEMORY_COUNTERS()
         counters.cb = ctypes.sizeof(counters)
-        process = ctypes.windll.kernel32.GetCurrentProcess()
-        ok = ctypes.windll.psapi.GetProcessMemoryInfo(
+        process = kernel32.GetCurrentProcess()
+        ctypes.set_last_error(0)
+        ok = psapi.GetProcessMemoryInfo(
             process,
             ctypes.byref(counters),
             counters.cb,
         )
         if not ok:
-            raise OSError("GetProcessMemoryInfo failed")
+            error = ctypes.get_last_error()
+            raise OSError(error, "GetProcessMemoryInfo failed")
         return int(counters.PeakWorkingSetSize)
 
     if _resource is None:
