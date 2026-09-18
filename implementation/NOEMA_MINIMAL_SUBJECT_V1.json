@@ -2,7 +2,7 @@
   "schema": "NOEMA_IMPLEMENTATION_SUBJECT_V1",
   "classification": "IP_CONFIDENTIAL",
   "research_parent_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
-  "source_commit": "6d40befe2ee260586270610c4c9e864a8e84403e",
+  "source_commit": "b376526e32945c6a7688b3ef7b0312881aede5de",
   "source_paths": [
     "src/noema/__init__.py",
     "src/noema/provenance.py",
@@ -19,7 +19,9 @@
     "src/noema/svf0_runner.py",
     "src/noema/svf0_statistics.py",
     "src/noema/svf0_experiment.py",
-    "implementation/svf0/EXECUTION_POLICY_V2.json"
+    "implementation/svf0/EXECUTION_POLICY_V2.json",
+    "src/noema/svf0_evaluator.py",
+    "implementation/svf0/EXECUTION_POLICY_V3.json"
   ],
   "test_paths": [
     "tests/test_package_boundary.py",
@@ -34,7 +36,8 @@
     "tests/test_recurrent_c1_c2.py",
     "tests/test_svf0_runner.py",
     "tests/test_svf0_statistics.py",
-    "tests/test_svf0_experiment.py"
+    "tests/test_svf0_experiment.py",
+    "tests/test_svf0_evaluator.py"
   ],
   "instrumentation_paths": [
     "src/noema/accounting.py",
@@ -58,16 +61,25 @@
   },
   "verification": {
     "verified_at": "2026-09-18",
-    "mode": "COMPOSITE_I1_EXECUTION_SHELL_VERIFICATION",
-    "deterministic_tests_present": 88,
+    "mode": "COMPOSITE_I1_EXECUTION_EVALUATION_FREEZE_V4",
+    "deterministic_tests_present": 103,
     "known_failures": 0,
-    "new_execution_layer_tests_executed": 19,
-    "new_execution_layer_tests_passed": 19,
-    "runner_tests_passed": 7,
-    "statistics_tests_passed": 7,
-    "e0_guard_tests_passed": 5,
+    "focused_execution_evaluation_tests_executed": 34,
+    "focused_execution_evaluation_tests_passed": 34,
+    "focused_test_files": {
+      "tests/test_svf0_runner.py": 8,
+      "tests/test_svf0_statistics.py": 9,
+      "tests/test_svf0_experiment.py": 8,
+      "tests/test_svf0_evaluator.py": 9
+    },
     "e0_valid_path_executed": false,
-    "prior_source_verification": "carried only for unchanged prior blobs; validator/profile identifier changed to V3 and was not clean-suite rerun",
-    "limitation": "Local sandbox cannot network-clone the private GitHub repository; hosted CI was not used."
+    "full_legacy_suite_rerun": "NOT_EXECUTED_IN_THIS_RUNTIME",
+    "exact_reconstructed_focus": "PASS",
+    "final_post_focus_source_changes": [
+      "validator first-core logical subject identifier V3 -> V4",
+      "matching hostile fixture logical subject identifier V3 -> V4",
+      "new inert EXECUTION_POLICY_V3.json"
+    ],
+    "limitation": "The local exact workspace contains the execution/evaluation slice but not every legacy private-repo module; hosted CI and paid compute were not used."
   }
 }
