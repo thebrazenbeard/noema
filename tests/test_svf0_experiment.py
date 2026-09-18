@@ -148,3 +148,24 @@ def test_unfrozen_seed_is_rejected_before_world_generation(monkeypatch):
     else:
         raise AssertionError("unfrozen seed was accepted")
     assert called is False
+
+
+def test_full_experiment_without_e0_authority_fails_before_any_seed(monkeypatch):
+    called = False
+
+    def forbidden_seed(**kwargs):
+        nonlocal called
+        called = True
+        raise AssertionError("seed executor ran before E0 authority")
+
+    monkeypatch.setattr(experiment, "execute_primary_seed", forbidden_seed)
+    try:
+        experiment.execute_frozen_experiment(
+            plan=_plan(),
+            authority=None,
+        )
+    except PermissionError as exc:
+        assert "E0" in str(exc)
+    else:
+        raise AssertionError("full experiment proceeded without E0 authority")
+    assert called is False
