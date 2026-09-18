@@ -383,6 +383,15 @@ class RecurrentReplayBuffer:
         return RecurrentReplayBuffer(items=next_items, capacity=self.capacity)
 
 
+def select_most_recent_replay_indices(*, item_count: int, max_updates: int) -> tuple[int, ...]:
+    if isinstance(item_count, bool) or not isinstance(item_count, int) or item_count < 0:
+        raise ValueError("item_count must be a nonnegative integer")
+    if isinstance(max_updates, bool) or not isinstance(max_updates, int) or max_updates < 0:
+        raise ValueError("max_updates must be a nonnegative integer")
+    count = min(item_count, max_updates)
+    return tuple(item_count - 1 - offset for offset in range(count))
+
+
 @dataclass(frozen=True, slots=True)
 class RecurrentC2State:
     base: RecurrentGaussianState
