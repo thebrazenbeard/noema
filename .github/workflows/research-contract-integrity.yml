@@ -33,6 +33,7 @@ jobs:
         run: |
           python3 - <<'PY'
           import json
+          import subprocess
           from pathlib import Path
 
           root = Path("docs/working-design")
@@ -65,5 +66,68 @@ jobs:
           if currentness.get("authority_ceiling") != "RESEARCH_DESIGN_ONLY_NO_I0_I1_E0_P0_AUTHORITY":
               raise SystemExit("research authority ceiling is not fail-closed")
 
-          print(f"validated {len(json_files)} working-design JSON artifacts and active V2 research surface")
+          verification = currentness.get("currentness_verification")
+          if not isinstance(verification, dict) or verification.get("required") is not True:
+              raise SystemExit("research currentness exact-ref verification is not required")
+
+          def remote_head(ref: str) -> str:
+              completed = subprocess.run(
+                  ["git", "ls-remote", "--exit-code", "origin", ref],
+                  check=True,
+                  capture_output=True,
+                  text=True,
+              )
+              lines = [line for line in completed.stdout.splitlines() if line.strip()]
+              if len(lines) != 1:
+                  raise SystemExit(f"expected exactly one remote ref result for {ref}")
+              sha, observed_ref = lines[0].split("\t", 1)
+              if observed_ref != ref or len(sha) != 40:
+                  raise SystemExit(f"invalid remote ref readback for {ref}")
+              return sha
+
+          canonical_ref = verification.get("canonical_branch_ref")
+          research_ref = verification.get("active_research_branch_ref")
+          if not isinstance(canonical_ref, str) or not isinstance(research_ref, str):
+              raise SystemExit("currentness refs must be explicit strings")
+
+          observed_main = remote_head(canonical_ref)
+          expected_main = currentness.get("canonical_commit_observed")
+          if observed_main != expected_main:
+              raise SystemExit(
+                  f"canonical main moved: observed={observed_main} expected={expected_main}"
+              )
+
+          observed_research = remote_head(research_ref)
+          reviewed_subject = currentness.get("reviewed_research_subject")
+          if observed_research != reviewed_subject:
+              raise SystemExit(
+                  "active research branch moved: "
+                  f"observed={observed_research} reviewed={reviewed_subject}"
+              )
+
+          artifact_blobs = verification.get("required_artifact_git_blobs")
+          if not isinstance(artifact_blobs, dict) or not artifact_blobs:
+              raise SystemExit("required artifact blob bindings are absent")
+
+          for artifact_path, expected_blob in artifact_blobs.items():
+              if not isinstance(artifact_path, str) or not isinstance(expected_blob, str):
+                  raise SystemExit("artifact binding must be path -> git blob")
+              completed = subprocess.run(
+                  ["git", "rev-parse", f"{reviewed_subject}:{artifact_path}"],
+                  check=True,
+                  capture_output=True,
+                  text=True,
+              )
+              observed_blob = completed.stdout.strip()
+              if observed_blob != expected_blob:
+                  raise SystemExit(
+                      f"artifact blob mismatch for {artifact_path}: "
+                      f"observed={observed_blob} expected={expected_blob}"
+                  )
+
+          print(
+              f"validated {len(json_files)} working-design JSON artifacts; "
+              f"main={observed_main}; research={observed_research}; "
+              f"bound_artifacts={len(artifact_blobs)}"
+          )
           PY
