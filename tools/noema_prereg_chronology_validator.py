@@ -11,6 +11,9 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema.exceptions import SchemaError
+
 PASS = "PASS_FROZEN_VALID"
 FAIL_SCHEMA = "FAIL_SCHEMA"
 FAIL_FREEZE = "FAIL_FREEZE_INTEGRITY"
@@ -25,6 +28,7 @@ _CANONICAL_REPOSITORY = "thebrazenbeard/noema"
 _CANONICAL_REMOTE = "https://github.com/thebrazenbeard/noema"
 _SHA40 = re.compile(r"^[0-9a-f]{40}$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_FREEZE_SCHEMA_CANONICAL_SHA256 = "b23bf9052b5550b140d8e8ebac31c2608a1639f47d129b3121ee7959eb27c215"
 
 _TOP_KEYS = {
     "schema_version", "classification", "status", "repository",
@@ -198,37 +202,6 @@ def _verify_external_subject_shape(
     return None
 
 
-def _verify_external_subject_shape(
-    subject: dict[str, Any],
-    *,
-    manifest_commit: str,
-    experiment_id: str,
-    freeze_at: datetime,
-) -> str | None:
-    exact = {"source_kind", "subject_id", "provider", "surface_id", "observation_id", "result_digest", "bound_manifest_commit", "logical_experiment_id", "observed_at", "coverage_cutoff"}
-    if set(subject) != exact or subject.get("source_kind") != "EXTERNAL_READBACK":
-        return "external evidence subject shape mismatch"
-    for name in ("subject_id", "provider", "surface_id", "observation_id"):
-        if not isinstance(subject.get(name), str) or not subject[name]:
-            return f"external evidence {name} is missing"
-    if not _SHA256.fullmatch(str(subject.get("result_digest", ""))):
-        return "external evidence result digest shape mismatch"
-    if subject.get("bound_manifest_commit") != manifest_commit:
-        return "evidence manifest binding mismatch"
-    if subject.get("logical_experiment_id") != experiment_id:
-        return "evidence experiment binding mismatch"
-    try:
-        observed_at = _parse_time(subject.get("observed_at"))
-        coverage = _parse_time(subject.get("coverage_cutoff"))
-    except ValueError as exc:
-        return str(exc)
-    if observed_at < coverage:
-        return "external evidence observation predates its claimed coverage cutoff"
-    if coverage < freeze_at:
-        return "evidence coverage does not reach freeze_observed_at"
-    return None
-
-
 def _verify_evidence_subject(
     subject: Any,
     *,
@@ -273,6 +246,30 @@ def validate_freeze_receipt(
     repo_root = Path(repo_root)
     if not _schema_surface_valid(schema):
         return _fail(FAIL_SCHEMA, "freeze receipt governance schema malformed or replaced")
+    canonical_schema = json.dumps(
+        schema,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    if hashlib.sha256(canonical_schema).hexdigest() != _FREEZE_SCHEMA_CANONICAL_SHA256:
+        return _fail(FAIL_SCHEMA, "freeze receipt governance schema exact binding mismatch")
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as exc:
+        return _fail(FAIL_SCHEMA, f"freeze receipt governance schema invalid: {exc.message}")
+    schema_validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    schema_errors = sorted(
+        schema_validator.iter_errors(receipt),
+        key=lambda error: tuple(str(part) for part in error.absolute_path),
+    )
+    if schema_errors:
+        first_error = schema_errors[0]
+        path = ".".join(str(part) for part in first_error.absolute_path) or "<root>"
+        return _fail(
+            FAIL_SCHEMA,
+            f"freeze receipt schema violation at {path}: {first_error.message}",
+        )
     if not isinstance(receipt, dict) or set(receipt) != _TOP_KEYS:
         return _fail(FAIL_SCHEMA, "freeze receipt top-level shape mismatch")
     if receipt.get("schema_version") != _SCHEMA_VERSION:
