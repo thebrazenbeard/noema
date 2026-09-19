@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:noema:experiment-preregistration-freeze-receipt:v1",
+  "title": "Noema Experiment Preregistration Freeze Receipt V1",
+  "description": "IP_CONFIDENTIAL. Provenance/chronology receipt only. Never authorizes implementation, training, experiment execution, or protected effects.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "classification",
+    "status",
+    "repository",
+    "manifest_subject",
+    "implementation_subject_commit",
+    "logical_experiment_id",
+    "freeze_observed_at",
+    "outcome_visibility_frontier",
+    "execution_frontier",
+    "visibility_inventory",
+    "chronology_status",
+    "post_freeze_change_creates_new_subject",
+    "separate_execution_authority_required",
+    "claim_ceiling"
+  ],
+  "properties": {
+    "schema_version": {"const": "NOEMA_EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_V1"},
+    "classification": {"enum": ["IP_CONFIDENTIAL", "IP_REVIEW_REQUIRED"]},
+    "status": {"const": "FROZEN_PROVENANCE_ONLY_NOT_EXECUTION_AUTHORITY"},
+    "repository": {"const": "thebrazenbeard/noema"},
+    "manifest_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "commit", "git_blob", "sha256", "schema_version"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "git_blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "schema_version": {"const": "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V2"}
+      }
+    },
+    "implementation_subject_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "logical_experiment_id": {"type": "string", "minLength": 1},
+    "freeze_observed_at": {"type": "string", "format": "date-time"},
+    "outcome_visibility_frontier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "observed_at", "evidence_refs"],
+      "properties": {
+        "status": {"enum": ["NO_SCORED_OUTCOME_VISIBLE", "VISIBLE", "UNKNOWN"]},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "execution_frontier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "observed_at", "evidence_refs"],
+      "properties": {
+        "status": {"enum": ["NOT_STARTED", "STARTED", "COMPLETED", "UNKNOWN"]},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "visibility_inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inventory_owner_subject",
+        "required_surface_inventory_digest",
+        "surface_receipts",
+        "overall_completeness"
+      ],
+      "properties": {
+        "inventory_owner_subject": {"type": "string", "minLength": 1},
+        "required_surface_inventory_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "surface_receipts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["surface_id", "status", "observed_at", "result_digest"],
+            "properties": {
+              "surface_id": {"type": "string", "minLength": 1},
+              "status": {"enum": ["COMPLETE", "PARTIAL", "UNAVAILABLE", "UNAUTHORIZED"]},
+              "observed_at": {"type": "string", "format": "date-time"},
+              "result_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        },
+        "overall_completeness": {"enum": ["COMPLETE", "PARTIAL", "UNAVAILABLE"]}
+      }
+    },
+    "chronology_status": {"enum": ["PROSPECTIVE_CONFIRMED", "UNPROVEN", "CONTRADICTED"]},
+    "post_freeze_change_creates_new_subject": {"const": true},
+    "separate_execution_authority_required": {"const": true},
+    "claim_ceiling": {"const": "PREREGISTRATION_CHRONOLOGY_ONLY_NOT_EXECUTION_NOT_TRAINING_NOT_RESULT_VALIDITY"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"chronology_status": {"const": "PROSPECTIVE_CONFIRMED"}},
+        "required": ["chronology_status"]
+      },
+      "then": {
+        "properties": {
+          "outcome_visibility_frontier": {
+            "properties": {"status": {"const": "NO_SCORED_OUTCOME_VISIBLE"}}
+          },
+          "execution_frontier": {
+            "properties": {"status": {"const": "NOT_STARTED"}}
+          },
+          "visibility_inventory": {
+            "properties": {"overall_completeness": {"const": "COMPLETE"}}
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome_visibility_frontier": {
+            "properties": {"status": {"const": "VISIBLE"}},
+            "required": ["status"]
+          }
+        }
+      },
+      "then": {"properties": {"chronology_status": {"const": "CONTRADICTED"}}}
+    }
+  ],
+  "x-noema-invariants": [
+    "PROSPECTIVE_CONFIRMED requires complete visibility inventory, no scored outcome visible, and execution NOT_STARTED.",
+    "PARTIAL, unavailable, unauthorized, or unknown evidence cannot silently establish prospective chronology.",
+    "A receipt binds an immutable manifest subject; post-freeze mutation creates a new subject.",
+    "Chronology PASS never authorizes implementation, learning, training, experiment execution, merge, deployment, publication, spend, provider/credential mutation, visibility change, or protected-system connection."
+  ]
+}
