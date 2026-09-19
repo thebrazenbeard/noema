@@ -5,11 +5,13 @@ on:
     paths:
       - "docs/working-design/**"
       - "governance/RESEARCH_CURRENTNESS.json"
+      - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
       - ".github/workflows/research-contract-integrity.yml"
   pull_request:
     paths:
       - "docs/working-design/**"
       - "governance/RESEARCH_CURRENTNESS.json"
+      - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
       - ".github/workflows/research-contract-integrity.yml"
 
 permissions:
@@ -45,6 +47,17 @@ jobs:
               with path.open("r", encoding="utf-8") as fh:
                   json.load(fh)
 
+          governance_root = Path("governance")
+          freeze_schema_path = governance_root / "EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+          with freeze_schema_path.open("r", encoding="utf-8") as fh:
+              freeze_schema = json.load(fh)
+          if freeze_schema.get("$id") != "urn:noema:experiment-preregistration-freeze-receipt:v1":
+              raise SystemExit("unexpected preregistration freeze receipt schema id")
+          if freeze_schema.get("properties", {}).get("schema_version", {}).get("const") != "NOEMA_EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_V1":
+              raise SystemExit("unexpected preregistration freeze receipt schema version")
+          if freeze_schema.get("properties", {}).get("claim_ceiling", {}).get("const") != "PREREGISTRATION_CHRONOLOGY_ONLY_NOT_EXECUTION_NOT_TRAINING_NOT_RESULT_VALIDITY":
+              raise SystemExit("freeze receipt claim ceiling is not fail-closed")
+
           required = [
               root / "EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json",
               root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md",
@@ -54,6 +67,7 @@ jobs:
               root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md",
               root / "C2_C4_COMPARATOR_INTERFACE_CONTRACT.md",
               root / "IMPLEMENTATION_SOURCE_HANDOFF_AND_AUTHORITY_BOUNDARY.md",
+              freeze_schema_path,
           ]
           missing = [str(path) for path in required if not path.is_file()]
           if missing:
