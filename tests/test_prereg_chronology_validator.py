@@ -131,6 +131,20 @@ class ChronologyValidatorHostileTests(unittest.TestCase):
         result = self.validate(receipt(), schema=schema)
         self.assertEqual(v.FAIL_SCHEMA, result.result)
 
+    def test_same_identity_weakened_schema_is_rejected(self):
+        schema = copy.deepcopy(self.schema)
+        schema["required"] = ["schema_version"]
+        schema["properties"]["status"] = {"type": "string"}
+        result = self.validate(receipt(), schema=schema)
+        self.assertEqual(v.FAIL_SCHEMA, result.result)
+        self.assertIn("exact binding", result.reasons[0])
+
+    def test_exact_schema_rejects_false_execution_authority_boundary(self):
+        candidate = receipt()
+        candidate["separate_execution_authority_required"] = False
+        result = self.validate(candidate)
+        self.assertEqual(v.FAIL_SCHEMA, result.result)
+
     def test_stale_manifest_binding_in_evidence_fails_closed(self):
         candidate = receipt()
         candidate["outcome_visibility_frontier"]["evidence_refs"][0][
