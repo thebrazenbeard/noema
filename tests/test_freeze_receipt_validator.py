@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import datetime as dt
 import importlib.util
 import json
@@ -117,6 +118,16 @@ class FreezeChronologyHostileTests(unittest.TestCase):
         bad["$id"] = "wrong"
         result = validator.validate_freeze_receipt(receipt(), schema=bad, resolver=FakeResolver())
         self.assertEqual("FAIL_FREEZE_INTEGRITY", result["status"])
+
+    def test_same_identity_weakened_schema_is_rejected(self):
+        weak = copy.deepcopy(schema())
+        weak["required"] = ["schema_version"]
+        weak["properties"]["status"] = {"type": "string"}
+        result = validator.validate_freeze_receipt(
+            receipt(), schema=weak, resolver=FakeResolver()
+        )
+        self.assertEqual("FAIL_FREEZE_INTEGRITY", result["status"])
+        self.assertIn("canonical digest", result["reason"])
 
     def test_wrong_receipt_status_fails_exact_schema(self):
         r = receipt()
