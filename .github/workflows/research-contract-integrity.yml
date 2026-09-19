@@ -6,12 +6,16 @@ on:
       - "docs/working-design/**"
       - "governance/RESEARCH_CURRENTNESS.json"
       - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+      - "tools/noema_prereg_chronology_validator.py"
+      - "tests/test_prereg_chronology_validator.py"
       - ".github/workflows/research-contract-integrity.yml"
   pull_request:
     paths:
       - "docs/working-design/**"
       - "governance/RESEARCH_CURRENTNESS.json"
       - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+      - "tools/noema_prereg_chronology_validator.py"
+      - "tests/test_prereg_chronology_validator.py"
       - ".github/workflows/research-contract-integrity.yml"
 
 permissions:
@@ -68,6 +72,8 @@ jobs:
               root / "C2_C4_COMPARATOR_INTERFACE_CONTRACT.md",
               root / "IMPLEMENTATION_SOURCE_HANDOFF_AND_AUTHORITY_BOUNDARY.md",
               freeze_schema_path,
+              Path("tools/noema_prereg_chronology_validator.py"),
+              Path("tests/test_prereg_chronology_validator.py"),
           ]
           missing = [str(path) for path in required if not path.is_file()]
           if missing:
@@ -145,3 +151,6 @@ jobs:
               f"bound_artifacts={len(artifact_blobs)}"
           )
           PY
+      - name: Run preregistration chronology hostile validator suite
+        working-directory: repo
+        run: python3 -m unittest -v tests.test_prereg_chronology_validator
