@@ -43,7 +43,7 @@ def receipt():
     return {
         "schema_version": validator.SCHEMA_VERSION,
         "classification": "IP_CONFIDENTIAL",
-        "status": "FROZEN",
+        "status": "FROZEN_PROVENANCE_ONLY_NOT_EXECUTION_AUTHORITY",
         "repository": "owner/repo",
         "manifest_subject": {
             "path": "manifest.json",
@@ -85,10 +85,9 @@ def receipt():
 
 
 def schema():
-    return {
-        "$id": validator.SCHEMA_ID,
-        "properties": {"schema_version": {"const": validator.SCHEMA_VERSION}},
-    }
+    return validator.load_json(
+        ROOT / "governance" / "EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+    )
 
 
 class FakeResolver:
@@ -117,6 +116,30 @@ class FreezeChronologyHostileTests(unittest.TestCase):
         bad = schema()
         bad["$id"] = "wrong"
         result = validator.validate_freeze_receipt(receipt(), schema=bad, resolver=FakeResolver())
+        self.assertEqual("FAIL_FREEZE_INTEGRITY", result["status"])
+
+    def test_wrong_receipt_status_fails_exact_schema(self):
+        r = receipt()
+        r["status"] = "FROZEN"
+        result = validator.validate_freeze_receipt(
+            r, schema=schema(), resolver=FakeResolver()
+        )
+        self.assertEqual("FAIL_FREEZE_INTEGRITY", result["status"])
+
+    def test_false_separate_execution_authority_fails_exact_schema(self):
+        r = receipt()
+        r["separate_execution_authority_required"] = False
+        result = validator.validate_freeze_receipt(
+            r, schema=schema(), resolver=FakeResolver()
+        )
+        self.assertEqual("FAIL_FREEZE_INTEGRITY", result["status"])
+
+    def test_malformed_evidence_subject_fails_exact_schema(self):
+        r = receipt()
+        r["outcome_visibility_frontier"]["evidence_refs"][0]["sha256"] = "not-a-digest"
+        result = validator.validate_freeze_receipt(
+            r, schema=schema(), resolver=FakeResolver()
+        )
         self.assertEqual("FAIL_FREEZE_INTEGRITY", result["status"])
 
     def test_24_stale_manifest_binding_fails_closed(self):
