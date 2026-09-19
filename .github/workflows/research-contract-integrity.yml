@@ -6,12 +6,16 @@ on:
       - "docs/working-design/**"
       - "governance/RESEARCH_CURRENTNESS.json"
       - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+      - "tools/**"
+      - "tests/**"
       - ".github/workflows/research-contract-integrity.yml"
   pull_request:
     paths:
       - "docs/working-design/**"
       - "governance/RESEARCH_CURRENTNESS.json"
       - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+      - "tools/**"
+      - "tests/**"
       - ".github/workflows/research-contract-integrity.yml"
 
 permissions:
@@ -145,3 +149,6 @@ jobs:
               f"bound_artifacts={len(artifact_blobs)}"
           )
           PY
+      - name: Run preregistration chronology hostile fixtures
+        working-directory: repo
+        run: python3 -m unittest discover -s tests -v
