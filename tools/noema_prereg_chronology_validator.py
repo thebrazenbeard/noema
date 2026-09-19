@@ -11,6 +11,9 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema.exceptions import SchemaError
+
 PASS = "PASS_FROZEN_VALID"
 FAIL_SCHEMA = "FAIL_SCHEMA"
 FAIL_FREEZE = "FAIL_FREEZE_INTEGRITY"
@@ -273,6 +276,23 @@ def validate_freeze_receipt(
     repo_root = Path(repo_root)
     if not _schema_surface_valid(schema):
         return _fail(FAIL_SCHEMA, "freeze receipt governance schema malformed or replaced")
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as exc:
+        return _fail(FAIL_SCHEMA, f"freeze receipt governance schema is invalid: {exc.message}")
+
+    schema_errors = sorted(
+        Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(receipt),
+        key=lambda error: tuple(str(part) for part in error.absolute_path),
+    )
+    if schema_errors:
+        first = schema_errors[0]
+        path = ".".join(str(part) for part in first.absolute_path) or "<root>"
+        return _fail(
+            FAIL_SCHEMA,
+            f"freeze receipt Draft-2020-12 validation failed at {path}: {first.message}",
+        )
+
     if not isinstance(receipt, dict) or set(receipt) != _TOP_KEYS:
         return _fail(FAIL_SCHEMA, "freeze receipt top-level shape mismatch")
     if receipt.get("schema_version") != _SCHEMA_VERSION:

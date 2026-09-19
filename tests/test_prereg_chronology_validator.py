@@ -125,6 +125,27 @@ class ChronologyValidatorHostileTests(unittest.TestCase):
         self.assertNotEqual(v.PASS, result.result)
         self.assertIn("not yet machine-verifiable", result.reasons[0])
 
+    def test_wrong_status_is_rejected_by_real_draft_2020_12_schema(self):
+        candidate = receipt()
+        candidate["status"] = "FROZEN"
+        result = self.validate(candidate)
+        self.assertEqual(v.FAIL_SCHEMA, result.result)
+        self.assertIn("Draft-2020-12", result.reasons[0])
+
+    def test_false_execution_authority_boundary_is_rejected_by_schema(self):
+        candidate = receipt()
+        candidate["separate_execution_authority_required"] = False
+        result = self.validate(candidate)
+        self.assertEqual(v.FAIL_SCHEMA, result.result)
+        self.assertIn("Draft-2020-12", result.reasons[0])
+
+    def test_invalid_date_time_format_is_rejected_by_schema(self):
+        candidate = receipt()
+        candidate["freeze_observed_at"] = "not-a-date"
+        result = self.validate(candidate)
+        self.assertEqual(v.FAIL_SCHEMA, result.result)
+        self.assertIn("Draft-2020-12", result.reasons[0])
+
     def test_malformed_governance_schema_fails_closed(self):
         schema = copy.deepcopy(self.schema)
         schema["$id"] = "urn:hostile:replacement"
@@ -160,13 +181,15 @@ class ChronologyValidatorHostileTests(unittest.TestCase):
         candidate = receipt()
         candidate["outcome_visibility_frontier"]["status"] = "VISIBLE"
         result = self.validate(candidate)
-        self.assertEqual(v.FAIL_FREEZE, result.result)
+        self.assertEqual(v.FAIL_SCHEMA, result.result)
+        self.assertIn("Draft-2020-12", result.reasons[0])
 
     def test_started_execution_cannot_be_prospective(self):
         candidate = receipt()
         candidate["execution_frontier"]["status"] = "STARTED"
         result = self.validate(candidate)
-        self.assertEqual(v.FAIL_FREEZE, result.result)
+        self.assertEqual(v.FAIL_SCHEMA, result.result)
+        self.assertIn("Draft-2020-12", result.reasons[0])
 
     def test_external_readback_shape_alone_never_establishes_authority(self):
         candidate = receipt()

@@ -8,6 +8,7 @@ on:
       - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
       - "tools/noema_prereg_chronology_validator.py"
       - "tests/test_prereg_chronology_validator.py"
+      - "requirements-governance.txt"
       - ".github/workflows/research-contract-integrity.yml"
   pull_request:
     paths:
@@ -16,6 +17,7 @@ on:
       - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
       - "tools/noema_prereg_chronology_validator.py"
       - "tests/test_prereg_chronology_validator.py"
+      - "requirements-governance.txt"
       - ".github/workflows/research-contract-integrity.yml"
 
 permissions:
@@ -74,6 +76,7 @@ jobs:
               freeze_schema_path,
               Path("tools/noema_prereg_chronology_validator.py"),
               Path("tests/test_prereg_chronology_validator.py"),
+              Path("requirements-governance.txt"),
           ]
           missing = [str(path) for path in required if not path.is_file()]
           if missing:
@@ -151,6 +154,9 @@ jobs:
               f"bound_artifacts={len(artifact_blobs)}"
           )
           PY
+      - name: Install governance validator dependency
+        working-directory: repo
+        run: python3 -m pip install --disable-pip-version-check -r requirements-governance.txt
       - name: Run preregistration chronology hostile validator suite
         working-directory: repo
         run: python3 -m unittest -v tests.test_prereg_chronology_validator
