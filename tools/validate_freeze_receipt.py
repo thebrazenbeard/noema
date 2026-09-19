@@ -14,6 +14,7 @@ from jsonschema.exceptions import SchemaError
 SCHEMA_ID = "urn:noema:experiment-preregistration-freeze-receipt:v1"
 SCHEMA_VERSION = "NOEMA_EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_V1"
 CLAIM_CEILING = "PREREGISTRATION_CHRONOLOGY_ONLY_NOT_EXECUTION_NOT_TRAINING_NOT_RESULT_VALIDITY"
+FREEZE_SCHEMA_CANONICAL_SHA256 = "b23bf9052b5550b140d8e8ebac31c2608a1639f47d129b3121ee7959eb27c215"
 
 
 @dataclass(frozen=True)
@@ -75,6 +76,17 @@ def validate_freeze_receipt(
 ) -> dict[str, Any]:
     if schema.get("$id") != SCHEMA_ID:
         return {"status": "FAIL_FREEZE_INTEGRITY", "reason": "freeze schema identity mismatch"}
+    canonical_schema = json.dumps(
+        schema,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    if hashlib.sha256(canonical_schema).hexdigest() != FREEZE_SCHEMA_CANONICAL_SHA256:
+        return {
+            "status": "FAIL_FREEZE_INTEGRITY",
+            "reason": "freeze schema canonical digest mismatch",
+        }
     if schema.get("properties", {}).get("schema_version", {}).get("const") != SCHEMA_VERSION:
         return {"status": "FAIL_FREEZE_INTEGRITY", "reason": "freeze schema version mismatch"}
     try:
