@@ -8,6 +8,7 @@ on:
       - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
       - "tools/**"
       - "tests/**"
+      - "requirements-validation.txt"
       - ".github/workflows/research-contract-integrity.yml"
   pull_request:
     paths:
@@ -16,6 +17,7 @@ on:
       - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
       - "tools/**"
       - "tests/**"
+      - "requirements-validation.txt"
       - ".github/workflows/research-contract-integrity.yml"
 
 permissions:
@@ -149,6 +151,9 @@ jobs:
               f"bound_artifacts={len(artifact_blobs)}"
           )
           PY
+      - name: Install chronology validation dependency
+        working-directory: repo
+        run: python3 -m pip install -r requirements-validation.txt
       - name: Run preregistration chronology hostile fixtures
         working-directory: repo
         run: python3 -m unittest discover -s tests -v
