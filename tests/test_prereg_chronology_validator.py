@@ -146,6 +146,14 @@ class ChronologyValidatorHostileTests(unittest.TestCase):
         self.assertEqual(v.FAIL_SCHEMA, result.result)
         self.assertIn("Draft-2020-12", result.reasons[0])
 
+    def test_same_identity_weakened_schema_is_rejected(self):
+        schema = copy.deepcopy(self.schema)
+        schema["required"] = ["schema_version"]
+        schema["properties"]["status"] = {"type": "string"}
+        result = self.validate(receipt(), schema=schema)
+        self.assertEqual(v.FAIL_SCHEMA, result.result)
+        self.assertIn("exact binding", result.reasons[0])
+
     def test_malformed_governance_schema_fails_closed(self):
         schema = copy.deepcopy(self.schema)
         schema["$id"] = "urn:hostile:replacement"
