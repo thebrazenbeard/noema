@@ -8,6 +8,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
+from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema.exceptions import SchemaError
+
 SCHEMA_ID = "urn:noema:experiment-preregistration-freeze-receipt:v1"
 SCHEMA_VERSION = "NOEMA_EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_V1"
 CLAIM_CEILING = "PREREGISTRATION_CHRONOLOGY_ONLY_NOT_EXECUTION_NOT_TRAINING_NOT_RESULT_VALIDITY"
@@ -74,6 +77,25 @@ def validate_freeze_receipt(
         return {"status": "FAIL_FREEZE_INTEGRITY", "reason": "freeze schema identity mismatch"}
     if schema.get("properties", {}).get("schema_version", {}).get("const") != SCHEMA_VERSION:
         return {"status": "FAIL_FREEZE_INTEGRITY", "reason": "freeze schema version mismatch"}
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as exc:
+        return {
+            "status": "FAIL_FREEZE_INTEGRITY",
+            "reason": f"freeze schema invalid: {exc.message}",
+        }
+    schema_validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    schema_errors = sorted(
+        schema_validator.iter_errors(receipt),
+        key=lambda error: tuple(str(part) for part in error.absolute_path),
+    )
+    if schema_errors:
+        first = schema_errors[0]
+        path = ".".join(str(part) for part in first.absolute_path) or "<root>"
+        return {
+            "status": "FAIL_FREEZE_INTEGRITY",
+            "reason": f"freeze receipt schema violation at {path}: {first.message}",
+        }
     if receipt.get("schema_version") != SCHEMA_VERSION:
         return {"status": "FAIL_FREEZE_INTEGRITY", "reason": "receipt schema version mismatch"}
     if receipt.get("claim_ceiling") != CLAIM_CEILING:
