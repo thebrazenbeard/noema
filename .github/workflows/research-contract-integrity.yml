@@ -151,7 +151,7 @@ jobs:
           PY
       - name: Install chronology validation dependency
         working-directory: repo
-        run: python3 -m pip install "jsonschema>=4.23,<5"
+        run: python3 -m pip install -r requirements-validation.txt
       - name: Run preregistration chronology hostile fixtures
         working-directory: repo
         run: python3 -m unittest discover -s tests -v
