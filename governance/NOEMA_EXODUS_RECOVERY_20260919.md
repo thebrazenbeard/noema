@@ -165,7 +165,8 @@ PR #43 — `Chronology gate: make exact-schema hostile suite executable-green`
   - `35482812287` (push): failure before runner admission, `runner_id=0`, zero steps
 - hosted classification: **NO_EXECUTABLE_EVIDENCE / SOURCE_UNDETERMINED BY HOSTED RUNNER**
 - local qualification: **EXECUTABLE-GREEN AT LOCAL NON-LEARNING SOURCE/TEST SCOPE**
-- independent exact-head hostile review after the repair is still desirable before any stronger source-qualification claim.
+- retiring-terminal fresh hostile rereview: GitHub review `5259008540`, isolated Python 3.12.10 + `jsonschema[format]==4.26.0`, **14/14 PASS**, py_compile PASS, parent-to-head diff-check PASS; no new bounded source bypass found.
+- that retiring-terminal rereview is **not organizationally independent qualification**; a truly independent exact-head review remains desirable before any stronger source-qualification claim.
 
 ## 5. Current chronology claim ceiling
 
@@ -297,7 +298,10 @@ Fresh issue/PR timeline evidence confirms ProjectV2 lifecycle activity for curre
 - PR #35: equivalent lifecycle events on 2026-09-14;
 - PR #36: equivalent lifecycle events on 2026-09-18;
 - PR #39: equivalent lifecycle events on 2026-09-19;
-- PR #42: equivalent lifecycle events on 2026-09-19.
+- PR #42: equivalent lifecycle events on 2026-09-19;
+- PR #43: equivalent lifecycle events on 2026-09-19/20 UTC;
+- PR #44: equivalent lifecycle events on 2026-09-19/20 UTC;
+- duplicate PR #45: equivalent lifecycle events, then closed unmerged as superseded provenance; the Project automation recorded a later status change after closure.
 
 This proves ProjectV2 attachment/activity only. It does **not** prove the Project title, item IDs, field schema, or current field/status values.
 
