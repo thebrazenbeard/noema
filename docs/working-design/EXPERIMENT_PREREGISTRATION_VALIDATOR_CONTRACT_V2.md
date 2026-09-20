@@ -8,6 +8,7 @@ Date: 2026-09-13
 
 Validates:
 - `EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json`
+- `../../governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json` for chronology/freeze receipts
 
 Normative companion addenda:
 - `EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_SOURCE_BINDING_ADDENDUM.md`
@@ -367,6 +368,36 @@ The later immutable freeze receipt must bind at least:
 - logical experiment ID;
 - freeze timestamp.
 
+The receipt schema itself is part of the active integrity surface and must be parsed and identity-checked by CI. Deleting, corrupting, or silently replacing that governance schema is a contract-integrity failure.
+
+### V13.1a — typed chronology evidence subjects
+
+A free-form evidence locator is not sufficient to establish prospective chronology.
+
+Every evidence subject used by the outcome-visibility frontier, execution frontier, inventory owner, or authoritative surface receipt must be one of the exact receipt-schema evidence subject types and must bind:
+
+- immutable subject identity;
+- exact manifest commit;
+- logical experiment ID;
+- observation time;
+- coverage cutoff;
+- content/result digest;
+- for Git evidence: repository + commit + path + Git blob + SHA-256;
+- for external readback: provider + surface + observation identifier + result digest.
+
+The validator must independently resolve/verify those bindings. Shape-valid or self-asserted identifiers are not authority.
+
+For `PROSPECTIVE_CONFIRMED`, the validator must additionally establish all of the following:
+
+1. every authoritative result/execution visibility surface is represented by the frozen inventory;
+2. every required surface is `COMPLETE`;
+3. each evidence subject binds the exact frozen manifest subject and experiment ID;
+4. each authoritative evidence cut covers at least through `freeze_observed_at`;
+5. the underlying immutable/readback evidence contains no qualifying scored outcome or execution event at or before `freeze_observed_at`;
+6. unavailable, unauthorized, partial, stale, digest-mismatched, manifest-mismatched, or non-authoritative evidence returns `BLOCKED_UNAVAILABLE_EVIDENCE` or `FAIL_FREEZE_INTEGRITY`, never PASS.
+
+Observation timestamps alone do not prove causal ordering. A later readback may establish an earlier historical frontier only when the authoritative source is itself immutable/append-only enough to prove the covered history. Otherwise chronology remains `UNPROVEN`.
+
 ### V13.2 — mutation creates a new subject
 
 Any change after freeze to source, information boundary, world/randomization/schedule, lineage/transfer policy, resources, support/audition policy, scoring, controls, stopping rule, or acceptance criteria creates a new subject.
@@ -419,9 +450,14 @@ A future validator must reject or block at least:
 19. restart-equivalence claim with incomplete causal state;
 20. changed stopping/acceptance rule after freeze;
 21. a structurally valid manifest with no real immutable implementation subject;
-22. a `PASS_FROZEN_VALID` manifest presented without separate execution authority.
+22. a `PASS_FROZEN_VALID` manifest presented without separate execution authority;
+23. a malformed or missing freeze-receipt governance schema;
+24. a chronology evidence subject whose manifest commit or logical experiment ID is stale/mismatched;
+25. a `PROSPECTIVE_CONFIRMED` receipt with any partial/unavailable/unauthorized inventory surface;
+26. a chronology evidence cut that does not cover through `freeze_observed_at`;
+27. authoritative evidence showing a scored result or execution event at or before the claimed freeze.
 
-For test 22 the validator result may remain PASS while the runner must still block execution.
+For test 22 the validator result may remain PASS while the runner must still block execution. Tests 23–27 must fail closed at the integrity/freeze boundary.
 
 ## 19. Exact next frontier
 

@@ -1,0 +1,35 @@
+{
+  "schema_id": "NOEMA_RESEARCH_CURRENTNESS_V1",
+  "canonical_repository": "thebrazenbeard/noema",
+  "canonical_branch": "main",
+  "canonical_commit_observed": "890efdca01cf496ce1b8686d86f8442a149a9d34",
+  "active_research_pull_request": 32,
+  "active_research_branch": "work/noema-representation-drift-scope-20260906",
+  "reviewed_research_subject": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "remediation_parent_subject": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "research_status": "RESEARCH_CONTRACT_AND_HANDOFF_BOUNDARY_READY_BASE_SUBJECT",
+  "authority_ceiling": "RESEARCH_DESIGN_ONLY_NO_I0_I1_E0_P0_AUTHORITY",
+  "superseded_or_provenance_only_pull_requests": [
+    33,
+    34
+  ],
+  "promotion_rule": "Every review or PASS binds an exact immutable subject. Any head movement requires fresh review. Research/design PASS grants no implementation, deterministic source verification, learning/experiment execution, protected effect, merge, deployment, publication, provider mutation, or credential authority.",
+  "staleness_rule": "The record is current only when fresh remote readback shows main == canonical_commit_observed, the active research branch == reviewed_research_subject, and every required research artifact at that reviewed subject has the recorded Git blob. Any mismatch makes the record historical until refreshed and re-reviewed.",
+  "source_of_truth": "Fresh GitHub source readback outranks this snapshot.",
+  "currentness_verification": {
+    "required": true,
+    "canonical_branch_ref": "refs/heads/main",
+    "active_research_branch_ref": "refs/heads/work/noema-representation-drift-scope-20260906",
+    "require_remote_ref_equality": true,
+    "required_artifact_git_blobs": {
+      "docs/working-design/EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json": "cda8446b473ccb38ef2424ad8f68e9aee4d41b47",
+      "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md": "deac889fc6c377ebe1490b23d952439885d6bd2a",
+      "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_SOURCE_BINDING_ADDENDUM.md": "44e6c12ee90cc80f6ec7b3b9a7947e48cb27896b",
+      "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_RESOURCE_ADDENDUM.md": "e7bde812596308c8eff9cf687b56514e0020c24b",
+      "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_DECIDABILITY_ADDENDUM.md": "f8761541e2f2848db87f80e1eda687f297360c54",
+      "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md": "725bfcd4dbd14f7bb505cb95e4f9f93b763c3ee6",
+      "docs/working-design/C2_C4_COMPARATOR_INTERFACE_CONTRACT.md": "0e9e5dcedfee242ab8920fcc16075cb674f9aa40",
+      "docs/working-design/IMPLEMENTATION_SOURCE_HANDOFF_AND_AUTHORITY_BOUNDARY.md": "606293cdb11b18fe7947a20ac3516bef0034430e"
+    }
+  }
+}

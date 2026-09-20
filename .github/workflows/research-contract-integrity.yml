@@ -1,0 +1,162 @@
+name: Noema Research Contract Integrity
+
+on:
+  push:
+    paths:
+      - "docs/working-design/**"
+      - "governance/RESEARCH_CURRENTNESS.json"
+      - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+      - "tools/noema_prereg_chronology_validator.py"
+      - "tests/test_prereg_chronology_validator.py"
+      - "requirements-governance.txt"
+      - ".github/workflows/research-contract-integrity.yml"
+  pull_request:
+    paths:
+      - "docs/working-design/**"
+      - "governance/RESEARCH_CURRENTNESS.json"
+      - "governance/EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+      - "tools/noema_prereg_chronology_validator.py"
+      - "tests/test_prereg_chronology_validator.py"
+      - "requirements-governance.txt"
+      - ".github/workflows/research-contract-integrity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone exact workflow subject
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          git clone --no-checkout "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git" repo
+          cd repo
+          git checkout --detach "${COMMIT_SHA}"
+      - name: Validate research JSON and required V2 surface
+        working-directory: repo
+        run: |
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          root = Path("docs/working-design")
+          json_files = sorted(root.glob("*.json"))
+          if not json_files:
+              raise SystemExit("no working-design JSON artifacts found")
+
+          for path in json_files:
+              with path.open("r", encoding="utf-8") as fh:
+                  json.load(fh)
+
+          governance_root = Path("governance")
+          freeze_schema_path = governance_root / "EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_SCHEMA_V1.json"
+          with freeze_schema_path.open("r", encoding="utf-8") as fh:
+              freeze_schema = json.load(fh)
+          if freeze_schema.get("$id") != "urn:noema:experiment-preregistration-freeze-receipt:v1":
+              raise SystemExit("unexpected preregistration freeze receipt schema id")
+          if freeze_schema.get("properties", {}).get("schema_version", {}).get("const") != "NOEMA_EXPERIMENT_PREREGISTRATION_FREEZE_RECEIPT_V1":
+              raise SystemExit("unexpected preregistration freeze receipt schema version")
+          if freeze_schema.get("properties", {}).get("claim_ceiling", {}).get("const") != "PREREGISTRATION_CHRONOLOGY_ONLY_NOT_EXECUTION_NOT_TRAINING_NOT_RESULT_VALIDITY":
+              raise SystemExit("freeze receipt claim ceiling is not fail-closed")
+
+          required = [
+              root / "EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_SOURCE_BINDING_ADDENDUM.md",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_RESOURCE_ADDENDUM.md",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_DECIDABILITY_ADDENDUM.md",
+              root / "EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md",
+              root / "C2_C4_COMPARATOR_INTERFACE_CONTRACT.md",
+              root / "IMPLEMENTATION_SOURCE_HANDOFF_AND_AUTHORITY_BOUNDARY.md",
+              freeze_schema_path,
+              Path("tools/noema_prereg_chronology_validator.py"),
+              Path("tests/test_prereg_chronology_validator.py"),
+              Path("requirements-governance.txt"),
+          ]
+          missing = [str(path) for path in required if not path.is_file()]
+          if missing:
+              raise SystemExit("missing required active research artifacts: " + ", ".join(missing))
+
+          with Path("governance/RESEARCH_CURRENTNESS.json").open("r", encoding="utf-8") as fh:
+              currentness = json.load(fh)
+          if currentness.get("schema_id") != "NOEMA_RESEARCH_CURRENTNESS_V1":
+              raise SystemExit("unexpected currentness schema")
+          if currentness.get("authority_ceiling") != "RESEARCH_DESIGN_ONLY_NO_I0_I1_E0_P0_AUTHORITY":
+              raise SystemExit("research authority ceiling is not fail-closed")
+
+          verification = currentness.get("currentness_verification")
+          if not isinstance(verification, dict) or verification.get("required") is not True:
+              raise SystemExit("research currentness exact-ref verification is not required")
+
+          def remote_head(ref: str) -> str:
+              completed = subprocess.run(
+                  ["git", "ls-remote", "--exit-code", "origin", ref],
+                  check=True,
+                  capture_output=True,
+                  text=True,
+              )
+              lines = [line for line in completed.stdout.splitlines() if line.strip()]
+              if len(lines) != 1:
+                  raise SystemExit(f"expected exactly one remote ref result for {ref}")
+              sha, observed_ref = lines[0].split("\t", 1)
+              if observed_ref != ref or len(sha) != 40:
+                  raise SystemExit(f"invalid remote ref readback for {ref}")
+              return sha
+
+          canonical_ref = verification.get("canonical_branch_ref")
+          research_ref = verification.get("active_research_branch_ref")
+          if not isinstance(canonical_ref, str) or not isinstance(research_ref, str):
+              raise SystemExit("currentness refs must be explicit strings")
+
+          observed_main = remote_head(canonical_ref)
+          expected_main = currentness.get("canonical_commit_observed")
+          if observed_main != expected_main:
+              raise SystemExit(
+                  f"canonical main moved: observed={observed_main} expected={expected_main}"
+              )
+
+          observed_research = remote_head(research_ref)
+          reviewed_subject = currentness.get("reviewed_research_subject")
+          if observed_research != reviewed_subject:
+              raise SystemExit(
+                  "active research branch moved: "
+                  f"observed={observed_research} reviewed={reviewed_subject}"
+              )
+
+          artifact_blobs = verification.get("required_artifact_git_blobs")
+          if not isinstance(artifact_blobs, dict) or not artifact_blobs:
+              raise SystemExit("required artifact blob bindings are absent")
+
+          for artifact_path, expected_blob in artifact_blobs.items():
+              if not isinstance(artifact_path, str) or not isinstance(expected_blob, str):
+                  raise SystemExit("artifact binding must be path -> git blob")
+              completed = subprocess.run(
+                  ["git", "rev-parse", f"{reviewed_subject}:{artifact_path}"],
+                  check=True,
+                  capture_output=True,
+                  text=True,
+              )
+              observed_blob = completed.stdout.strip()
+              if observed_blob != expected_blob:
+                  raise SystemExit(
+                      f"artifact blob mismatch for {artifact_path}: "
+                      f"observed={observed_blob} expected={expected_blob}"
+                  )
+
+          print(
+              f"validated {len(json_files)} working-design JSON artifacts; "
+              f"main={observed_main}; research={observed_research}; "
+              f"bound_artifacts={len(artifact_blobs)}"
+          )
+          PY
+      - name: Install governance validator dependency
+        working-directory: repo
+        run: python3 -m pip install --disable-pip-version-check -r requirements-governance.txt
+      - name: Run preregistration chronology hostile validator suite
+        working-directory: repo
+        run: python3 -m unittest -v tests.test_prereg_chronology_validator
