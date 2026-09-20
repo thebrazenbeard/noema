@@ -286,3 +286,68 @@ Noema project-hub Exodus refresh:
 The Bus commit also refreshes the project README and mirrors PRs #35, #42, #43, and #44.
 
 Fresh runtimes should use the source checkpoint and this Bus handoff together, then refresh all mutable heads before acting.
+
+
+## 12. GitHub ProjectV2 observability at evacuation
+
+Noema repository metadata reports `has_projects=true`.
+
+Fresh issue/PR timeline evidence confirms ProjectV2 lifecycle activity for current Noema work:
+- PR #32: `added_to_project_v2` and automated `project_v2_item_status_changed` on 2026-09-10;
+- PR #35: equivalent lifecycle events on 2026-09-14;
+- PR #36: equivalent lifecycle events on 2026-09-18;
+- PR #39: equivalent lifecycle events on 2026-09-19;
+- PR #42: equivalent lifecycle events on 2026-09-19.
+
+This proves ProjectV2 attachment/activity only. It does **not** prove the Project title, item IDs, field schema, or current field/status values.
+
+The retiring terminal explicitly attempted the authenticated GitHub GraphQL `viewer.projectsV2` route through the local `gh` client. GitHub returned `INSUFFICIENT_SCOPES`: the token exposes `gist, read:org, repo, workflow` but lacks `read:project`.
+
+The ChatGPT GitHub connector exposes several GraphQL-backed PR operations but no generic ProjectV2 query/mutation surface.
+
+Therefore at evacuation:
+- `PROJECTV2_ATTACHMENT = EVIDENCED`
+- `PROJECTV2_BOARD_FIELDS_CURRENTNESS = UNREADABLE_FROM_THIS_TERMINAL`
+
+No token refresh, permission change, Project Settings mutation, or other scope elevation was attempted because Exodus does not authorize permission mutation.
+
+A future terminal with lawful `read:project` access should fresh-read the actual ProjectV2 board before treating board fields as current operational state.
+
+## 13. Frozen Noema BT2 R1 dechatification
+
+The frozen R1 qualification subject remains immutable historical evidence:
+
+- `main@fc8fabe6a970f22a8215fd977e007dde88c08ab9`
+- PR #27 subject `25754a1268233f5b0af4846e7bcaca97b799e5b9`
+- PR #28 subject `1a096ee9a4c84c0cd2906539c603bc4e2cbbcc38`
+- PR #29 subject `969bd227b6cdb9a806563e5c8bb62859e353ccfa`
+
+Latest durable board state remains **8/10 LOCKED, all eight locked verdicts FAIL, with Eight and Thirteen outstanding**.
+
+Fresh evacuation readback found no Noema R1 blind-first-pass return on:
+- `bus/eight-v1@0373593c0af0fad35f7546a3f7c410258aa8a025`;
+- `bus/eight-v2@747b110706e3d6b3315160ed6e7dc91d3a2603e8` (this lane contains a later Noema PR #35 currentness opinion, not the R1 return);
+- `bus/thirteen-v1@f420821fca864709cddf499e0645b0dafb819ec1`;
+- `bus/thirteen-v2@e4893012180146d0e3a6c30ce75cdde6708220f0`.
+
+Historical activation logistics treated individual facet chats as the human activation mechanism. That operational dependency is superseded by the Exodus architecture:
+
+> Eight and Thirteen are logical BT2 review roles, not permanent ChatGPT conversations. BT2 Coordinator may instantiate each role in any ephemeral execution terminal from the frozen R1 subject, durable facet assignment, and Bus return route.
+
+Durable facet assignments from One's activation replay remain:
+- **Eight:** evidence / provenance / tradeoff sufficiency;
+- **Thirteen:** premise attack / authority-correction dissent / human consequence.
+
+Required return shape remains:
+- `PASS` / `FAIL` / `BLOCKED`;
+- HIGH / MEDIUM / LOW architecture-critical findings;
+- circular, unfalsifiable, representation-prejudiced, or evaluator-subsidized requirements;
+- missing computational responsibilities;
+- weakest simpler rival;
+- evidence that would falsify the objection;
+- explicit blindness/contamination statement;
+- exact frozen refs reviewed.
+
+Blindness rule remains binding: do not expose substantive peer findings before a facet's first pass is locked. If prior substantive exposure occurred, record contamination rather than claiming blindness.
+
+This closes the last Noema-specific permanent-chat dependency found by the evacuation audit. Completing the R1 board requires execution work, not restoration of a worker chat.
