@@ -271,3 +271,18 @@ Durable restore directive:
 `BT2_COORDINATOR::NOEMA::RESTORE_FROM_GIT_AND_BUS::NOEMA_EXODUS_RECOVERY_20260919`
 
 The directive means: fresh-read the exact repository and Bus objects named above, instantiate temporary workers as needed, and proceed from current durable evidence. It does **not** name or require a successor ChatGPT conversation.
+
+## 11. Durable Bus recovery binding
+
+Noema project-hub Exodus refresh:
+- repository: `thebrazenbeard/chat-communication-bus`
+- branch: `project/noema-v1`
+- commit: `89bf79fe8a853bf5c4b8b74ecab428aed098588a`
+- refreshed currentness path: `projects/noema/CURRENTNESS.json`
+- refreshed currentness Git blob: `9e43207feb6424e26c76225c6a15d7f412896358`
+- recovery handoff path: `projects/noema/messages/20260919T2204-noema-exodus-recovery.md`
+- recovery handoff Git blob: `60408c25cfbeff74d98cbd59504c85cf7b0195b8`
+
+The Bus commit also refreshes the project README and mirrors PRs #35, #42, #43, and #44.
+
+Fresh runtimes should use the source checkpoint and this Bus handoff together, then refresh all mutable heads before acting.
