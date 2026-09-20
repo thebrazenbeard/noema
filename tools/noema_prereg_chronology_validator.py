@@ -244,8 +244,6 @@ def validate_freeze_receipt(
     repo_root: str | Path,
 ) -> Validation:
     repo_root = Path(repo_root)
-    if not _schema_surface_valid(schema):
-        return _fail(FAIL_SCHEMA, "freeze receipt governance schema malformed or replaced")
     canonical_schema = json.dumps(
         schema,
         sort_keys=True,
@@ -254,6 +252,8 @@ def validate_freeze_receipt(
     ).encode("utf-8")
     if hashlib.sha256(canonical_schema).hexdigest() != _FREEZE_SCHEMA_CANONICAL_SHA256:
         return _fail(FAIL_SCHEMA, "freeze receipt governance schema exact binding mismatch")
+    if not _schema_surface_valid(schema):
+        return _fail(FAIL_SCHEMA, "freeze receipt governance schema malformed or replaced")
     try:
         Draft202012Validator.check_schema(schema)
     except SchemaError as exc:
