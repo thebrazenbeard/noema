@@ -1,0 +1,142 @@
+{
+  "schema_id": "NOEMA_SVF0_FREEZE_RECEIPT_V2",
+  "classification": "IP_CONFIDENTIAL",
+  "status": "FROZEN_PREREGISTRATION_NO_EXECUTION_AUTHORITY",
+  "freeze_time": "2026-09-18T16:53:58-04:00",
+  "logical_experiment_id": "NOEMA_SVF0_RECURRENT_GATE1_V2",
+  "repository": "thebrazenbeard/noema",
+  "supersedes": {
+    "manifest": {
+      "path": "implementation/svf0/SVF0_PREREGISTRATION_V2.json",
+      "commit": "33f08d7ceb30e0f9cb5c445a27c67f7a8c90af9b",
+      "git_blob": "005157c2c7a3840dc33a80e84ac79411d2695bff"
+    },
+    "freeze_receipt": {
+      "path": "implementation/svf0/SVF0_FREEZE_RECEIPT_V1.json",
+      "commit": "cc60f91cf265ae7d5cfc5d2afc1e4fd2f595732c"
+    },
+    "reason": "Resident-memory resource accounting was corrected from Python allocation peak to real process peak resident set / peak working set; the resource envelope was refrozen accordingly."
+  },
+  "manifest": {
+    "path": "implementation/svf0/SVF0_PREREGISTRATION_V2_R2.json",
+    "commit": "7fd2f0eac73759efbad856c9ace7cc50b42f192c",
+    "git_blob": "593fc355dfa8d610b8923891850a8dc65607865d",
+    "schema_version": "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V2"
+  },
+  "research_subject": {
+    "commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+    "normative_artifacts": [
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_MANIFEST_SCHEMA_V2.json",
+        "git_blob": "cda8446b473ccb38ef2424ad8f68e9aee4d41b47"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_CONTRACT_V2.md",
+        "git_blob": "deac889fc6c377ebe1490b23d952439885d6bd2a"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_SOURCE_BINDING_ADDENDUM.md",
+        "git_blob": "44e6c12ee90cc80f6ec7b3b9a7947e48cb27896b"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_RESOURCE_ADDENDUM.md",
+        "git_blob": "e7bde812596308c8eff9cf687b56514e0020c24b"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_DECIDABILITY_ADDENDUM.md",
+        "git_blob": "f8761541e2f2848db87f80e1eda687f297360c54"
+      },
+      {
+        "path": "docs/working-design/EXPERIMENT_PREREGISTRATION_VALIDATOR_V2_COMPARATOR_MATRIX_ADDENDUM.md",
+        "git_blob": "725bfcd4dbd14f7bb505cb95e4f9f93b763c3ee6"
+      },
+      {
+        "path": "docs/working-design/C0_C4_FAIR_COMPARISON_AND_CLAIM_BOUNDARY_MATRIX.md",
+        "git_blob": "eed4c71d9d342ab93b61c75dba0a9578c4b062d8"
+      },
+      {
+        "path": "docs/working-design/C2_C4_COMPARATOR_INTERFACE_CONTRACT.md",
+        "git_blob": "0e9e5dcedfee242ab8920fcc16075cb674f9aa40"
+      }
+    ]
+  },
+  "implementation_subject": {
+    "source_commit": "8460f5e279c0178d6305e115cbb5ddcb29bebf03",
+    "manifest": {
+      "path": "implementation/NOEMA_MINIMAL_SUBJECT_V1.json",
+      "commit": "d4796cbfbe8c88e026b000baf8563c6afd861a70",
+      "git_blob": "80b9f50b4dc13ac8855e8cdc5e9f0a56289afcc0"
+    },
+    "i1_receipt": {
+      "path": "implementation/NOEMA_MINIMAL_SOURCE_I1_VERIFICATION_RECEIPT.md",
+      "commit": "1c9d5dc7b35e126222d9c62c1041a4bee9146599"
+    }
+  },
+  "support_subject": {
+    "commit": "d44bfb26764571aaf8ff8f3d156d3a449f65f120",
+    "support_bundle": {
+      "path": "implementation/svf0/SUPPORT_BUNDLE_V3.json",
+      "git_blob": "eb0d769ac842872be05b6a3f1997859096df889e"
+    },
+    "resource_measurement": {
+      "path": "implementation/svf0/RESOURCE_MEASUREMENT_CONTRACT_V3.json",
+      "git_blob": "251a9f0c4c5cd9b142324614e596c4d59cda259e"
+    },
+    "lineage_state_scope": {
+      "path": "implementation/svf0/STATE_SCOPE_MANIFEST_V3.json",
+      "git_blob": "8c26aa74ed320aa3891ae27fd435fe6f05605fa7"
+    },
+    "scoring_decisions": {
+      "path": "implementation/svf0/SCORING_AND_DECISION_RULES_V3.json",
+      "git_blob": "320d3ea0bfe934d8fa1ce48bdb930c47e32ad142"
+    },
+    "negative_control": {
+      "path": "implementation/svf0/NEGATIVE_CONTROL_SPEC_V3.json",
+      "git_blob": "0ec1e235d5e08aca257cff697e2df43813ad3ad2"
+    }
+  },
+  "commitments": {
+    "parameter_distribution_sha256": "8a171d2262b4a939757344115ec08283c51fc7aed5f2100d0693865633673723",
+    "seed_manifest_sha256": "f68ee0307f9a7e9d735a0893c0c7c65bda938682e9d668bdd6bf5ccb2818dd5b"
+  },
+  "qualification_evidence": {
+    "canonical_schema_validation": {
+      "status": "PASS",
+      "schema_git_blob": "cda8446b473ccb38ef2424ad8f68e9aee4d41b47",
+      "manifest_git_blob": "593fc355dfa8d610b8923891850a8dc65607865d",
+      "errors": []
+    },
+    "independent_semantic_mirror": {
+      "status": "PASS",
+      "findings": []
+    },
+    "source_i1": {
+      "status": "COMPOSITE_PASS",
+      "deterministic_tests_present": 69,
+      "known_failures": 0,
+      "clean_private_repo_checkout": "UNAVAILABLE_IN_LOCAL_SANDBOX"
+    },
+    "implementation_validator_exact_manifest_execution": {
+      "status": "NOT_EXECUTED_IN_THIS_RUNTIME",
+      "reason": "The local sandbox cannot obtain a clean authenticated checkout of the private repository; hosted CI/paid compute was not used."
+    }
+  },
+  "resource_correction": {
+    "resident_axis": "real process peak resident set / peak working set",
+    "python_allocation_peak": "diagnostic only",
+    "fixed_resident_ceiling_bytes": 268435456,
+    "missing_measurement": "INVALIDATE_FIXED_ENVELOPE_POINT",
+    "over_budget": "INVALIDATE_FIXED_ENVELOPE_POINT"
+  },
+  "authority": {
+    "i0_implementation_source": "AUTHORIZED",
+    "i1_deterministic_non_learning_verification": "AUTHORIZED",
+    "e0_learning_training_experiment_execution": "NOT_AUTHORIZED",
+    "p0_protected_effects": "NOT_AUTHORIZED",
+    "merge": "NOT_AUTHORIZED",
+    "deployment": "NOT_AUTHORIZED",
+    "publication": "NOT_AUTHORIZED",
+    "paid_or_hosted_compute": "NOT_AUTHORIZED"
+  },
+  "mutation_rule": "Any change to the R2 manifest, bound research artifacts, corrected implementation source subject, support V3 artifacts, resource meter, lineage state scope, scoring decisions, parameter commitment, or seed commitment creates a new preregistration subject and requires a new freeze receipt."
+}

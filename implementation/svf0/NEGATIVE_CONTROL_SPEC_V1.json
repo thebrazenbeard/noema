@@ -1,0 +1,17 @@
+{
+  "schema_id": "NOEMA_SVF0_NEGATIVE_CONTROL_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "generator": "src/noema/svf0.py::svf0_negative_control_point",
+  "world": {
+    "coefficient": 0.4,
+    "stable_coefficient": -0.2,
+    "noise_half_width": 0.05,
+    "max_events": 128
+  },
+  "purpose": "Detect replay advantage claims that persist when no preregistered regime change exists.",
+  "derived_variable": {
+    "negative_control_mean_nll_delta": "mean_nll_C1_minus_mean_nll_C2"
+  },
+  "acceptance_rule": "expr:negative_control_mean_nll_delta<=0.02"
+}

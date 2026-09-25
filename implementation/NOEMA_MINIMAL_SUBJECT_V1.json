@@ -1,0 +1,82 @@
+{
+  "schema": "NOEMA_IMPLEMENTATION_SUBJECT_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "research_parent_commit": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "source_commit": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
+  "source_paths": [
+    "src/noema/__init__.py",
+    "src/noema/provenance.py",
+    "src/noema/boundary.py",
+    "src/noema/candidates.py",
+    "src/noema/accounting.py",
+    "src/noema/comparator.py",
+    "src/noema/validator.py",
+    "src/noema/svf0.py",
+    "implementation/svf0/RECURRENT_BASE_CONFIG_V1.json",
+    "implementation/svf0/REPLAY_CONFIG_V1.json",
+    "implementation/svf0/RESET_REFERENCE_CONFIG_V1.json",
+    "implementation/svf0/EXECUTION_POLICY_V1.json",
+    "src/noema/svf0_runner.py",
+    "src/noema/svf0_statistics.py",
+    "src/noema/svf0_experiment.py",
+    "implementation/svf0/EXECUTION_POLICY_V2.json",
+    "src/noema/svf0_evaluator.py",
+    "implementation/svf0/EXECUTION_POLICY_V3.json",
+    "implementation/svf0/EXECUTION_POLICY_V4.json"
+  ],
+  "test_paths": [
+    "tests/test_package_boundary.py",
+    "tests/test_provenance.py",
+    "tests/test_boundary.py",
+    "tests/test_c1_c2.py",
+    "tests/test_c4.py",
+    "tests/test_accounting_comparator.py",
+    "tests/test_validator.py",
+    "tests/test_hostile_contracts.py",
+    "tests/test_svf0.py",
+    "tests/test_recurrent_c1_c2.py",
+    "tests/test_svf0_runner.py",
+    "tests/test_svf0_statistics.py",
+    "tests/test_svf0_experiment.py",
+    "tests/test_svf0_evaluator.py"
+  ],
+  "instrumentation_paths": [
+    "src/noema/accounting.py",
+    "src/noema/comparator.py",
+    "src/noema/validator.py"
+  ],
+  "runtime": {
+    "python": "3.13.5",
+    "jsonschema": "4.26.0",
+    "pytest": "9.0.2"
+  },
+  "authority": {
+    "i0_source_authorized": true,
+    "i1_deterministic_verification_authorized": true,
+    "training_executed": false,
+    "experiment_executed": false,
+    "hosted_compute_used": false,
+    "merge_authorized": false,
+    "deployment_authorized": false,
+    "publication_authorized": false
+  },
+  "verification": {
+    "verified_at": "2026-09-18",
+    "mode": "EXACT_I1_FULL_SUITE_WINDOWS_PYTHON_3_13_5",
+    "deterministic_tests_present": 103,
+    "deterministic_tests_executed": 103,
+    "deterministic_tests_passed": 103,
+    "known_failures": 0,
+    "exact_worktree_commit": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
+    "exact_worktree_clean": true,
+    "runtime": {
+      "platform": "Windows",
+      "python": "3.13.5",
+      "jsonschema": "4.26.0",
+      "pytest": "9.0.2"
+    },
+    "windows_resident_memory_abi": "EXPLICIT_64_BIT_HANDLE_DWORD_BOOL_SIGNATURES",
+    "e0_valid_path_executed": false,
+    "hosted_or_paid_compute_used": false
+  }
+}

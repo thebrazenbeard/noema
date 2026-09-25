@@ -1,0 +1,23 @@
+{
+  "schema_id": "NOEMA_SVF0_SUPPORT_BUNDLE_V3",
+  "classification": "IP_CONFIDENTIAL",
+  "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V2",
+  "research_parent": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "implementation_source_commit": "8460f5e279c0178d6305e115cbb5ddcb29bebf03",
+  "files": [
+    "implementation/svf0/LEARNER_VISIBLE_SCHEMA_V1.json",
+    "implementation/svf0/EVALUATOR_ONLY_SCHEMA_V1.json",
+    "implementation/svf0/SEED_MANIFEST_V1.json",
+    "implementation/svf0/RECURRENT_BASE_CONFIG_V1.json",
+    "implementation/svf0/REPLAY_CONFIG_V1.json",
+    "implementation/svf0/RESET_REFERENCE_CONFIG_V1.json",
+    "implementation/svf0/EXECUTION_POLICY_V1.json",
+    "implementation/svf0/PARAMETER_DISTRIBUTION_V3.json",
+    "implementation/svf0/STATE_SCOPE_MANIFEST_V3.json",
+    "implementation/svf0/RESOURCE_MEASUREMENT_CONTRACT_V3.json",
+    "implementation/svf0/NEGATIVE_CONTROL_SPEC_V3.json",
+    "implementation/svf0/SCORING_AND_DECISION_RULES_V3.json"
+  ],
+  "supersedes_support_bundle": "implementation/svf0/SUPPORT_BUNDLE_V2.json",
+  "execution_authority": false
+}

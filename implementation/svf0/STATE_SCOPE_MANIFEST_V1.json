@@ -1,0 +1,41 @@
+{
+  "schema_id": "NOEMA_SVF0_STATE_SCOPE_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "cross_world_transfer_used": false,
+  "within_world": {
+    "C1": [
+      "GaussianState.mean",
+      "GaussianState.variance",
+      "GaussianState.count"
+    ],
+    "C2": [
+      "GaussianState.mean",
+      "GaussianState.variance",
+      "GaussianState.count",
+      "ReplayBuffer.items",
+      "ReplayBuffer.capacity"
+    ],
+    "RESET_REFERENCE": []
+  },
+  "between_worlds": {
+    "C1": "RESET_TO_FROZEN_INITIAL_STATE",
+    "C2": "RESET_TO_FROZEN_INITIAL_STATE",
+    "RESET_REFERENCE": "RESET_TO_FROZEN_INITIAL_STATE"
+  },
+  "initial_state": {
+    "mean": [
+      0,
+      0,
+      0
+    ],
+    "variance": [
+      1,
+      1,
+      1
+    ],
+    "count": 0,
+    "replay_items": [],
+    "replay_capacity": 32
+  },
+  "evaluator_lineage_ids_learner_visible": false
+}

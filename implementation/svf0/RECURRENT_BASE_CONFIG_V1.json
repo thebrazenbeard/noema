@@ -1,0 +1,15 @@
+{
+  "schema_id": "NOEMA_SVF0_RECURRENT_BASE_CONFIG_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "state_type": "RecurrentGaussianState",
+  "prediction": "predict_recurrent",
+  "update": "transition_recurrent",
+  "dimension": 3,
+  "initial_variance": 1,
+  "learning_rate": 0.1,
+  "variance_alpha": 0.05,
+  "variance_floor": 0.0025,
+  "context": "previous learner-visible observation only",
+  "semantic_labels": false
+}

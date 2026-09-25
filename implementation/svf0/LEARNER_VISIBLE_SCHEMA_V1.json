@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:noema:svf0:learner-visible:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "step",
+    "channels",
+    "intervention"
+  ],
+  "properties": {
+    "step": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "channels": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "number"
+      }
+    },
+    "intervention": {
+      "type": "null"
+    }
+  }
+}
