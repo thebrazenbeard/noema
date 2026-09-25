@@ -1,0 +1,43 @@
+{
+  "schema_id": "NOEMA_SVF0_SUPPORT_BUNDLE_V6",
+  "classification": "IP_CONFIDENTIAL",
+  "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V5",
+  "research_parent": "be8eeb9a5f71e992180f3b3272ca5a0b80d8fc33",
+  "implementation_source_commit": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
+  "files": [
+    "implementation/svf0/LEARNER_VISIBLE_SCHEMA_V1.json",
+    "implementation/svf0/EVALUATOR_ONLY_SCHEMA_V1.json",
+    "implementation/svf0/SEED_MANIFEST_V1.json",
+    "implementation/svf0/RECURRENT_BASE_CONFIG_V1.json",
+    "implementation/svf0/REPLAY_CONFIG_V1.json",
+    "implementation/svf0/RESET_REFERENCE_CONFIG_V1.json",
+    "implementation/svf0/EXECUTION_POLICY_V4.json",
+    "implementation/svf0/PARAMETER_DISTRIBUTION_V6.json",
+    "implementation/svf0/STATE_SCOPE_MANIFEST_V6.json",
+    "implementation/svf0/RESOURCE_MEASUREMENT_CONTRACT_V6.json",
+    "implementation/svf0/NEGATIVE_CONTROL_SPEC_V6.json",
+    "implementation/svf0/SCORING_AND_DECISION_RULES_V6.json"
+  ],
+  "source_modules": [
+    "src/noema/svf0_runner.py",
+    "src/noema/svf0_statistics.py",
+    "src/noema/svf0_experiment.py",
+    "src/noema/svf0_evaluator.py"
+  ],
+  "supersedes_support_bundle": "implementation/svf0/SUPPORT_BUNDLE_V5.json",
+  "execution_authority": false,
+  "focused_i1": {
+    "tests_passed": 34,
+    "tests_present_total": 103,
+    "e0_valid_path_executed": false
+  },
+  "i1_exact_full_suite": {
+    "platform": "Windows",
+    "python": "3.13.5",
+    "tests_present": 103,
+    "tests_executed": 103,
+    "tests_passed": 103,
+    "known_failures": 0,
+    "e0_valid_path_executed": false
+  }
+}

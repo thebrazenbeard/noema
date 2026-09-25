@@ -1,0 +1,29 @@
+{
+  "schema_id": "NOEMA_SVF0_EXECUTION_POLICY_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "authority": "INERT_SOURCE_ONLY_NO_E0",
+  "event_order": [
+    "evaluator constructs the next opaque event internally",
+    "C1 and C2 predictions are computed from state committed after the previous revealed event",
+    "prediction tickets are committed before the next learner-visible outcome is revealed",
+    "the learner-visible event is revealed identically to C1 and C2",
+    "proper score is evaluated against the committed prediction",
+    "C1 performs exactly one live recurrent update",
+    "C2 performs exactly the same live recurrent update and stores the opaque transition pair",
+    "C2 may then perform at most one replay update selected by select_most_recent_replay_indices",
+    "resource measurements and validity state are recorded without coercing missing values to zero"
+  ],
+  "prediction": "predict_recurrent",
+  "c1_live_update": "transition_recurrent",
+  "c2_live_update": "transition_recurrent_c2_once",
+  "c2_replay_update": "transition_recurrent_c2_replay",
+  "c2_replay_selector": "select_most_recent_replay_indices",
+  "replay_timing": "AFTER_LIVE_UPDATE",
+  "reset_reference": "predict_reset_reference",
+  "reset_reference_carried_state": "NONE",
+  "max_events_per_world": 128,
+  "checkpointing_used": false,
+  "full_history_automatic_refit_allowed": false,
+  "post_freeze_tuning_allowed": false
+}

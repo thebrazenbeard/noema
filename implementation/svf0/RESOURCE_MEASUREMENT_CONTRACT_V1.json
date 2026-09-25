@@ -1,0 +1,32 @@
+{
+  "schema_id": "NOEMA_SVF0_RESOURCE_MEASUREMENT_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "runtime": "CPython 3.13.5",
+  "measurement_method_id": "NOEMA_SVF0_PYTHON_FIXED_ENVELOPE_V1",
+  "rules": {
+    "cpu_clock": "time.process_time_ns",
+    "resident_memory": "tracemalloc peak bytes measured over each candidate operation window",
+    "durable_state": "len(pickle.dumps(state, protocol=5))",
+    "update_cpu": "live update plus any replay updates are charged together to max_update_cpu_seconds_per_event",
+    "query_cpu": "prediction call only",
+    "replay": "every replay update counted and charged; missing replay timing invalidates the event",
+    "shared_overhead": "candidate-specific orchestration overhead is charged to that candidate; evaluator-only world generation is excluded from learner resource comparison",
+    "absent_feature_zero": "structural/scope/audition/base-shadow classes may be recorded as exact zero only when the frozen candidate source exposes no invoked path for that class",
+    "missing_measurement": "INVALIDATE_FIXED_ENVELOPE_POINT",
+    "over_budget": "INVALIDATE_FIXED_ENVELOPE_POINT"
+  },
+  "envelope": {
+    "max_resident_memory_bytes": 8388608,
+    "max_durable_state_bytes": 1048576,
+    "max_update_cpu_seconds_per_event": 0.05,
+    "max_query_cpu_seconds_per_event": 0.01,
+    "max_shadow_auditions_per_event": 0
+  },
+  "replay": {
+    "raw_buffer_capacity_events": 32,
+    "max_replay_updates_per_event": 1,
+    "sampling_policy": "DETERMINISTIC_MOST_RECENT_ELIGIBLE_V1",
+    "priority_provenance": "LEARNER_VISIBLE_ORDER_ONLY"
+  }
+}

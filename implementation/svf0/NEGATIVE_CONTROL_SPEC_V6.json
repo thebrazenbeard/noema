@@ -1,0 +1,24 @@
+{
+  "schema_id": "NOEMA_SVF0_NEGATIVE_CONTROL_V6",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_choice": true,
+  "implementation_source_commit": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
+  "generator": "src/noema/svf0.py::svf0_negative_control_point",
+  "executor": "src/noema/svf0_experiment.py::execute_negative_control_seed",
+  "dependency_lag_events": 1,
+  "world": {
+    "coefficient": 0.4,
+    "stable_coefficient": -0.2,
+    "noise_half_width": 0.05,
+    "max_events": 128
+  },
+  "regime_change_present": false,
+  "purpose": "Detect apparent replay advantage when the preregistered changed-dependency event is absent.",
+  "derived_variable": {
+    "negative_control_mean_nll_delta": "C2 mean Gaussian NLL minus C1 mean Gaussian NLL over the frozen negative-control window"
+  },
+  "acceptance_rule": "expr:negative_control_mean_nll_delta<=0.02",
+  "destructive_search_not_applicable": true,
+  "evaluator": "src/noema/svf0_evaluator.py::evaluate_gate1",
+  "result_provenance": "logical_subject_id + deterministic plan_commitment required"
+}

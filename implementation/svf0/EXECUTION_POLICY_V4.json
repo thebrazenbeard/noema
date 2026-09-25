@@ -1,0 +1,42 @@
+{
+  "schema_id": "NOEMA_SVF0_EXECUTION_POLICY_V4",
+  "classification": "IP_CONFIDENTIAL",
+  "logical_subject_id": "NOEMA_SVF0_RECURRENT_GATE1_V5",
+  "authority": "INERT_SOURCE_ONLY_NO_E0",
+  "source_bindings": {
+    "single_step_runner": "src/noema/svf0_runner.py::execute_svf0_step",
+    "experiment_plan": "src/noema/svf0_experiment.py::SVF0ExperimentPlan",
+    "primary_seed_executor": "src/noema/svf0_experiment.py::execute_primary_seed",
+    "negative_control_seed_executor": "src/noema/svf0_experiment.py::execute_negative_control_seed",
+    "e0_authority": "src/noema/svf0_experiment.py::E0ExecutionAuthority",
+    "statistics": "src/noema/svf0_statistics.py",
+    "evaluator": "src/noema/svf0_evaluator.py::evaluate_experiment_result",
+    "plan_commitment": "src/noema/svf0_experiment.py::experiment_plan_commitment"
+  },
+  "event_order": [
+    "construct the exact frozen subject-bound experiment plan and deterministic plan commitment",
+    "world point is constructed evaluator-side only after valid subject-matched E0 authority is present",
+    "C1, C2, and reset predictions are computed from state committed after the previous revealed event",
+    "all prediction tickets are committed before learner-visible outcome reveal",
+    "the identical learner-visible event is revealed to all developmental candidates",
+    "SVF-0 intervention packets are rejected",
+    "proper score and per-channel Gaussian NLLs are persisted against each committed prediction",
+    "C1 performs exactly one live recurrent update",
+    "C2 performs the identical live recurrent update, stores the current opaque transition, then replays at most one strictly prior transition; the just-stored current transition is ineligible until a later event",
+    "resource measurements are adjudicated fail-closed; any candidate resource failure invalidates the whole point",
+    "seed results bind logical subject and plan commitment; Gate-1 evaluation recomputes commitments/scores and rejects mixed or corrupted evidence"
+  ],
+  "replay_timing": "AFTER_LIVE_UPDATE_STRICTLY_PRIOR_ONLY",
+  "checkpointing_used": false,
+  "full_history_automatic_refit_allowed": false,
+  "post_freeze_tuning_allowed": false,
+  "frozen_seed_count": 8,
+  "max_events_per_world": 128,
+  "valid_e0_path_requires_subject_matched_authority": true,
+  "no_authority_path_must_fail_before_world_generation": true,
+  "execution_authority_granted": false,
+  "current_transition_same_step_replay_allowed": false,
+  "plan_commitment_required": true,
+  "evaluator_integrity_recomputation_required": true,
+  "resource_measurement_note": "Windows resident-memory path uses explicitly typed 64-bit HANDLE/DWORD/BOOL ctypes signatures; Unix path remains getrusage-based."
+}

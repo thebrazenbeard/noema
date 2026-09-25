@@ -1,0 +1,49 @@
+{
+  "schema_id": "NOEMA_SVF0_STATE_SCOPE_V6",
+  "classification": "IP_CONFIDENTIAL",
+  "implementation_source_commit": "dcd8bed41b7ac3d7e41be5baed9ec31dcf7e76e7",
+  "cross_world_transfer_used": false,
+  "within_world": {
+    "C1": [
+      "RecurrentGaussianState.weights",
+      "RecurrentGaussianState.variance",
+      "RecurrentGaussianState.previous",
+      "RecurrentGaussianState.count"
+    ],
+    "C2": [
+      "RecurrentGaussianState.weights",
+      "RecurrentGaussianState.variance",
+      "RecurrentGaussianState.previous",
+      "RecurrentGaussianState.count",
+      "RecurrentReplayBuffer.items",
+      "RecurrentReplayBuffer.capacity"
+    ],
+    "RESET_REFERENCE": []
+  },
+  "replay_item_scope": [
+    "RecurrentTransition.context",
+    "RecurrentTransition.outcome"
+  ],
+  "between_worlds": {
+    "C1": "RESET_TO_FROZEN_INITIAL_STATE",
+    "C2": "RESET_TO_FROZEN_INITIAL_STATE",
+    "RESET_REFERENCE": "STATELESS_RECONSTRUCTION"
+  },
+  "initial_state": {
+    "dimension": 3,
+    "weights": "3x3 all zeros",
+    "variance": [
+      1,
+      1,
+      1
+    ],
+    "previous": null,
+    "count": 0,
+    "replay_items": [],
+    "replay_capacity": 32
+  },
+  "replay_updates_increment_base_count": true,
+  "evaluator_lineage_ids_learner_visible": false,
+  "replay_eligibility": "STRICTLY_PRIOR_TRANSITIONS_ONLY",
+  "current_transition_same_step_replay_allowed": false
+}

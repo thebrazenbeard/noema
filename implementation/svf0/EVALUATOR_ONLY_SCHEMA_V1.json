@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:noema:svf0:evaluator-only:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evaluator_seed",
+    "evaluator_step_index",
+    "regime_after_change",
+    "changed_coefficient",
+    "stable_coefficient"
+  ],
+  "properties": {
+    "evaluator_seed": {
+      "type": "integer"
+    },
+    "evaluator_step_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "regime_after_change": {
+      "type": "boolean"
+    },
+    "changed_coefficient": {
+      "type": "number"
+    },
+    "stable_coefficient": {
+      "type": "number"
+    }
+  }
+}

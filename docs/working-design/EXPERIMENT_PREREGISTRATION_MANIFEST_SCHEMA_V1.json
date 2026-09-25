@@ -1,0 +1,612 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:noema:experiment-preregistration-manifest:v1",
+  "title": "Noema Experiment Preregistration Manifest V1",
+  "description": "IP_CONFIDENTIAL. Strict inert preregistration schema for future authorized Noema SVF-0/SVF-1 experiments. This schema does not authorize execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "classification",
+    "status",
+    "subject",
+    "effect_boundary",
+    "information_boundary",
+    "candidates",
+    "world",
+    "stream_contract",
+    "resource_contract",
+    "audition_scope_contract",
+    "scoring_contract",
+    "statistics_contract",
+    "controls",
+    "restart_contract",
+    "freeze_contract"
+  ],
+  "properties": {
+    "schema_version": {"const": "NOEMA_EXPERIMENT_PREREGISTRATION_MANIFEST_V1"},
+    "classification": {"enum": ["IP_CONFIDENTIAL", "IP_REVIEW_REQUIRED"]},
+    "status": {"const": "PREREGISTERED_INERT_UNTIL_SEPARATE_EXECUTION_AUTHORITY"},
+    "subject": {"$ref": "#/$defs/subject"},
+    "effect_boundary": {"$ref": "#/$defs/effect_boundary"},
+    "information_boundary": {"$ref": "#/$defs/information_boundary"},
+    "candidates": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/candidate"}
+    },
+    "world": {"$ref": "#/$defs/world"},
+    "stream_contract": {"$ref": "#/$defs/stream_contract"},
+    "resource_contract": {"$ref": "#/$defs/resource_contract"},
+    "audition_scope_contract": {"$ref": "#/$defs/audition_scope_contract"},
+    "scoring_contract": {"$ref": "#/$defs/scoring_contract"},
+    "statistics_contract": {"$ref": "#/$defs/statistics_contract"},
+    "controls": {"$ref": "#/$defs/controls"},
+    "restart_contract": {"$ref": "#/$defs/restart_contract"},
+    "freeze_contract": {"$ref": "#/$defs/freeze_contract"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "subject": {
+            "properties": {"stage": {"const": "SVF-0"}},
+            "required": ["stage"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "candidates": {
+            "allOf": [
+              {"contains": {"properties": {"role": {"const": "C1"}}, "required": ["role"]}},
+              {"contains": {"properties": {"role": {"const": "C2"}}, "required": ["role"]}}
+            ]
+          },
+          "world": {
+            "properties": {
+              "intervention_mode": {"const": "NONE"},
+              "passive_observational_equivalence_required": {"const": false}
+            }
+          },
+          "scoring_contract": {
+            "properties": {
+              "primary_claims": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {"const": "S"}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "subject": {
+            "properties": {"stage": {"const": "SVF-1"}},
+            "required": ["stage"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "candidates": {
+            "allOf": [
+              {"contains": {"properties": {"role": {"const": "C2"}}, "required": ["role"]}},
+              {"contains": {"properties": {"role": {"const": "C4"}}, "required": ["role"]}}
+            ]
+          },
+          "world": {
+            "properties": {
+              "intervention_mode": {"const": "EXTERNALLY_SCHEDULED"},
+              "passive_observational_equivalence_required": {"const": true}
+            },
+            "required": [
+              "intervention_mode",
+              "passive_observational_equivalence_required",
+              "observational_equivalence_verification"
+            ]
+          },
+          "controls": {
+            "properties": {
+              "semantic_cheat_diagnostic": {"const": true},
+              "intervention_blind_ablation": {"const": true},
+              "replay_ablation": {"const": true},
+              "reset_refit_diagnostic": {"const": true},
+              "premature_commitment_ablation": {"const": true},
+              "uniform_audition_rival": {"const": true},
+              "negative_structural_value_worlds": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha40": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nonempty_string": {"type": "string", "minLength": 1},
+    "artifact_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "path"],
+      "properties": {
+        "repository": {"$ref": "#/$defs/nonempty_string"},
+        "commit": {"$ref": "#/$defs/sha40"},
+        "path": {"$ref": "#/$defs/nonempty_string"},
+        "git_blob": {"$ref": "#/$defs/sha40"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project",
+        "repository",
+        "design_base_commit",
+        "implementation_subject_commit",
+        "experiment_family",
+        "stage",
+        "manifest_logical_id",
+        "created_at"
+      ],
+      "properties": {
+        "project": {"const": "Noema"},
+        "repository": {"const": "thebrazenbeard/noema"},
+        "design_base_commit": {"$ref": "#/$defs/sha40"},
+        "implementation_subject_commit": {"$ref": "#/$defs/sha40"},
+        "experiment_family": {"const": "MINIMAL_STRUCTURAL_VALUE_FALSIFICATION"},
+        "stage": {"enum": ["SVF-0", "SVF-1"]},
+        "manifest_logical_id": {"$ref": "#/$defs/nonempty_string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "supersedes_manifest": {
+          "oneOf": [
+            {"$ref": "#/$defs/artifact_ref"},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "effect_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution_authorized_by_this_manifest",
+        "training_authorized_by_this_manifest",
+        "paid_compute_authorized_by_this_manifest",
+        "merge_authorized_by_this_manifest",
+        "deployment_authorized_by_this_manifest",
+        "publication_authorized_by_this_manifest",
+        "provider_or_credential_mutation_authorized_by_this_manifest",
+        "separate_execution_authority_required"
+      ],
+      "properties": {
+        "execution_authorized_by_this_manifest": {"const": false},
+        "training_authorized_by_this_manifest": {"const": false},
+        "paid_compute_authorized_by_this_manifest": {"const": false},
+        "merge_authorized_by_this_manifest": {"const": false},
+        "deployment_authorized_by_this_manifest": {"const": false},
+        "publication_authorized_by_this_manifest": {"const": false},
+        "provider_or_credential_mutation_authorized_by_this_manifest": {"const": false},
+        "separate_execution_authority_required": {"const": true}
+      }
+    },
+    "information_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "learner_visible_schema",
+        "evaluator_only_schema",
+        "learner_visible_field_names",
+        "evaluator_only_field_names",
+        "field_sets_must_be_disjoint",
+        "semantic_applicability_labels_exposed",
+        "hidden_world_state_exposed",
+        "future_derived_targets_exposed",
+        "evaluator_score_exposed",
+        "exact_intervention_success_truth_exposed"
+      ],
+      "properties": {
+        "learner_visible_schema": {"$ref": "#/$defs/artifact_ref"},
+        "evaluator_only_schema": {"$ref": "#/$defs/artifact_ref"},
+        "learner_visible_field_names": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/nonempty_string"}
+        },
+        "evaluator_only_field_names": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/nonempty_string"}
+        },
+        "field_sets_must_be_disjoint": {"const": true},
+        "semantic_applicability_labels_exposed": {"const": false},
+        "hidden_world_state_exposed": {"const": false},
+        "future_derived_targets_exposed": {"const": false},
+        "evaluator_score_exposed": {"const": false},
+        "exact_intervention_success_truth_exposed": {"const": false}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "role",
+        "source_commit",
+        "source_artifacts",
+        "information_condition_id",
+        "opportunity_condition_id",
+        "resource_condition_id",
+        "replay_policy_id",
+        "scope_policy_id",
+        "developmental_evidence_eligible"
+      ],
+      "properties": {
+        "candidate_id": {"$ref": "#/$defs/nonempty_string"},
+        "role": {"enum": ["C0", "C1", "C2", "C3", "C4", "REFERENCE", "ORACLE_DIAGNOSTIC", "CHEAT_DIAGNOSTIC"]},
+        "source_commit": {"$ref": "#/$defs/sha40"},
+        "source_artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/artifact_ref"}
+        },
+        "base_substrate_id": {
+          "oneOf": [
+            {"$ref": "#/$defs/nonempty_string"},
+            {"type": "null"}
+          ]
+        },
+        "information_condition_id": {"$ref": "#/$defs/nonempty_string"},
+        "opportunity_condition_id": {"$ref": "#/$defs/nonempty_string"},
+        "resource_condition_id": {"$ref": "#/$defs/nonempty_string"},
+        "replay_policy_id": {"$ref": "#/$defs/nonempty_string"},
+        "scope_policy_id": {"$ref": "#/$defs/nonempty_string"},
+        "developmental_evidence_eligible": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "role": {"enum": ["REFERENCE", "ORACLE_DIAGNOSTIC", "CHEAT_DIAGNOSTIC"]}
+            },
+            "required": ["role"]
+          },
+          "then": {
+            "properties": {
+              "developmental_evidence_eligible": {"const": false}
+            }
+          },
+          "else": {
+            "properties": {
+              "developmental_evidence_eligible": {"const": true}
+            }
+          }
+        }
+      ]
+    },
+    "world": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generator",
+        "parameter_distribution_commitment",
+        "seed_commitment",
+        "hidden_family_randomization_rule",
+        "intervention_mode",
+        "passive_observational_equivalence_required",
+        "negative_control_generator"
+      ],
+      "properties": {
+        "generator": {"$ref": "#/$defs/artifact_ref"},
+        "parameter_distribution_commitment": {"$ref": "#/$defs/sha256"},
+        "seed_commitment": {"$ref": "#/$defs/sha256"},
+        "hidden_family_randomization_rule": {"$ref": "#/$defs/nonempty_string"},
+        "intervention_mode": {"enum": ["NONE", "EXTERNALLY_SCHEDULED"]},
+        "intervention_schedule_commitment": {
+          "oneOf": [
+            {"$ref": "#/$defs/sha256"},
+            {"type": "null"}
+          ]
+        },
+        "passive_observational_equivalence_required": {"type": "boolean"},
+        "observational_equivalence_verification": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["analytic_check", "numeric_check", "numeric_tolerance"],
+              "properties": {
+                "analytic_check": {"const": true},
+                "numeric_check": {"const": true},
+                "numeric_tolerance": {"type": "number", "exclusiveMinimum": 0}
+              }
+            },
+            {"type": "null"}
+          ]
+        },
+        "negative_control_generator": {"$ref": "#/$defs/artifact_ref"}
+      }
+    },
+    "stream_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "temporal_order_preserved",
+        "predictions_committed_before_outcome",
+        "full_history_automatic_refit_allowed",
+        "identical_learner_visible_stream_required_for_primary_c2_c4_comparison",
+        "outcome_missingness_states_preserved"
+      ],
+      "properties": {
+        "temporal_order_preserved": {"const": true},
+        "predictions_committed_before_outcome": {"const": true},
+        "full_history_automatic_refit_allowed": {"const": false},
+        "identical_learner_visible_stream_required_for_primary_c2_c4_comparison": {"const": true},
+        "outcome_missingness_states_preserved": {"const": true},
+        "maximum_unresolved_outcome_horizon_events": {"type": "integer", "minimum": 0}
+      }
+    },
+    "resource_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource_views",
+        "measurement_method",
+        "fixed_total_envelope",
+        "replay_limits",
+        "structural_limits",
+        "checkpoint_limits"
+      ],
+      "properties": {
+        "resource_views": {"const": ["FIXED_TOTAL_ENVELOPE", "RESOURCE_PERFORMANCE_FRONTIER"]},
+        "measurement_method": {"$ref": "#/$defs/nonempty_string"},
+        "fixed_total_envelope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_resident_memory_bytes", "max_durable_state_bytes", "max_update_cpu_seconds_per_event", "max_query_cpu_seconds_per_event"],
+          "properties": {
+            "max_resident_memory_bytes": {"type": "integer", "minimum": 1},
+            "max_durable_state_bytes": {"type": "integer", "minimum": 1},
+            "max_update_cpu_seconds_per_event": {"type": "number", "exclusiveMinimum": 0},
+            "max_query_cpu_seconds_per_event": {"type": "number", "exclusiveMinimum": 0}
+          }
+        },
+        "replay_limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["raw_buffer_capacity_events", "max_replay_updates_per_event", "replay_compute_charged", "replay_selection_policy_id"],
+          "properties": {
+            "raw_buffer_capacity_events": {"type": "integer", "minimum": 0},
+            "max_replay_updates_per_event": {"type": "integer", "minimum": 0},
+            "replay_compute_charged": {"const": true},
+            "replay_selection_policy_id": {"$ref": "#/$defs/nonempty_string"}
+          }
+        },
+        "structural_limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_active_candidates", "max_proposals_per_event", "structural_memory_charged", "scope_compute_charged", "audition_compute_charged"],
+          "properties": {
+            "max_active_candidates": {"type": "integer", "minimum": 0},
+            "max_proposals_per_event": {"type": "integer", "minimum": 0},
+            "structural_memory_charged": {"const": true},
+            "scope_compute_charged": {"const": true},
+            "audition_compute_charged": {"const": true}
+          }
+        },
+        "checkpoint_limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_checkpoint_bytes", "max_checkpoint_seconds", "max_restart_to_ready_seconds"],
+          "properties": {
+            "max_checkpoint_bytes": {"type": "integer", "minimum": 1},
+            "max_checkpoint_seconds": {"type": "number", "exclusiveMinimum": 0},
+            "max_restart_to_ready_seconds": {"type": "number", "exclusiveMinimum": 0}
+          }
+        }
+      }
+    },
+    "audition_scope_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope_ticket_required_before_outcome",
+        "audition_separate_from_candidate_influence",
+        "simple_audition_rival_required",
+        "simple_audition_probability",
+        "selection_probability_logged_before_outcome",
+        "zero_support_confidence_allowed",
+        "off_policy_estimator_may_override_zero_support",
+        "representation_drift_requires_support_disposition",
+        "support_class_thresholds"
+      ],
+      "properties": {
+        "scope_ticket_required_before_outcome": {"const": true},
+        "audition_separate_from_candidate_influence": {"const": true},
+        "simple_audition_rival_required": {"const": true},
+        "simple_audition_probability": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "selection_probability_logged_before_outcome": {"const": true},
+        "zero_support_confidence_allowed": {"const": false},
+        "off_policy_estimator_may_override_zero_support": {"const": false},
+        "representation_drift_requires_support_disposition": {"const": true},
+        "support_class_thresholds": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"type": "number", "minimum": 0}
+        }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_id", "claim", "direction", "comparator", "aggregation_rule", "threshold_rule", "support_requirement"],
+      "properties": {
+        "metric_id": {"$ref": "#/$defs/nonempty_string"},
+        "claim": {"enum": ["S", "T", "L", "G"]},
+        "direction": {"enum": ["HIGHER_IS_BETTER", "LOWER_IS_BETTER"]},
+        "comparator": {"$ref": "#/$defs/nonempty_string"},
+        "aggregation_rule": {"$ref": "#/$defs/nonempty_string"},
+        "threshold_rule": {"$ref": "#/$defs/nonempty_string"},
+        "support_requirement": {"$ref": "#/$defs/nonempty_string"}
+      }
+    },
+    "scoring_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proper_scoring_rule",
+        "primary_claims",
+        "primary_metrics",
+        "c2_vs_c4_external_comparison_required",
+        "c4_internal_base_shadow_diagnostic",
+        "counterfactual_unobserved_never_scored_as_observed",
+        "post_result_metric_substitution_allowed"
+      ],
+      "properties": {
+        "proper_scoring_rule": {"$ref": "#/$defs/nonempty_string"},
+        "primary_claims": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["S", "T", "L", "G"]}
+        },
+        "primary_metrics": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/metric"}
+        },
+        "c2_vs_c4_external_comparison_required": {"const": true},
+        "c4_internal_base_shadow_diagnostic": {"type": "boolean"},
+        "counterfactual_unobserved_never_scored_as_observed": {"const": true},
+        "post_result_metric_substitution_allowed": {"const": false}
+      }
+    },
+    "statistics_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seed_count",
+        "confidence_level",
+        "uncertainty_method",
+        "paired_comparison_used_where_causally_valid",
+        "multiple_comparison_rule",
+        "stopping_rule",
+        "maximum_worlds",
+        "maximum_events_per_world",
+        "kill_criteria"
+      ],
+      "properties": {
+        "seed_count": {"type": "integer", "minimum": 2},
+        "confidence_level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "uncertainty_method": {"$ref": "#/$defs/nonempty_string"},
+        "paired_comparison_used_where_causally_valid": {"const": true},
+        "multiple_comparison_rule": {"$ref": "#/$defs/nonempty_string"},
+        "stopping_rule": {"$ref": "#/$defs/nonempty_string"},
+        "maximum_worlds": {"type": "integer", "minimum": 1},
+        "maximum_events_per_world": {"type": "integer", "minimum": 1},
+        "kill_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/nonempty_string"}
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semantic_cheat_diagnostic",
+        "intervention_blind_ablation",
+        "replay_ablation",
+        "reset_refit_diagnostic",
+        "premature_commitment_ablation",
+        "no_meta_learning_ablation",
+        "uniform_audition_rival",
+        "negative_structural_value_worlds"
+      ],
+      "properties": {
+        "semantic_cheat_diagnostic": {"type": "boolean"},
+        "intervention_blind_ablation": {"type": "boolean"},
+        "replay_ablation": {"type": "boolean"},
+        "reset_refit_diagnostic": {"type": "boolean"},
+        "premature_commitment_ablation": {"type": "boolean"},
+        "no_meta_learning_ablation": {"type": "boolean"},
+        "uniform_audition_rival": {"type": "boolean"},
+        "negative_structural_value_worlds": {"type": "boolean"}
+      }
+    },
+    "restart_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkpointing_used",
+        "restart_equivalence_claimed",
+        "persist_outstanding_prediction_action_scope_tickets",
+        "persist_unresolved_outcomes",
+        "persist_assignment_rng_state",
+        "persist_audit_policy_state",
+        "persist_support_intervals",
+        "persist_representation_version_boundaries",
+        "persist_stopping_rule_state",
+        "loss_of_required_state_forfeits_restart_equivalence"
+      ],
+      "properties": {
+        "checkpointing_used": {"type": "boolean"},
+        "restart_equivalence_claimed": {"type": "boolean"},
+        "persist_outstanding_prediction_action_scope_tickets": {"const": true},
+        "persist_unresolved_outcomes": {"const": true},
+        "persist_assignment_rng_state": {"const": true},
+        "persist_audit_policy_state": {"const": true},
+        "persist_support_intervals": {"const": true},
+        "persist_representation_version_boundaries": {"const": true},
+        "persist_stopping_rule_state": {"const": true},
+        "loss_of_required_state_forfeits_restart_equivalence": {"const": true}
+      }
+    },
+    "freeze_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome_visibility_before_freeze",
+        "mutable_after_freeze",
+        "change_after_freeze_creates_new_subject",
+        "freeze_receipt_locator",
+        "self_hash_circularity_avoided",
+        "receipt_must_bind_manifest_commit_path_and_blob"
+      ],
+      "properties": {
+        "outcome_visibility_before_freeze": {"const": false},
+        "mutable_after_freeze": {"const": false},
+        "change_after_freeze_creates_new_subject": {"const": true},
+        "freeze_receipt_locator": {"$ref": "#/$defs/nonempty_string"},
+        "self_hash_circularity_avoided": {"const": true},
+        "receipt_must_bind_manifest_commit_path_and_blob": {"const": true}
+      }
+    }
+  },
+  "x-noema-invariants": [
+    "candidate_id values MUST be unique even when candidate objects differ in other fields; standard JSON Schema uniqueItems is insufficient for key uniqueness, so the future manifest validator must enforce this.",
+    "learner_visible_field_names and evaluator_only_field_names MUST be disjoint; standard JSON Schema cannot enforce cross-array disjointness, so the future manifest validator must.",
+    "Evaluator-only fields MUST have no learner ingress unless a new subject explicitly admits an ordinary learner-visible field through the governed information boundary.",
+    "Each candidate source_commit MUST match the commits bound by its source_artifacts at execution; a mismatch invalidates the subject.",
+    "C2 and C4 primary comparisons MUST receive identical learner-visible world streams and externally scheduled interventions in SVF-1.",
+    "Every scored prediction/action/scope decision MUST be committed before its scored outcome becomes visible.",
+    "Replay records MUST NOT be enriched with evaluator annotations or future-derived semantic labels after original experience.",
+    "NOT_AUDITED, COUNTERFACTUAL_UNOBSERVED, unresolved, invalidated, success, and failure MUST remain distinct through aggregation.",
+    "Every primary_metrics claim value MUST be present in primary_claims; the future manifest validator must enforce this cross-collection invariant.",
+    "If transfer claim T is primary, no_meta_learning_ablation MUST be true.",
+    "Zero or unknown support MUST NOT be transformed into strong scope confidence by IPS, doubly robust estimation, learned reward models, or another estimator.",
+    "A material representation change MUST close or explicitly transport the prior support interval before confidence is reused.",
+    "Resource charges for replay, structure, scope inference, audition, checkpointing, and candidate probation MUST be nonzero when resources are actually consumed; unmeasured is not zero.",
+    "Changing candidate source, learner-visible schema, world generator, seed/parameter commitment, resource envelope, scoring rule, support thresholds, controls, stopping rule, or acceptance criteria after freeze creates a new experiment subject.",
+    "This manifest is evidence/governance metadata only and can never itself constitute execution, training, merge, deployment, spend, publication, credential, provider, or repository-visibility authority."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_id": "NOEMA_SVF0_PARAMETER_DISTRIBUTION_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "distribution_kind": "DEGENERATE_SINGLE_PARAMETER_SET",
+  "implementation_choice": true,
+  "world": {
+    "change_point": 64,
+    "coefficient_before": 0.8,
+    "coefficient_after": -0.4,
+    "stable_coefficient": 0.3,
+    "noise_half_width": 0.05,
+    "max_events": 128
+  },
+  "generator_rule": "src/noema/svf0.py::svf0_point",
+  "lane_rule": "SHA256('NOEMA_SVF0_V1:{seed}:{step}:{lane}') first 64 bits mapped to [0,1), then to [-1,1)"
+}

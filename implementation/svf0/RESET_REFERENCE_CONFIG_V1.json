@@ -1,0 +1,10 @@
+{
+  "schema_id": "NOEMA_SVF0_RESET_REFERENCE_CONFIG_V1",
+  "classification": "IP_CONFIDENTIAL",
+  "developmental_evidence_eligible": false,
+  "prediction": "predict_reset_reference",
+  "dimension": 3,
+  "variance": 1,
+  "carried_state": "NONE",
+  "purpose": "reset control for cross-time persistence advantage"
+}
