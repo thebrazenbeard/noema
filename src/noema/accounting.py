@@ -194,8 +194,11 @@ class FixedEnvelope:
     def __post_init__(self) -> None:
         if self.max_resident_memory_bytes < 1 or self.max_durable_state_bytes < 1:
             raise ValueError("memory limits must be positive")
-        if self.max_update_cpu_seconds_per_event <= 0 or self.max_query_cpu_seconds_per_event <= 0:
-            raise ValueError("CPU limits must be positive")
+        if (not math.isfinite(self.max_update_cpu_seconds_per_event)
+                or not math.isfinite(self.max_query_cpu_seconds_per_event)
+                or self.max_update_cpu_seconds_per_event <= 0
+                or self.max_query_cpu_seconds_per_event <= 0):
+            raise ValueError("CPU limits must be finite and positive")
         if self.max_shadow_auditions_per_event < 0:
             raise ValueError("shadow audition limit must be nonnegative")
 
