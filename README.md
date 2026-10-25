@@ -44,3 +44,13 @@ Source presence, deterministic verification, experiment execution, empirical evi
 - `governance/IMPLEMENTATION_CURRENTNESS.json` — implementation currentness and authority ceiling.
 
 The project does **not** assume that an LLM, tokenizer, SPM, or existing AI architecture belongs at the core. Those remain candidate tools only where evidence supports them.
+
+## Source checkout safety
+
+Noema does not need Node.js, editor folder-open tasks, or executable files in
+`public/fonts/` for its Python research tests. Automatic editor tasks are
+disabled in the repository settings. The dependency-free
+`python scripts/check_editor_source_safety.py` check rejects editor-startup
+execution and disguised script files in the font directory; both CI workflows
+run it before installing Python dependencies. This is a source-level control,
+not evidence that a particular workstation or deployment is secure.
