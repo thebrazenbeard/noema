@@ -42,7 +42,13 @@ class ArtifactRef:
             raise ValueError("repository must be owner/name")
         if not _SHA40.fullmatch(self.commit):
             raise ValueError("commit must be an exact 40-character lowercase hex SHA")
-        if not self.path or self.path.startswith("/") or ".." in self.path.split("/"):
+        if (
+            not self.path
+            or "\\" in self.path
+            or ":" in self.path
+            or "\x00" in self.path
+            or any(segment in {"", ".", ".."} for segment in self.path.split("/"))
+        ):
             raise ValueError("path must be a repository-relative immutable artifact path")
         if self.git_blob is not None and not _SHA40.fullmatch(self.git_blob):
             raise ValueError("git_blob must be 40-character lowercase hex")
