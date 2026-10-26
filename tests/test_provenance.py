@@ -57,6 +57,14 @@ def test_resolver_rejects_git_blob_mismatch():
         "src/x.py/",
         "src/unsafe\x00name.py",
         "src/x:y.py",
+        "src/CON",
+        "src/aux.txt",
+        "src/dir/LPT1.cfg",
+        "src/COM9",
+        "src/name.",
+        "src/name ",
+        "src/x\n.py",
+        "src/x\x7f.py",
     ),
 )
 def test_artifact_ref_rejects_noncanonical_or_unsafe_paths(path):
