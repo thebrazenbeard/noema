@@ -1,4 +1,5 @@
 from noema.provenance import ArtifactRef, ArtifactRecord, DictArtifactResolver, canonical_json_bytes
+import pytest
 
 
 def test_canonical_json_is_order_independent():
@@ -42,3 +43,34 @@ def test_resolver_rejects_git_blob_mismatch():
         assert "git_blob" in str(exc)
     else:
         raise AssertionError("git blob mismatch accepted")
+
+
+@pytest.mark.parametrize(
+    "path",
+    (
+        "src\\..\\secrets.env",
+        "C:\\secrets.env",
+        "src/./x.py",
+        "./x.py",
+        "src//x.py",
+        "src/../x.py",
+        "src/x.py/",
+        "src/unsafe\x00name.py",
+        "src/x:y.py",
+        "src/CON",
+        "src/aux.txt",
+        "src/dir/LPT1.cfg",
+        "src/COM9",
+        "src/name.",
+        "src/name ",
+        "src/x\n.py",
+        "src/x\x7f.py",
+    ),
+)
+def test_artifact_ref_rejects_noncanonical_or_unsafe_paths(path):
+    with pytest.raises(ValueError, match="repository-relative"):
+        ArtifactRef(
+            repository="thebrazenbeard/noema",
+            commit="a" * 40,
+            path=path,
+        )
