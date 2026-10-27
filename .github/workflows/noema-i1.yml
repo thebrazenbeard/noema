@@ -23,3 +23,38 @@ jobs:
       - run: python -m pip install -e ".[test]"
       - run: python -m pytest -q
       - run: python -m compileall -q src tests
+
+  # The default pull_request checkout above is GitHub's synthetic merge commit.
+  # Test the literal submitted source independently so a passing merge-tree
+  # check is never mistaken for an exact-head I1 qualification receipt.
+  exact-pr-head:
+    if: github.event_name == 'pull_request'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.number }}/head
+          persist-credentials: false
+      - name: Bind checkout to exact pull request head
+        shell: pwsh
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          $actual = git rev-parse HEAD
+          if ($actual -ne $env:EXPECTED_HEAD) {
+            throw "PR head changed during checkout: expected $env:EXPECTED_HEAD, got $actual"
+          }
+          if (git status --porcelain) {
+            throw "Exact-head checkout is not clean"
+          }
+          Write-Output "NOEMA_EXACT_PR_HEAD=$actual"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.5"
+      - run: python scripts/check_editor_source_safety.py
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[test]"
+      - name: Record exact runtime
+        run: python -c "import sys, jsonschema, pytest; print(sys.version); print('jsonschema', jsonschema.__version__); print('pytest', pytest.__version__)"
+      - run: python -m pytest -q
+      - run: python -m compileall -q src tests
