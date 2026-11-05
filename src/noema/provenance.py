@@ -8,6 +8,23 @@ from typing import Mapping
 
 _SHA40 = re.compile(r"^[0-9a-f]{40}$")
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_WINDOWS_RESERVED = frozenset(
+    {"con", "prn", "aux", "nul", "conin$", "conout$"}
+    | {f"com{i}" for i in range(1, 10)}
+    | {f"lpt{i}" for i in range(1, 10)}
+)
+
+
+def _canonical_artifact_path(path: str) -> bool:
+    if not isinstance(path, str) or not path or "\\" in path or ":" in path:
+        return False
+    if any(ord(char) < 32 or ord(char) == 127 for char in path):
+        return False
+    for segment in path.split("/"):
+        if (segment in {"", ".", ".."} or segment.endswith((".", " "))
+                or segment.casefold().split(".", 1)[0] in _WINDOWS_RESERVED):
+            return False
+    return True
 
 
 def canonical_json_bytes(value: object) -> bytes:
@@ -42,7 +59,7 @@ class ArtifactRef:
             raise ValueError("repository must be owner/name")
         if not _SHA40.fullmatch(self.commit):
             raise ValueError("commit must be an exact 40-character lowercase hex SHA")
-        if not self.path or self.path.startswith("/") or ".." in self.path.split("/"):
+        if not _canonical_artifact_path(self.path):
             raise ValueError("path must be a repository-relative immutable artifact path")
         if self.git_blob is not None and not _SHA40.fullmatch(self.git_blob):
             raise ValueError("git_blob must be 40-character lowercase hex")
