@@ -1,9 +1,11 @@
-"""Regression tests for the dependency-free editor startup source guard."""
+"""Source-only regression coverage for editor autorun and disguised font files.
 
+No VS Code task, Node payload, or font-like executable is ever launched.
+"""
+
+import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
-import pytest
 
 from scripts.check_editor_source_safety import check_source
 
@@ -11,90 +13,96 @@ from scripts.check_editor_source_safety import check_source
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_actual_checkout_has_no_editor_autorun_or_nonfont_script():
-    assert check_source(ROOT) == ()
+class WorkspaceStartupSafetyTests(unittest.TestCase):
+    def setUp(self):
+        directory = TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.root = Path(directory.name)
 
+    def write_editor(self, filename, content):
+        path = self.root / ".vscode" / filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
 
-def test_jsonc_editor_task_and_automatic_settings_are_rejected():
-    with TemporaryDirectory() as directory:
-        root = Path(directory)
-        editor = root / ".vscode"
-        editor.mkdir()
-        (editor / "tasks.json").write_text(
-            '{"tasks":[{"runOn":"folderOpen", "command":"node public/fonts/payload.woff2",},]}',
+    def findings(self):
+        return "\n".join(check_source(self.root))
+
+    def test_checkout_is_clear(self):
+        self.assertEqual(check_source(ROOT), ())
+
+    def test_bom_jsonc_comments_trailing_comma_and_inherited_args(self):
+        self.write_editor(
+            "tasks.json",
+            '\ufeff{\n// legit comment\n"tasks":[{"command":"node",'
+            '"windows":{"args":["public/fonts/fa-solid-600.ttf"]},'
+            '"runOptions":{"runOn":"folderOpen",},},],}',
+        )
+        findings = self.findings()
+        self.assertIn("editor folderOpen task", findings)
+        self.assertIn("task refers to font-directory asset", findings)
+
+    def test_application_scoped_autotask_setting_on_is_rejected(self):
+        self.write_editor(
+            "settings.json",
+            '{"task.allowAutomaticTasks":"on", "search.exclude":{"// literal":true},}',
+        )
+        self.assertIn("automatic editor tasks enabled", self.findings())
+
+    def test_unicode_escape_in_property_and_value_is_decoded(self):
+        self.write_editor("tasks.json", r'{"tasks":[{"run\u004fn":"folder\u004fpen"}]}')
+        self.assertIn("editor folderOpen task", self.findings())
+
+    def test_workspace_tasks_with_platform_specific_run_on_are_rejected(self):
+        path = self.root / "sample.code-workspace"
+        path.write_text(
+            '{"folders":[],"tasks":{"tasks":[{"linux":{"runOptions":'
+            '{"runOn":"folderOpen"}}}]}}',
             encoding="utf-8",
         )
-        (editor / "settings.json").write_text(
-            '{"task.allowAutomaticTasks":"on"}', encoding="utf-8"
+        self.assertIn("editor folderOpen task", self.findings())
+
+    def test_duplicate_keys_and_invalid_jsonc_fail_closed(self):
+        self.write_editor(
+            "tasks.json",
+            '{"tasks":[{"runOptions":{"runOn":"folderOpen","runOn":"default"}}]}',
         )
-        findings = check_source(root)
-        assert any("editor folderOpen task" in item for item in findings)
-        assert any("automatic editor tasks enabled" in item for item in findings)
-        assert any("command executes a font-directory file" in item for item in findings)
+        self.assertIn("invalid editor JSONC", self.findings())
+        self.write_editor("tasks.json", '{"tasks": [/* unterminated')
+        self.assertIn("invalid editor JSONC", self.findings())
 
-
-def test_workspace_folderopen_variant_is_rejected_without_tasks_json():
-    with TemporaryDirectory() as directory:
-        root = Path(directory)
-        (root / "project.code-workspace").write_text(
-            '{"tasks":{"runOn" : "folderOpen"}}', encoding="utf-8"
+    def test_valid_manual_task_and_jsonc_comment_are_allowed(self):
+        self.write_editor(
+            "tasks.json",
+            '{"tasks":[{"command":"python -m unittest",'
+            '"args":["--help"],"label":"manual"}],'
+            '/* "runOn":"folderOpen" is a comment */}',
         )
-        assert any("editor folderOpen task" in item for item in check_source(root))
+        self.write_editor("settings.json", '{"task.allowAutomaticTasks":"off"}')
+        self.assertEqual(check_source(self.root), ())
 
-
-def test_unicode_escaped_jsonc_keys_cannot_hide_editor_autorun():
-    with TemporaryDirectory() as directory:
-        root = Path(directory)
-        editor = root / ".vscode"
-        editor.mkdir()
-        (editor / "tasks.json").write_text(
-            r'{"tasks":[{"run\u004fn":"folder\u004fpen"}]}',
-            encoding="utf-8",
-        )
-        (editor / "settings.json").write_text(
-            r'{"task.allowAutomaticT\u0061sks":"\u006fn"}',
-            encoding="utf-8",
-        )
-        findings = check_source(root)
-        assert any("tasks.json: escaped editor configuration" in item for item in findings)
-        assert any("settings.json: escaped editor configuration" in item for item in findings)
-
-
-def test_disguised_script_as_font_is_rejected_but_real_woff2_is_allowed():
-    with TemporaryDirectory() as directory:
-        root = Path(directory)
-        fonts = root / "public" / "fonts"
+    def test_magic_prefixed_script_polyglot_cannot_replace_good_font(self):
+        fonts = self.root / "public" / "fonts"
         fonts.mkdir(parents=True)
-        (fonts / "normal.woff2").write_bytes(b"wOF2" + b"\0" * 100)
-        assert check_source(root) == ()
-        (fonts / "stealth.woff2").write_bytes(b"require('child_process')")
-        findings = check_source(root)
-        assert any("invalid font header" in item for item in findings)
-        (fonts / "stealth.woff2").unlink()
-        (fonts / "stealth.lkf").write_bytes(b"require('child_process')")
-        findings = check_source(root)
-        assert any("non-font file" in item for item in findings)
-
-
-def test_symlinked_font_directory_is_rejected_without_following_it():
-    with TemporaryDirectory() as directory:
-        root = Path(directory)
-        outside = root / "outside"
-        outside.mkdir()
-        (root / "public").mkdir()
-        try:
-            (root / "public" / "fonts").symlink_to(outside, target_is_directory=True)
-        except OSError as exc:
-            pytest.skip(f"directory symlinks unavailable: {exc}")
-        assert any("symlinked font directory" in item for item in check_source(root))
-
-
-def test_case_variant_editor_folder_is_scanned_for_autorun():
-    with TemporaryDirectory() as directory:
-        root = Path(directory)
-        editor = root / ".VSCode"
-        editor.mkdir()
-        (editor / "Tasks.JSON").write_text(
-            '{"tasks":[{"runOn":"folderOpen"}]}', encoding="utf-8"
+        (fonts / "fa-solid-900.ttf").write_bytes(
+            b"\x00\x01\x00\x00" + b"var payload = require('child_process')" * 4
         )
-        assert any("editor folderOpen task" in item for item in check_source(root))
+        self.assertIn("font digest differs from clean parent", self.findings())
+
+    def test_new_disguised_font_is_rejected_even_with_header(self):
+        fonts = self.root / "public" / "fonts"
+        fonts.mkdir(parents=True)
+        (fonts / "fa-solid-600.ttf").write_bytes(b"\x00\x01\x00\x00" + b"\x00" * 100)
+        self.assertIn("unreviewed font asset", self.findings())
+
+    def test_editor_symlink_is_rejected(self):
+        outside = self.root / "outside"
+        outside.mkdir()
+        try:
+            (self.root / ".vscode").symlink_to(outside, target_is_directory=True)
+        except OSError as exc:
+            self.skipTest(f"symlinks unavailable: {exc}")
+        self.assertIn("symlinked editor configuration", self.findings())
+
+
+if __name__ == "__main__":
+    unittest.main()
